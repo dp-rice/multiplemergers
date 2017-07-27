@@ -1,0 +1,103 @@
+{
+	"__default__":
+	{
+		"time" : "10:00:00",
+    "mem": "1G",
+		"out": "log/default-%j.out",
+		"err": "log/default-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	},
+	"generate_snplist":
+	{
+		"time" : "10:00:00",
+    "mem": "1G",
+		"out": "log/generate_snplist-%j.out",
+		"err": "log/generate_snplist-%j.err",
+		"partition": "jnovembre",
+		"ncores": "2"
+	}, 
+	"maf_filter_snplist":
+	{
+		"time" : "10:00:00",
+    "mem": "1G",
+		"out": "log/maf_filter_snplist-%j.out",
+		"err": "log/maf_filter_snplist-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	}, 
+	"generate_geodist":
+	{
+		"time" : "10:00:00",
+    "mem": "1G",
+		"out": "log/generate_geodist-%j.out",
+		"err": "log/generate_geodist-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	}, 
+	"plot_geodist":
+	{
+		"time" : "1:00:00",
+    "mem": "1G",
+		"out": "log/plot_geodist-%j.out",
+		"err": "log/plot_geodist-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	}, 
+	"aggregate_geodist_cnts":
+	{
+		"time" : "10:00:00",
+    "mem": "1G",
+		"out": "log/aggregate_geodist_cnts-%j.out",
+		"err": "log/aggregate_geodist_cnts-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	}, 
+	"conv_pbwt":
+	{
+		"time" : "10:00:00",
+    "mem": "2G",
+		"out": "log/conv_pbwt-%j.out",
+		"err": "log/conv_pbwt-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	},
+	"allele_sharing":
+	{
+		"time" : "10:00:00",
+    "mem": "2G",
+		"out": "log/allele_sharing-%j.out",
+		"err": "log/allele_sharing-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	},
+	"pop_specific_sfs":
+	{
+		"time" : "10:00:00",
+    "mem": "1G",
+		"out": "log/calc-sfs-%j.out",
+		"err": "log/calc-sfs-%j.err",
+		"partition": "broadwl",
+		"ncores": "1"
+	},
+	"join_af_genotype_indiv":
+	{
+		"time" : "1:00:00",
+    "mem": "1G",
+		"out": "log/join-af-genotype-indiv-%j.out",
+		"err": "log/join-af-genotype-indiv-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	},
+	"aggregate_logl":
+	{
+		"time" : "1:00:00",
+    "mem": "1G",
+		"out": "log/aggregate-logl-%j.out",
+		"err": "log/aggregate-logl-%j.err",
+		"partition": "jnovembre",
+		"ncores": "1"
+	}
+
+
+}
