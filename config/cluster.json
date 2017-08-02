@@ -2,10 +2,17 @@
 	"__default__":
 	{
 		"time" : "10:00:00",
-    "mem": "1G",
-		"out": "log/default-%j.out",
-		"err": "log/default-%j.err",
+        "mem": "1G",
 		"partition": "jnovembre",
-		"ncores": "1"
+		"ncores": "1",
+        "name": "{rule}.{wildcards}",
+		"out": "log/{rule}.{wildcards}-%j.out",
+		"err": "log/{rule}.{wildcards}-%j.err"
+	},
+
+	"untar_dpgp3":
+	{
+		"time" : "1:00:00",
+        "mem": "1G"
 	}
 }
