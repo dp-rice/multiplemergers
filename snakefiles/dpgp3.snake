@@ -50,7 +50,7 @@ rule untar_dpgp3:
 '''
     Combine the consensus sequences into a single file for one chromosome
 '''
-rule align_dpgp:
+rule align_dpgp3:
     input:
         DATA_PATH + "dpgp3_{chrom}.tar",
         DATA_PATH + "inversions/noninverted_{chrom}.txt"
@@ -63,7 +63,7 @@ rule align_dpgp:
 '''
     Combine the consensus sequences into a single file for all chromosomes
 '''
-rule align_dpgp_all:
+rule align_dpgp3_all:
     input:
         expand(DATA_PATH + "{CHROM}.alignment.txt.gz", CHROM=CHROMS)
 
