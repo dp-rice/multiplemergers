@@ -19,5 +19,10 @@
     "align_dpgp3":
     {
         "time" : "2:00:00"
+    },
+
+    "filter_missing_data":
+    {
+        "time" : "0:15:00"
     }
 }

@@ -67,6 +67,28 @@ rule align_dpgp3_all:
     input:
         expand(DATA_PATH + "{CHROM}.alignment.txt.gz", CHROM=CHROMS)
 
+'''
+    Filter out all sites with missing data
+'''
+rule filter_missing_data:
+    input:
+        alignment = DATA_PATH + "{chrom}.alignment.txt.gz",
+        samples = DATA_PATH + "inversions/noninverted_{chrom}.txt"
+    output:
+        DATA_PATH + "{chrom}.alignment.N0.txt.gz"
+    shell:
+        "NSAMPLES=$(wc -l < {input.samples}); "
+        "gunzip -c < {input.alignment} | python src/filter_missing_data.py $NSAMPLES 0 "
+        "| gzip -c > {output}"
+
+'''
+    Filter out all sites with missing data for all chromosomes
+'''
+rule filter_missing_data_all:
+    input:
+        expand(DATA_PATH + "{CHROM}.alignment.N0.txt.gz", CHROM=CHROMS)
+
+
 # '''
 #     Convert to PBWT format (only variants that are polymorphic)
 # '''
