@@ -6,7 +6,7 @@ import os
 
 # ----- Definitions for the project ----- #
 
-#CHROMS = [i for i in range(22,0, -1)]
+# CHROMS = [i for i in range(22,0, -1)]
 
 #REF_GENOME = "/home/abiddanda/novembre_lab/data/external_public/reference_genomes/hs37d5.fa"
 
@@ -25,10 +25,7 @@ import os
 #base = lambda x:os.path.splitext(x)[0]
 
 # ---- Including other snakefiles ---- #
-#include: 'snakefiles/sfs.snake'
-#include: 'snakefiles/geodist.snake'
-#include: 'snakefiles/a_share.snake'
-
+include: 'snakefiles/dpgp3.snake'
 
 # ---- Base Rule ----------- #
 

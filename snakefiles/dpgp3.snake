@@ -1,0 +1,84 @@
+#!python3
+
+import gzip as gz
+import os
+
+
+# ----- Definitions for the project ----- #
+
+CHROMS = ['Chr' + c for c in ['2L', '2R', '3L', '3R']]
+
+DATA_PATH = "/project/jnovembre/data/external_public/DPGP3/"
+
+# REF_GENOME = "/home/abiddanda/novembre_lab/data/external_public/reference_genomes/hs37d5.fa"
+
+# PBWT = 'bin/pbwt/pbwt'
+
+
+# GEODIST_FILE = "/home/abiddanda/novembre_lab/data/external_public/geodist/newll"
+
+# GEODIST_PROJECT = "/home/abiddanda/novembre_lab/abiddanda/hackathonDec2016"
+
+# INDIVS = ['BOT2016', 'Yamnaya', 'Yana', 'Kolyma_River']
+
+# ---- Useful Functions ---- #
+
+# base = lambda x:os.path.splitext(x)[0]
+
+# ------  Rules ----- # 
+
+'''
+    Download raw DPGP3 consensus sequences.
+'''
+# rule download_dpgp3:
+#     output:
+#         DATA_PATH + "dpgp3_sequences.tar.bz2"
+#     shell:
+#         "wget http://pooldata.genetics.wisc.edu/dpgp3_sequences.tar.bz2 -O {output}"
+
+'''
+    Untar the consensus sequence archive.
+'''
+rule untar_dpgp3:
+    input:
+        DATA_PATH + "dpgp3_sequences.tar.bz2"
+    output:
+        expand(DATA_PATH + "dpgp3_{CHROM}.tar", CHROM=CHROMS)
+    shell:
+        "tar -xjf {input} -C " + DATA_PATH
+
+'''
+    Combine the consensus sequences into a single file for one chromosome
+'''
+rule align_dpgp:
+    input:
+        DATA_PATH + "dpgp3_{chrom}.tar",
+        DATA_PATH + "inversions/noninverted_{chrom}.txt"
+    output:
+        DATA_PATH + "{chrom}.alignment.txt.gz"
+    shell:
+        "python src/merge_seq.py {input} {{}}_{wildcards.chrom}.seq "
+        "| gzip -c > {output}"
+
+'''
+    Combine the consensus sequences into a single file for all chromosomes
+'''
+rule align_dpgp_all:
+    input:
+        expand(DATA_PATH + "{CHROM}.alignment.txt.gz", CHROM=CHROMS)
+
+# '''
+#     Convert to PBWT format (only variants that are polymorphic)
+# '''
+# rule conv_pbwt:
+#     input:
+#         vcf= DATA_PATH + '/vcfs/samtools.combined.chr{CHROM}.release1.rn.vcf.gz'
+#     output:
+#         tmp_vcf  = temp('data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.vcf.gz'),
+#         tmp_vcf_idx = temp('data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.vcf.gz.tbi'),
+#         pbwt = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.pbwt',
+#         sites = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.sites',
+#         samples = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.samples',
+#     run:
+#         shell('bcftools view -m2 -M2 -v snps {input.vcf} | bgzip > {output.tmp_vcf} ; tabix {output.tmp_vcf}')
+#         shell('%s -readVcfGT {output.tmp_vcf} -write {output.pbwt} -writeSites {output.sites} -writeSamples {output.samples}' % PBWT)
