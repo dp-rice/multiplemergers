@@ -10,6 +10,23 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
+    "unlinked":
+    {
+        "time" : "1:00:00"
+    },
+
+    "constant_rate":
+    {
+        "time" : "8:00:00",
+        "mem" : "1G"
+    },
+
+    "exponential_growth":
+    {
+        "time" : "8:00:00",
+        "mem" : "1G"
+    },
+     
 	"untar_dpgp3":
 	{
 		"time" : "1:00:00",
@@ -19,6 +36,11 @@
     "align_dpgp3":
     {
         "time" : "2:00:00"
+    },
+
+    "get_maf":
+    {
+        "time" : "0:15:00"
     },
 
     "filter_missing_data":

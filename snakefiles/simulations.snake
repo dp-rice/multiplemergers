@@ -1,0 +1,71 @@
+import numpy as np
+
+RS = np.append(np.logspace(-1, 3, 13), 0)
+ALPHAS = [1.25, 1.5, 1.75, 2.0]
+GS = [0.01, 0.1, 1.0, 2.0, 4.0, 8.0]
+TS = [0.01, 0.1, 1.0]
+SS = [0.1, 0.05, 0.01]
+
+rule unlinked_loci_bsc:
+    output:
+        "simulations/jsfs_a-1.01_unlinked.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
+        "--alpha 1.01 --unlinked > {output}"
+
+rule unlinked_loci:
+    output:
+        "simulations/jsfs_a-2.0_unlinked_rep-{rep}.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
+        "--alpha 2.0 --unlinked > {output}"
+
+rule unlinked_loci_all:
+    input:
+        expand("simulations/jsfs_a-2.0_unlinked_rep-{rep}.txt", rep=np.arange(100)) 
+
+rule constant_rate_short:
+    output:
+        "simulations/jsfs_a-{alpha}_r-{r}_rep-{rep}.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 10000 "
+        "--alpha {wildcards.alpha} -r {wildcards.r} > {output}"
+
+rule alpha1:
+    input:
+        expand("simulations/jsfs_a-1.01_r-{r}_rep-{rep}.txt", r=RS, rep=np.arange(10))
+
+rule constant_rate:
+    output:
+        "simulations/jsfs_a-{alpha}_r-{r}.txt"
+    wildcard_constraints:
+        r="\d+\.\d*"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
+        "--alpha {wildcards.alpha} -r {wildcards.r} > {output}"
+
+rule constant_rate_all:
+    input:
+        expand("simulations/jsfs_a-{alpha}_r-{r}.txt", alpha=ALPHAS, r=RS)
+
+rule exponential_growth:
+    output:
+        "simulations/jsfs_g-{g}_r-{r}.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
+        "-G {wildcards.g} -r {wildcards.r} > {output}"
+
+rule exponential_growth_all:
+    input:
+        expand("simulations/jsfs_g-{g}_r-{r}.txt", g=GS, r=RS)
+
+rule step_growth:
+    output:
+        "simulations/jsfs_T-{T}_S-{S}_r-{r}.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
+        "-T {wildcards.T} -S {wildcards.S} -r {wildcards.r} > {output}"
+
+rule step_growth_all:
+    input:
+        expand("simulations/jsfs_T-{T}_S-{S}_r-{r}.txt", r=RS, T=TS, S=SS)

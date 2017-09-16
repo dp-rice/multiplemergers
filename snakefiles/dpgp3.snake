@@ -68,6 +68,22 @@ rule align_dpgp3_all:
         expand(DATA_PATH + "{CHROM}.alignment.txt.gz", CHROM=CHROMS)
 
 '''
+    Subsample, filter missing data, and get minor allele frequencies.
+'''
+rule get_maf:
+    input:
+        DATA_PATH + "{chrom}.alignment.txt.gz"
+    output:
+        DATA_PATH + "{chrom}.maf.txt.gz"
+    shell:
+        "gunzip -c < {input} | python src/alignment2maf.py 100 "
+        "| gzip -c > {output}"
+
+rule get_maf_all:
+    input:
+        expand(DATA_PATH + "{CHROM}.maf.txt.gz", CHROM=CHROMS)
+
+'''
     Filter out all sites with missing data
 '''
 rule filter_missing_data:
@@ -88,6 +104,19 @@ rule filter_missing_data_all:
     input:
         expand(DATA_PATH + "{CHROM}.alignment.N0.txt.gz", CHROM=CHROMS)
 
+'''
+    Calculate SFS in windows
+'''
+rule calculate_windowed_sfs:
+    input:
+        alignment = DATA_PATH + "{chrom}.alignment.N0.txt.gz",
+        samples = DATA_PATH + "inversions/noninverted_{chrom}.txt"
+    output:
+        "data/DPGP3/windowed_sfs/{chrom}.windows.N0.{window_size}.txt.gz"
+    shell:
+        "NSAMPLES=$(wc -l < {input.samples}); "
+        "gunzip -c < {input.alignment} | python src/filter_missing_data.py $NSAMPLES 0 "
+        "| gzip -c > {output}"
 
 # '''
 #     Convert to PBWT format (only variants that are polymorphic)

@@ -24,6 +24,9 @@ parser.add_argument("--nSamples", type=int, default=2, help="number of samples t
 parser.add_argument("--nLoci", nargs='*', type=int, default=[1], help="number of independent loci to simulate DEFAULT=1")
 parser.add_argument("-Tc", "--coalescent_time", nargs='*', type=float, default=[1], help="initial average coalescent time DEFAULT=1")
 
+# FIXME: make this play nicely with the recombination rate
+parser.add_argument("--unlinked", action='store_true', default=False,
+                    help='Simulate unlinked trees, i.e. r->Infinity.')
 parser.add_argument("-r", "--recombination_rate", type=float, default=0.0, help="per-locus recombination rate per coal unit")
 parser.add_argument("-G", "--growth_rate", type=float, default=0.0, help="population growth rate DEFAULT=0.0") 
 parser.add_argument("-a", "--alpha", type=float, default=2.0, help="Beta-coalescent parameter alpha. DEFAULT=2.0 (Kingman)")
@@ -174,52 +177,49 @@ cumulative_loci = 0
 for nLoci, Tc in zip(args.nLoci, args.coalescent_time):
     sys.stderr.write('{} loci with Tc={}\n'.format(nLoci, Tc))
     sys.stderr.write('Simulating genealogies...\n')
-    simulations = msprime.simulate(
-            recombination_rate=args.recombination_rate,
-            demographic_events=demographic_events,
-            population_configurations=population_configurations,
-            migration_matrix=migration_matrix,
-            num_replicates=nLoci,
-            Ne=Tc/2.0,
-            mutation_rate=args.mutation_rate)
+    if args.unlinked:
+        simulations = msprime.simulate(
+                recombination_rate=0,
+                demographic_events=demographic_events,
+                population_configurations=population_configurations,
+                migration_matrix=migration_matrix,
+                num_replicates=2*nLoci,
+                Ne=Tc/2.0,
+                mutation_rate=args.mutation_rate)
+        for rep1 in simulations:
+            rep2 = next(simulations)
+            tau1, _ = jsfs.get_jsfs(rep1)
+            tau2, _ = jsfs.get_jsfs(rep2)
+            mTAU += tau1
+            mTAU += tau2
+            # FIXME: debug
+            # if tau1[40] > 0 and tau2[40] > 0:
+            #     sys.stderr.write("{}\t{}\t{}\n".format(tau1[40], tau2[40], tau1[40]*tau2[40]))
+            jTAU += tau1[None,:] * tau2[:,None]
 
-    # CALCULATE AND OUTPUT SFS
-    sys.stderr.write('Calculating times...\n')
-    for i_rep, rep in enumerate(simulations):
-        try:
-            if (i_rep+1) % (nLoci/10) == 0:
-                sys.stderr.write('Completed {} reps.\n'.format(i_rep+1))
-        except ZeroDivisionError:
-            pass
+    else:
+        simulations = msprime.simulate(
+                recombination_rate=args.recombination_rate,
+                demographic_events=demographic_events,
+                population_configurations=population_configurations,
+                migration_matrix=migration_matrix,
+                num_replicates=nLoci,
+                Ne=Tc/2.0,
+                mutation_rate=args.mutation_rate)
 
-        # TODO: impliment a version that calculate based on mutations
-        # if args.mutation_rate:
-        #     TAU[i_rep+cumulative_loci,:] = sfs.get_sfs_from_mutations(rep, args.error_rate)
-        # else:
-        #     TAU[i_rep+cumulative_loci,:] = sfs.get_sfs(rep)
-        tau1, tau2 = jsfs.get_jsfs(rep)
-        # TAU1[i_rep + cumulative_loci, :] = tau1
-        # TAU2[i_rep + cumulative_loci, :] = tau2
-        mTAU += tau1
-        mTAU += tau2
-        jTAU += tau1[None,:] * tau2[:,None]
+        # CALCULATE AND OUTPUT SFS
+        sys.stderr.write('Calculating times...\n')
+        for i_rep, rep in enumerate(simulations):
+            try:
+                if (i_rep+1) % (nLoci/10) == 0:
+                    sys.stderr.write('Completed {} reps.\n'.format(i_rep+1))
+            except ZeroDivisionError:
+                pass
 
-        # tau1 *= args.mutation_rate
-        # sfs1 = np.zeros(args.nSamples)
-        # sfs1[0] = 1 - np.sum(tau1)
-        # sfs1[1:] = tau1
-
-        # tau2 *= args.mutation_rate
-        # sfs2 = np.zeros(args.nSamples)
-        # sfs2[0] = 1 - np.sum(tau2)
-        # sfs2[1:] = tau2
-        # mTAU[i_rep + cumulative_loci, :] = (tau1 + tau2) / 2.0
-        # jTAU[i_rep + cumulative_loci, :] = tau1[None,:] * tau2[:,None]
-
-        # JSFS[i_rep + cumulative_loci, :, :] = sfs1[None,:] * sfs2[:,None]
-        # if args.individual_loci:
-        #     line = '{}\t{}\n'.format(n_sites, '\t'.join([str(entry) for entry in TAU[i_rep+cumulative_loci, :]]))
-        #     sys.stdout.write(line)
+            tau1, tau2 = jsfs.get_jsfs(rep)
+            mTAU += tau1
+            mTAU += tau2
+            jTAU += tau1[None,:] * tau2[:,None]
 
     cumulative_loci += nLoci
 
