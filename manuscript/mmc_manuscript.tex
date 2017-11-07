@@ -16,7 +16,7 @@
 \newcommand{\Fig}[1]{Figure~\ref{#1}}
 \newcommand{\E}[1]{\left<{#1}\right>}
 
-\title{Distinguishing among coalescent models using two-site joint allele frequency spectra}
+\title{Distinguishing among coalescent models using two-site allele frequency spectra}
 \author{Daniel P. Rice}
 \date{\today}							
 
@@ -41,7 +41,7 @@ frequency spectrum (SFS). However, the signatures of multiple
 mergers in the average SFS are also consistent with a Kingman
 coalescent process with a time-varying population size. Here, I
 present a new method for detecting multiple mergers based on
-the mutual information of the joint site frequency spectrum at pairs of linked sites. Unlike the average SFS,
+the mutual information of the joint allele frequency spectrum at pairs of linked sites. Unlike the average SFS,
 the mutual information depends mostly on the topologies of genealogies
 rather than their branch lengths and is therefore robust to most
 demographic effects.}
@@ -139,21 +139,38 @@ If multiple-mergers events are frequent enough, this effect may dominate the tra
 
 There are two limitations of these existing results.
 First, they only apply to time-homogeneous coalescent processes and thus do not distinguish between multiple-mergers coalescents and Kingman models with time-varying population size.
-Second, they assume a non-recombining locus and may break down for sites separated by a finite distance.
+Second, they assume a non-recombining locus and may break down for sites separated by a finite genetic distance.
 
-\subsubsection*{Loosely-linked sites}
+\subsubsection*{Weakly-linked sites}
 
 Previous work on the multiple-mergers coalescent with recombination is limited relative to the literature on multiple-mergers models in non-recombining loci.
 Nonetheless, existing results suggest that the two-site joint site frequency spectrum will behave differently as a function of genetic distance in multiple-mergers versus Kingman models.
 
-Eldon and Wakeley \cite{} calculated the expected linkage disequilibrium in a coalescent model of a population with multiple-mergers induced by occasional ``jackpot'' reproductive events.
-The found that LD may be reduced by multiple mergers at short genetic distances because of the elevated proportion of singleton mutations.
+Eldon and Wakeley \cite{} calculated the expected linkage disequilibrium (LD) in a modified Wright-Fisher model with occasional ``jackpot'' reproductive events.
+In these events, one individual is selected to be the ancestor of a fixed finite fraction of the population.
+As a result, even in the $N \to \infty$ limit, more than two lineages may share the same ancestor in the same generation.
+Eldon and Wakely found that LD may be reduced by multiple mergers at short genetic distances because of the elevated proportion of singleton mutations in this model.
 This effect is similar to the impact of population growth on LD.
-In contrast, Eldon and Wakeley found that LD
+In contrast, the authors found that pairwise coalescent times at two unlinked sites may be correlated due to jackpot events: there is a finite probability that both lineages at both sites are descended from the ``lucky'' ancestor.
 
-LD in the MMC.
+Birkner et al. \cite{} extended the results of Eldon and Wakeley \cite{} by deriving the ancestral recombination graph for a diploid population with jackpot reproductive events.
+They show that in this model, the limiting marginal coalescent process is a simultaneous multiple-mergers coalescent with up to four simultaneous mergers permitted.
+(The four possible mergers are due to the four chromosomes of the two diploid parents of the jackpot event.)
+Birkner et al. find that the correlations in pairwise coalescent times found by Eldon and Wakeley holds for correlations between coalescent times in samples larger than two.
+This results suggests that the two-site frequency spectrum considered as a function of genetic distance will be informative for identifying multiple-mergers coalescent processes. 
 
-Correlations in coalescence times.
+\subsubsection*{Natural selection and multiple mergers}
+
+It is well-known that natural selection distorts sample genealogies (reviewed in \cite{neher:2013}.)
+For example, Durrett and Schweinsberg \cite{durrett:schweinsberg:2005} and Coop and Ralph \cite{coop:ralph:2013} have studied the effects of recurrent selective sweeps on the genealogical process.
+They find that, under some conditions, the rapid increase in the frequency of a beneficial allele generates multiple-mergers--like coalescent processes at linked sites.
+Others \cite{} have shown that rapidly-adapting populations, in which multiple beneficial mutations segregate at the same time and interfere with one another, also generate genealogies with apparent multiple mergers and unbalanced branching patterns.
+(These models converge to a modified version of the Bolthausen-Sznitman $\Lambda$-coalesecent \cite{neher:hallatscheck:2013}.)
+
+The genealogical effects of selection are not restricted to adaptive evolution; purifying selection at many linked loci can also distort the genealogies at neutral sites.
+While most work on this ``background selection'' \cite{charlesworth:etal:1993} focuses on the reduction of pairwise diversity (e.g. \cite{mcvicker}), recent theoretical studies have examined how it distorts genealogies.
+ 
+
 
 \section*{Summary statistics}
 

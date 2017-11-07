@@ -114,5 +114,3 @@ dependencies:
   - jupyter-console==5.1.0
   - jupyter-core==4.3.0
   - prompt-toolkit==1.0.14
-prefix: /Users/danielrice/miniconda3/envs/mmc_py35
-
