@@ -6,6 +6,17 @@ GS = [0.01, 0.1, 1.0, 2.0, 4.0, 8.0]
 TS = [0.01, 0.1, 1.0]
 SS = [0.2, 0.1, 0.05, 0.01]
 
+rule sweeps:
+    output:
+        "simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt"
+    shell:
+        "slim -d fsel={wildcards.fsel} src/slim/sweeps.slim > {output}"
+
+FSEL = np.insert(np.logspace(-5, -2, 7), 0, 0)
+rule sweeps_all:
+    input:
+        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(10))
+
 rule unlinked_loci_bsc:
     output:
         "simulations/jsfs_a-1.01_unlinked.txt"
