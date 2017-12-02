@@ -12,10 +12,10 @@ rule sweeps:
     shell:
         "slim -d fsel={wildcards.fsel} src/slim/sweeps.slim > {output}"
 
-FSEL = np.insert(np.logspace(-5, -2, 7), 0, 0)
+FSEL = np.insert(np.logspace(-5, -3, 3), 0, 0)
 rule sweeps_all:
     input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(10))
+        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(100))
 
 rule unlinked_loci_bsc:
     output:

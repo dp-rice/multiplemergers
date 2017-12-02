@@ -10,6 +10,11 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
+    "sweeps":
+    {
+        "time" : "0:10:00"
+    },
+
     "unlinked":
     {
         "time" : "1:00:00"
