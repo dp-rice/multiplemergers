@@ -10,6 +10,11 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
+    "parse_slim":
+    {
+        "time" : "0:02:00"
+    },
+
     "unlinked":
     {
         "time" : "1:00:00"
