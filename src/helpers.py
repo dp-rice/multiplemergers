@@ -1,4 +1,5 @@
 import numpy as np
+import gzip
 
 def pairwise_diversity(allele_counts, sample_size):
     f = allele_counts / sample_size
@@ -37,7 +38,12 @@ def import_slim_output(filename):
     return sample_size, np.array(positions), np.array(allele_counts)
 
 def cross_correlation(X, Y, lim):
-    return np.correlate(X, Y[:-lim], 'valid') / (X.shape[0] - lim)
+    # return np.correlate(X, Y[:-lim], 'valid') / (X.shape[0] - lim)
+    n_comps = X.shape[0] - lim
+    xy = np.correlate(X, Y[:-lim], 'valid') / n_comps
+    x = np.convolve(X, np.ones(n_comps), 'valid') / n_comps
+    y = np.sum(Y[:-lim]) / n_comps
+    return (xy - x*y)
 
 def windowed_sfs(positions, minor_allele_counts, sample_size, L, window_size):
     sfs_w = np.zeros(((sample_size+1)//2, L//window_size), dtype=int)
@@ -46,3 +52,28 @@ def windowed_sfs(positions, minor_allele_counts, sample_size, L, window_size):
     for i in range(sfs_w.shape[0]):
         sfs_w[i,:] = np.histogram(pos_w[minor_allele_counts == i+1], bins=bins)[0]
     return sfs_w
+
+def smooth(x, window_len=11, window='hamming'):
+    if window_len < 3:
+        return x
+    s=np.r_[x[window_len-1:0:-1],x,x[-2:-window_len-1:-1]]
+    if window == 'flat':
+        w=np.ones(window_len,'d')
+    else:
+        w=eval('np.'+window+'(window_len)')
+    y=np.convolve(w/w.sum(),s,mode='valid')
+    # Trim off the ends, which are outside the x-range of the data
+    trim = window_len//2
+    return y[trim:-trim]
+
+# This is faster than numpy loadtxt because it pre-allocates the space
+def loadints(fn, rows, cols): 
+    ret = np.zeros((rows, cols), dtype=int)
+    with gzip.open(fn, 'rb') as infile:
+        i = 0
+        for line in infile:
+            if line.startswith(b'#'):
+                continue
+            ret[i,:] = line.split()
+            i += 1
+    return ret
