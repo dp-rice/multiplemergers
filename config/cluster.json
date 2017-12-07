@@ -10,6 +10,16 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
+    "merge_correlations":
+    {
+        "time" : "0:10:00"
+    },
+
+    "correlations":
+    {
+        "time" : "0:02:00"
+    },
+
     "parse_slim":
     {
         "time" : "0:02:00"
