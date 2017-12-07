@@ -9,58 +9,57 @@ SS = [0.2, 0.1, 0.05, 0.01]
 FBGSEL = np.logspace(-2, 0, 3)
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
 
-rule merge_correlations:
-    output:
-        "simulations/slim/sweeps_fsel-{fsel}_corrmerged.txt.gz"
-    input:
-        expand("simulations/slim/sweeps_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
-    shell:
-        "python src/merge_corr.py 100 1e8 1e3 {input} | gzip -c > {output}"
+### SLiM ###
 
 rule merge_correlations_all:
     input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_corrmerged.txt.gz", fsel=FSEL)
+        expand("simulations/slim/sweeps_fsel-{fsel}_corrmerged.txt.gz", fsel=FSEL),
+        expand("simulations/slim/bgsel_fsel-{fsel}_corrmerged.txt.gz", fsel=FBGSEL)
+
+rule merge_correlations:
+    output:
+        "simulations/slim/{typ}_fsel-{fsel}_corrmerged.txt.gz"
+    input:
+        expand("simulations/slim/{{typ}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
+    shell:
+        "python src/merge_corr.py 100 1e8 1e3 {input} | gzip -c > {output}"
 
 rule correlations:
     input:
-        "simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
+        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
     output:
-        "simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.corr.txt.gz"
+        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.corr.txt.gz"
     shell:
         "python src/alleles2correlations.py {input} 100 1e8 1000 | gzip -c > {output}"
 
 rule parse_slim:
     input:
-        "simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt"
+        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.txt"
     output:
-        "simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
+        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
     shell:
         "python src/parse_slim.py {input} 1e8 1000"
 
-rule parse_slim_all:
-    input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.wsfs.txt.gz", fsel=FSEL, rep=np.arange(100))
+rule slim:
+    output:
+        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.txt"
+    shell:
+        "slim -d fsel={wildcards.fsel} src/slim/{wildcards.typ}.slim > {output}"
 
 rule slim_all:
     input:
         expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(100)),
         expand("simulations/slim/bgsel_fsel-{fsel}_rep-{rep}.txt", fsel=FBGSEL, rep=np.arange(100))
-    
-rule bgsel:
-    output:
-        "simulations/slim/bgsel_fsel-{fsel}_rep-{rep}.txt"
-    shell:
-        "slim -d fsel={wildcards.fsel} src/slim/bgsel.slim > {output}"
-
-rule sweeps:
-    output:
-        "simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt"
-    shell:
-        "slim -d fsel={wildcards.fsel} src/slim/sweeps.slim > {output}"
 
 rule sweeps_all:
     input:
         expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(100))
+
+rule parse_slim_sweeps:
+    input:
+        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.wsfs.txt.gz", fsel=FSEL, rep=np.arange(100))
+
+### MSPRIME ###
 
 rule unlinked_loci_bsc:
     output:
