@@ -7,6 +7,7 @@ TS = [0.01, 0.1, 1.0]
 SS = [0.2, 0.1, 0.05, 0.01]
 
 FSEL = np.insert(np.logspace(-5, -3, 3), 0, 0)
+FBGSEL = np.logspace(-2, 0, 3)
 
 rule parse_slim:
     input:
@@ -19,6 +20,17 @@ rule parse_slim:
 rule parse_slim_all:
     input:
         expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.wsfs.txt.gz", fsel=FSEL, rep=np.arange(100))
+
+rule slim_all:
+    input:
+        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(100)),
+        expand("simulations/slim/bgsel_fsel-{fsel}_rep-{rep}.txt", fsel=FBGSEL, rep=np.arange(100))
+    
+rule bgsel:
+    output:
+        "simulations/slim/bgsel_fsel-{fsel}_rep-{rep}.txt"
+    shell:
+        "slim -d fsel={wildcards.fsel} src/slim/bgsel.slim > {output}"
 
 rule sweeps:
     output:
