@@ -10,35 +10,14 @@ FBGSEL = np.logspace(-2, 0, 3)
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
 
 ### SLiM ###
+sample_size = 100
+L = int(1e8)
+w = 1000
 
 rule merge_correlations_all:
     input:
         expand("simulations/slim/sweeps_fsel-{fsel}_corrmerged.txt.gz", fsel=FSEL),
         expand("simulations/slim/bgsel_fsel-{fsel}_corrmerged.txt.gz", fsel=FBGSEL)
-
-rule merge_correlations_short:
-    output:
-        "simulations/slim/{typ}_fsel-{fsel}_corrmerged.w100.txt.gz"
-    input:
-        expand("simulations/slim/{{typ}}_fsel-{{fsel}}_rep-{rep}.corr.w100.txt.gz", rep=np.arange(100))
-    shell:
-        "python src/merge_corr.py 100 1e8 1e3 {input} | gzip -c > {output}"
-
-rule correlations_short:
-    input:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.w100.txt.gz"
-    output:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.corr.w100.txt.gz"
-    shell:
-        "python src/alleles2correlations.py {input} 100 1e8 100 | gzip -c > {output}"
-
-rule parse_slim_short:
-    input:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.txt"
-    output:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.w100.txt.gz"
-    shell:
-        "python src/parse_slim.py {input} 1e8 100"
 
 rule merge_correlations:
     output:
@@ -46,7 +25,7 @@ rule merge_correlations:
     input:
         expand("simulations/slim/{{typ}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
     shell:
-        "python src/merge_corr.py 100 1e8 1e3 {input} | gzip -c > {output}"
+        "python src/merge_corr.py {sample_size} {L} {w} input} | gzip -c > {output}"
 
 rule correlations:
     input:
@@ -54,7 +33,7 @@ rule correlations:
     output:
         "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.corr.txt.gz"
     shell:
-        "python src/alleles2correlations.py {input} 100 1e8 1000 | gzip -c > {output}"
+        "python src/alleles2correlations.py {input} {sample_size} {L} {w} | gzip -c > {output}"
 
 rule parse_slim:
     input:
@@ -62,7 +41,7 @@ rule parse_slim:
     output:
         "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
     shell:
-        "python src/parse_slim.py {input} 1e8 1000"
+        "python src/parse_slim.py {input} {L} {w}"
 
 rule slim:
     output:
