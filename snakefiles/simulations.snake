@@ -25,7 +25,7 @@ rule merge_correlations:
     input:
         expand("simulations/slim/{{typ}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
     shell:
-        "python src/merge_corr.py {sample_size} {L} {w} input} | gzip -c > {output}"
+        "python src/merge_corr.py {sample_size} {L} {w} {input} | gzip -c > {output}"
 
 rule correlations:
     input:
