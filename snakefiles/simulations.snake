@@ -43,7 +43,7 @@ rule parse_slim:
     output:
         temp("simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz")
     shell:
-        "python src/parse_slim.py {input} {L} {w}"
+        "python src/parse_slim.py {input} {L} {w} {output}"
 
 rule slim:
     output:
