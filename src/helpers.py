@@ -114,6 +114,32 @@ def readcorr(fn):
         return sfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
 
 
+def normalizecorr(readcorrout, n_samples):
+    '''Normalize the correlation functions by the product means
+
+    Keyword arguments:
+    readcorrout -- tuple output by readcorr
+    '''
+
+    sfs, pi_corr, lolo_corr, lohi_corr, hihi_corr = readcorrout
+    pi = sfs2pi(sfs, n_samples)
+    pi_corr /= pi**2
+    for i in range(lolo_corr.shape[0]):
+        cutoff = i+1
+        lo = np.sum(sfs[:cutoff])
+        hi = np.sum(sfs[cutoff:])
+        lolo_corr[i] /= lo*lo
+        lohi_corr[i] /= lo*hi
+        hihi_corr[i] /= hi*hi
+    return pi, sfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
+
+
+def readcorr_normed(fn, n_samples):
+    '''Read data from a correlation file and normalize correlations'''
+    data = readcorr(fn)
+    return normalizecorr(data, n_samples)
+
+
 def jsfs2corr(msfs, jsfs, n_samples, normalize=True):
     '''Convert marginal and joint site frequency spectra
     to correlations in summary statistics.
@@ -210,3 +236,31 @@ def import_msprime_sfs(file_list, n_samples):
 
     return pi, mSFS_fold, jSFS_fold
 
+def import_msprime_corr(file_list, n_samples, normalize=True):
+    '''Import pi and the marginal and joint folded sfs from msprime output
+    and calculate correlations in pi and the sfs.
+
+    Keyword arguments:
+    file_list -- list of input files containing unfolded
+                 marginal and joint sfs
+    n_samples -- the sample size of the simulations
+    normalize -- if True, normalize correlations by product of means
+                 if False, return raw correlations
+    '''
+    n_files = len(file_list)
+    n_samples_fold = (n_samples+1)//2
+
+    # Import sfs
+    pi, sfs, jsfs = import_msprime_sfs(file_list, n_samples)
+
+    # Calculate correlations
+    pi_corr = np.zeros(n_files)
+    lolo_corr = np.zeros((n_files, n_samples_fold - 1))
+    lohi_corr = np.zeros((n_files, n_samples_fold - 1))
+    hihi_corr = np.zeros((n_files, n_samples_fold - 1))
+    data = (pi_corr, lolo_corr, lohi_corr, hihi_corr)
+    for i in range(n_files):
+        new_data = jsfs2corr(sfs[i], jsfs[i], n_samples, normalize=normalize)
+        for old, new in zip(data, new_data):
+            old[i] = new
+    return pi, sfs, jsfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
