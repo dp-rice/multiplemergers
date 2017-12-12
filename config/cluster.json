@@ -30,7 +30,22 @@
         "time" : "0:30:00"
     },
 
+    "sweepslong":
+    {
+        "time" : "0:30:00"
+    },
+
     "sweeps":
+    {
+        "time" : "0:10:00"
+    },
+
+    "sweepsbigN":
+    {
+        "time" : "0:20:00"
+    },
+
+    "msprime_like_slim":
     {
         "time" : "0:10:00"
     },
