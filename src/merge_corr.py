@@ -40,17 +40,20 @@ for fn in filenames:
         pi_corr += np.array([float(x) for x in infile.readline().split()])
         # LOLO_CORR header and LOLO_CORR
         infile.readline()
-        for i, line in enumerate(infile):
+        for i in range(lolo_corr.shape[0]):
+            line = infile.readline()
             y = np.array([float(x) for x in line.split()])
             lolo_corr[i,:] += y
         # LOHI_CORR header and LOHI_CORR
         infile.readline()
-        for i, line in enumerate(infile):
+        for i in range(lohi_corr.shape[0]):
+            line = infile.readline()
             y = np.array([float(x) for x in line.split()])
             lohi_corr[i,:] += y
         # HIHI_CORR header and HIHI_CORR
         infile.readline()
-        for i, line in enumerate(infile):
+        for i in range(hihi_corr.shape[0]):
+            line = infile.readline()
             y = np.array([float(x) for x in line.split()])
             hihi_corr[i,:] += y
 

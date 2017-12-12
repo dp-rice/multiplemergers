@@ -34,7 +34,9 @@ pi_corr = h.cross_correlation(pi_w, pi_w, lim)
 
 # Calculate the cross correlation between high- and low-frequency mutations,
 # varying the cutoff between low and high.
+lolo_corr = np.zeros((lo_max, lim + 1))
 lohi_corr = np.zeros((lo_max, lim + 1))
+hihi_corr = np.zeros((lo_max, lim + 1))
 for freq_cutoff in range(1, lo_max + 1):
     lo = np.sum(wsfs[:freq_cutoff,:], axis=0) / w
     hi = np.sum(wsfs[freq_cutoff:,:], axis=0) / w
