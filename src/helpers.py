@@ -112,3 +112,101 @@ def readcorr(fn):
             hihi_corr[i,:] = y
 
         return sfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
+
+
+def jsfs2corr(msfs, jsfs, n_samples, normalize=True):
+    '''Convert marginal and joint site frequency spectra
+    to correlations in summary statistics.
+
+    Keyword arguments:
+    msfs -- the marginal (average) site frequency spectrum
+    jsfs -- the joint (two-site) site frequency spectrum
+    n_samples -- the sample size
+    normalize -- if True, normalize correlations by product of means
+                 if False, return raw correlations
+    '''
+    n_samples_fold = (n_samples+1)//2
+    pi_weights = pairwise_diversity(np.arange(1, n_samples_fold+1), n_samples)
+
+    # Calculate correlation in pi at the two sites
+    pi = sfs2pi(msfs, n_samples)
+    pi_sq = np.sum(jsfs * pi_weights[:,None] * pi_weights[None,:])
+    if normalize:
+        pi_corr = (pi_sq/pi**2) - 1
+    else:
+        pi_corr = pi_sq - pi**2
+
+    lolo_corr = np.zeros(n_samples_fold-1)
+    lohi_corr = np.zeros(n_samples_fold-1)
+    hihi_corr = np.zeros(n_samples_fold-1)
+    # Calculate correlation in reduced jsfs for each cutoff
+    for cutoff in np.arange(1, n_samples_fold):
+        i = cutoff - 1
+        lo = np.sum(msfs[:cutoff])
+        hi = np.sum(msfs[cutoff:])
+        lolo = np.sum(jsfs[:cutoff, :cutoff])
+        lohi = np.sum(jsfs[:cutoff, cutoff:])
+        hihi = np.sum(jsfs[cutoff:, cutoff:])
+        if normalize:
+            lolo_corr[i] = lolo/(lo**2) - 1
+            lohi_corr[i] = lohi/(lo*hi) - 1
+            hihi_corr[i] = hihi/(hi**2) - 1
+        else:
+            lolo_corr[i] = lolo - lo**2
+            lohi_corr[i] = lohi - lo*hi
+            hihi_corr[i] = hihi - hi**2
+
+    return pi_corr, lolo_corr, lohi_corr, hihi_corr
+
+
+def import_msprime_sfs(file_list, n_samples):
+    '''Import pi and the marginal and joint folded sfs from msprime output.
+
+    Keyword arguments:
+    file_list -- list of input files containing unfolded
+                 marginal and joint sfs
+    n_samples -- the sample size of the simulations
+    '''
+
+    n_files = len(file_list)
+    mSFS = np.zeros((n_files, n_samples-1))
+    jSFS_triu = np.zeros((n_files, n_samples*(n_samples-1)//2))
+
+    # Import data from files
+    for i, f in enumerate(file_list):
+        with open(f) as datafile:
+            for line in datafile:
+                # Skip header lines
+                if line.startswith('#'):
+                    continue
+                # First two non-header lines contain
+                # the marginal and joint SFS.
+                mSFS[i,:] = np.array(line.split(), dtype=float)
+                jSFS_triu[i,:] = np.array(datafile.readline().split())
+                break
+    
+    # Unpack the joint SFS from 1D to 2D array
+    jSFS = np.zeros((n_files, n_samples-1, n_samples-1))
+    for i in range(n_files):
+        jSFS[i,:,:][np.triu_indices(n_samples-1)] = jSFS_triu[i,:]
+        # Don't double-count the diagonal values
+        jSFS[i,:,:][np.diag_indices(n_samples-1)] /= 2
+        # Symmetrize distribution
+    jSFS += np.transpose(jSFS, axes=(0,2,1))
+
+    # Fold marginal and joint SFS
+    mSFS_fold = (mSFS + mSFS[:,::-1])[:,:n_samples//2]
+    jSFS_fold = (jSFS + jSFS[:,::-1,:]
+                 + jSFS[:,:,::-1]
+                 + jSFS[:,::-1,::-1])[:,:n_samples//2,:n_samples//2]
+    # Don't double-count the n//2 = n - n//2 values
+    if n_samples % 2 == 0:
+        mSFS_fold[:,-1] /= 2
+        jSFS_fold[:,-1,:-1] /= 2
+        jSFS_fold[:,:-1,-1] /= 2
+        jSFS_fold[:,-1,-1] /= 4
+
+    pi = sfs2pi(mSFS_fold.T, n_samples)
+
+    return pi, mSFS_fold, jSFS_fold
+
