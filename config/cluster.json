@@ -12,12 +12,12 @@
 
     "merge_correlations":
     {
-        "time" : "0:10:00"
+        "time" : "0:20:00"
     },
 
     "correlations":
     {
-        "time" : "0:02:00"
+        "time" : "0:10:00"
     },
 
     "parse_slim":
@@ -27,7 +27,7 @@
 
     "bgsel":
     {
-        "time" : "0:30:00"
+        "time" : "1:00:00"
     },
 
     "sweepslong":
@@ -37,7 +37,7 @@
 
     "sweeps":
     {
-        "time" : "0:10:00"
+        "time" : "0:30:00"
     },
 
     "sweepsbigN":
