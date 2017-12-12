@@ -12,12 +12,12 @@
 
     "merge_correlations":
     {
-        "time" : "0:10:00"
+        "time" : "0:20:00"
     },
 
     "correlations":
     {
-        "time" : "0:02:00"
+        "time" : "0:10:00"
     },
 
     "parse_slim":
@@ -27,10 +27,25 @@
 
     "bgsel":
     {
+        "time" : "1:00:00"
+    },
+
+    "sweepslong":
+    {
         "time" : "0:30:00"
     },
 
     "sweeps":
+    {
+        "time" : "0:30:00"
+    },
+
+    "sweepsbigN":
+    {
+        "time" : "0:20:00"
+    },
+
+    "msprime_like_slim":
     {
         "time" : "0:10:00"
     },

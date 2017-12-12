@@ -34,11 +34,15 @@ pi_corr = h.cross_correlation(pi_w, pi_w, lim)
 
 # Calculate the cross correlation between high- and low-frequency mutations,
 # varying the cutoff between low and high.
+lolo_corr = np.zeros((lo_max, lim + 1))
 lohi_corr = np.zeros((lo_max, lim + 1))
+hihi_corr = np.zeros((lo_max, lim + 1))
 for freq_cutoff in range(1, lo_max + 1):
     lo = np.sum(wsfs[:freq_cutoff,:], axis=0) / w
     hi = np.sum(wsfs[freq_cutoff:,:], axis=0) / w
+    lolo_corr[freq_cutoff-1] = h.cross_correlation(lo, lo, lim)
     lohi_corr[freq_cutoff-1] = h.cross_correlation(lo, hi, lim)
+    hihi_corr[freq_cutoff-1] = h.cross_correlation(hi, hi, lim)
 
 # Write output.
 sys.stdout.write('#SFS:\n')
@@ -47,6 +51,14 @@ sys.stdout.write(' '.join(map(str, sfs)) + '\n')
 sys.stdout.write('#PI_CORR:\n')
 sys.stdout.write(' '.join(map(str, pi_corr)) + '\n')
 
+sys.stdout.write('#LOLO_CORR:\n')
+for i in range(lo_max):
+    sys.stdout.write(' '.join(map(str, lolo_corr[i,:])) + '\n')
+
 sys.stdout.write('#LOHI_CORR:\n')
 for i in range(lo_max):
     sys.stdout.write(' '.join(map(str, lohi_corr[i,:])) + '\n')
+
+sys.stdout.write('#HIHI_CORR:\n')
+for i in range(lo_max):
+    sys.stdout.write(' '.join(map(str, hihi_corr[i,:])) + '\n')

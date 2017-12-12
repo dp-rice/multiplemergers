@@ -77,3 +77,38 @@ def loadints(fn, rows, cols):
             ret[i,:] = line.split()
             i += 1
     return ret
+
+def readcorr(fn):
+    with gzip.open(fn, 'rb') as infile:
+        # SFS header and SFS
+        infile.readline()
+        sfs = np.array([float(x) for x in infile.readline().split()])
+
+        # PI_CORR header and PI_CORR
+        infile.readline()
+        pi_corr = np.array([float(x) for x in infile.readline().split()])
+
+        lolo_corr = np.zeros((len(sfs)-1, len(pi_corr)))
+        lohi_corr = np.zeros((len(sfs)-1, len(pi_corr)))
+        hihi_corr = np.zeros((len(sfs)-1, len(pi_corr)))
+
+        # LOLO_CORR header and LOLO_CORR
+        infile.readline()
+        for i in range(lolo_corr.shape[0]):
+            line = infile.readline()
+            y = np.array([float(x) for x in line.split()])
+            lolo_corr[i,:] = y
+        # LOHI_CORR header and LOHI_CORR
+        infile.readline()
+        for i in range(lohi_corr.shape[0]):
+            line = infile.readline()
+            y = np.array([float(x) for x in line.split()])
+            lohi_corr[i,:] = y
+        # HIHI_CORR header and HIHI_CORR
+        infile.readline()
+        for i in range(hihi_corr.shape[0]):
+            line = infile.readline()
+            y = np.array([float(x) for x in line.split()])
+            hihi_corr[i,:] = y
+
+        return sfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
