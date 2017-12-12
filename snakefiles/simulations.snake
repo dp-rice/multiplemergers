@@ -33,21 +33,21 @@ rule correlations:
     input:
         "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
     output:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.corr.txt.gz"
+        temp("simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.corr.txt.gz")
     shell:
         "python src/alleles2correlations.py {input} {sample_size} {L} {w} | gzip -c > {output}"
 
 rule parse_slim:
     input:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.txt"
+        "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
     output:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
+        temp("simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz")
     shell:
         "python src/parse_slim.py {input} {L} {w}"
 
 rule slim:
     output:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.txt"
+        "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
     shell:
         "slim -d fsel={wildcards.fsel} src/slim/{wildcards.typ}.slim > {output}"
 
