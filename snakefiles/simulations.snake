@@ -51,19 +51,6 @@ rule slim:
     shell:
         "slim -d fsel={wildcards.fsel} src/slim/{wildcards.typ}.slim > {output}"
 
-rule slim_all:
-    input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(100)),
-        expand("simulations/slim/bgsel_fsel-{fsel}_rep-{rep}.txt", fsel=FBGSEL, rep=np.arange(100))
-
-rule sweeps_all:
-    input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.txt", fsel=FSEL, rep=np.arange(100))
-
-rule parse_slim_sweeps:
-    input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_rep-{rep}.wsfs.txt.gz", fsel=FSEL, rep=np.arange(100))
-
 ### MSPRIME ###
 rule msprime_like_slim:
     output:
@@ -134,3 +121,16 @@ rule step_growth:
 rule step_growth_all:
     input:
         expand("simulations/jsfs_T-{T}_S-{S}_r-{r}.txt", r=RS, T=TS, S=SS)
+
+MS = np.logspace(-1, 1, 5)
+rule two_deme:
+    output:
+        "simulations/jsfs_d-2_M-{M}_r-{r}.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
+        "-d 2 -M {wildcards.M} -r {wildcards.r} > {output}"
+
+rule two_deme_all:
+    input:
+        expand("simulations/jsfs_d-2_M-{M}_r-{r}.txt", r=RS[:-3], M=MS[2:]),
+        expand("simulations/jsfs_d-2_M-{M}_r-{r}.txt", r=RS[:-2]/10, M=MS[:2])

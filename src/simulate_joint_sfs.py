@@ -125,7 +125,7 @@ if args.demes:
         migration_matrix += migration_matrix.T
     migration_matrix *= m
     migration_matrix = migration_matrix.tolist()
-    samples_per_deme = args.nSamples / args.demes
+    samples_per_deme = args.nSamples // args.demes
     population_configurations = [msprime.PopulationConfiguration(
                                         sample_size=samples_per_deme,
                                         growth_rate=args.growth_rate,

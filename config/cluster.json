@@ -55,6 +55,12 @@
         "time" : "1:00:00"
     },
 
+    "two_deme":
+    {
+        "time" : "10:00:00",
+        "mem" : "2G"
+    },
+
     "constant_rate":
     {
         "time" : "8:00:00",
