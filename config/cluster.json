@@ -55,6 +55,12 @@
         "time" : "1:00:00"
     },
 
+    "steppingstone":
+    {
+        "time" : "10:00:00",
+        "mem" : "2G"
+    },
+
     "two_deme":
     {
         "time" : "10:00:00",
