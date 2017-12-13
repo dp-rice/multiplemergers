@@ -143,9 +143,9 @@ rule steppingstone:
         "simulations/jsfs_steppingstone_d-{dstep}_M-{M}_r-{r}.txt"
     shell:
         "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "--migration_type steppingstone -d 10 -M {wildcards.M} -r {wildcards.r} > {output}"
+        "--migration_type steppingstone -d {wildcards.dstep} -M {wildcards.M} -r {wildcards.r} > {output}"
 
 rule steppingstone_all:
     input:
-        expand("simulations/jsfs_steppingstone_d-10_M-{M}_r-{r}.txt", r=RS[:-2]/10, M=MS[2:]),
-        expand("simulations/jsfs_steppingstone_d-10_M-{M}_r-{r}.txt", r=RS[:-1]/100, M=MS[:2])
+        expand("simulations/jsfs_steppingstone_d-100_M-{M}_r-{r}.txt", r=RS[:-2]/100, M=MS[2:]),
+        expand("simulations/jsfs_steppingstone_d-100_M-{M}_r-{r}.txt", r=RS[:-1]/1000, M=MS[:2])
