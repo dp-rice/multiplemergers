@@ -66,14 +66,19 @@ rule msprime_like_slim:
 
 rule growth_all:
     input:
-        expand("simulations/msprime/jsfs_n-4_a-{alpha}_r-{r}.txt", alpha=ALPHAS, r=RS[:-3]),
-        expand("simulations/msprime/jsfs_n-4_g-{g}_r-{r}.txt", g=GS, r=RS),
-        expand("simulations/msprime/jsfs_n-4_T-{T}_S-{S}_r-{r}.txt", T=TS, S=SS, r=RS)
+        expand("simulations/msprime/jsfs_n-{n}_a-{alpha}_r-{r}.txt", n=SAMPLE_SIZES, alpha=ALPHAS, r=RS[:-3]),
+        expand("simulations/msprime/jsfs_n-{n}_g-{g}_r-{r}.txt", n=SAMPLE_SIZES, g=GS, r=RS),
+        expand("simulations/msprime/jsfs_n-{n}_T-{T}_S-{S}_r-{r}.txt", n=SAMPLE_SIZES, T=TS, S=SS, r=RS)
 
 rule two_deme_all:
     input:
-        expand("simulations/msprime/jsfs_n-4_d-2_M-{M}_r-{r}.txt", r=RS[:-2], M=MS[2:]),
-        expand("simulations/msprime/jsfs_n-4_d-2_M-{M}_r-{r}.txt", r=RS[:-1]/10, M=MS[:2])
+        expand("simulations/msprime/jsfs_n-{n}_d-2_M-{M}_r-{r}.txt", n=SAMPLE_SIZES, r=RS[:-2], M=MS[2:]),
+        expand("simulations/msprime/jsfs_n-{n}_d-2_M-{M}_r-{r}.txt", n=SAMPLE_SIZES, r=RS[:-1]/10, M=MS[:2])
+
+rule steppingstone_all:
+    input:
+        expand("simulations/msprime/jsfs_steppingstone_n-50_d-50_M-{M}_r-{r}.txt", r=RS[:-2]/100, M=MS[2:]),
+        expand("simulations/msprime/jsfs_steppingstone_n-50_d-50_M-{M}_r-{r}.txt", r=RS[:-1]/1000, M=MS[:2])
 
 rule constant_rate:
     output:
@@ -105,10 +110,18 @@ rule two_deme:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "-d 2 -M {wildcards.M} -r {wildcards.r} > {output}"
 
+rule steppingstone:
+    output:
+        "simulations/msprime/jsfs_steppingstone_n-{n}_d-{dstep}_M-{M}_r-{r}.txt"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
+        "--migration_type steppingstone -d {wildcards.dstep} -M {wildcards.M} -r {wildcards.r} > {output}"
+
 
 
 
 ### OLD ###
+'''
 rule unlinked_loci_bsc:
     output:
         "simulations/jsfs_a-1.01_unlinked.txt"
@@ -141,6 +154,8 @@ rule alpha1:
 rule constant_rate_all:
     input:
         expand("simulations/jsfs_a-{alpha}_r-{r}.txt", alpha=ALPHAS, r=RS)
+'''
+
 '''
 rule exponential_growth:
     output:
@@ -178,6 +193,8 @@ rule two_deme_all:
         expand("simulations/jsfs_d-2_M-{M}_r-{r}.txt", r=RS[:-2], M=MS[2:]),
         expand("simulations/jsfs_d-2_M-{M}_r-{r}.txt", r=RS[:-1]/10, M=MS[:2])
 '''
+
+'''
 rule steppingstone:
     output:
         "simulations/jsfs_steppingstone_d-{dstep}_M-{M}_r-{r}.txt"
@@ -189,3 +206,4 @@ rule steppingstone_all:
     input:
         expand("simulations/jsfs_steppingstone_d-100_M-{M}_r-{r}.txt", r=RS[:-2]/100, M=MS[2:]),
         expand("simulations/jsfs_steppingstone_d-100_M-{M}_r-{r}.txt", r=RS[:-1]/1000, M=MS[:2])
+'''
