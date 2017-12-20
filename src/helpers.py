@@ -23,7 +23,7 @@ def cross_correlation(X, Y, lim):
     n_comps = X.shape[0] - lim
     xy = np.correlate(X, Y[:-lim], 'valid') / n_comps
     x = np.convolve(X, np.ones(n_comps), 'valid') / n_comps
-    y = np.sum(Y[:-lim]) / n_comps
+    y = np.nansum(Y[:-lim]) / n_comps
     return (xy - x*y)
 
 
