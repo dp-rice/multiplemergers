@@ -32,15 +32,15 @@ rule merge_correlations:
     output:
         "simulations/slim/{typ}_n-{n}_fsel-{fsel}_corrmerged.txt.gz"
     input:
-        expand("simulations/slim/{{typ}}_n-{{n}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
+        expand("simulations/slim/scratch/{{typ}}_n-{{n}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
     shell:
         "python src/merge_corr.py {wildcards.n} {L} {w} {input} | gzip -c > {output}"
 
 rule correlations:
     input:
-        "simulations/slim/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
+        "simulations/slim/scratch/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
     output:
-        temp("simulations/slim/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.corr.txt.gz")
+        temp("simulations/slim/scratch/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.corr.txt.gz")
     shell:
         "python src/alleles2correlations.py {input} {wildcards.n} {L} {w} | gzip -c > {output}"
 
@@ -48,7 +48,7 @@ rule parse_slim:
     input:
         "simulations/slim/sampled/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.txt"
     output:
-        temp("simulations/slim/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz")
+        temp("simulations/slim/scratch/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz")
     shell:
         "python src/parse_slim.py {input} {L} {w} {output}"
 
