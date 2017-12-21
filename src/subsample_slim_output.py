@@ -7,6 +7,13 @@ n_new = int(n_new)
 infile = sys.stdin
 outfile = sys.stdout
 
+# If the two sample sizes are equal, copy the file
+if n_old == n_new:
+    for line in infile:
+        outfile.write(line)
+    exit()
+
+
 line = infile.readline() 
 # Re-print header
 while not line.startswith('#OUT'):

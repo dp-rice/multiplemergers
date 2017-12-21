@@ -18,42 +18,53 @@ FBGSEL = np.logspace(-2, 0, 3)
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
 
 ### SLiM ###
-sample_size = 100
+sim_sample_size = 100
+SUBSAMPLE_SIZES = [100, 4]
 L = int(1e8)
 w = 1000
 
 rule merge_correlations_all:
     input:
-        expand("simulations/slim/sweeps_fsel-{fsel}_corrmerged.txt.gz", fsel=FSEL),
-        expand("simulations/slim/bgsel_fsel-{fsel}_corrmerged.txt.gz", fsel=FBGSEL)
+        expand("simulations/slim/sweeps_n-{n}_fsel-{fsel}_corrmerged.txt.gz", fsel=FSEL, n=SUBSAMPLE_SIZES),
+        expand("simulations/slim/bgsel_n-{n}_fsel-{fsel}_corrmerged.txt.gz", fsel=FBGSEL, n=SUBSAMPLE_SIZES)
 
 rule merge_correlations:
     output:
-        "simulations/slim/{typ}_fsel-{fsel}_corrmerged.txt.gz"
+        "simulations/slim/{typ}_n-{n}_fsel-{fsel}_corrmerged.txt.gz"
     input:
-        expand("simulations/slim/{{typ}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
+        expand("simulations/slim/{{typ}}_n-{{n}}_fsel-{{fsel}}_rep-{rep}.corr.txt.gz", rep=np.arange(100))
     shell:
-        "python src/merge_corr.py {sample_size} {L} {w} {input} | gzip -c > {output}"
+        "python src/merge_corr.py {wildcards.n} {L} {w} {input} | gzip -c > {output}"
 
 rule correlations:
     input:
-        "simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
+        "simulations/slim/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz"
     output:
-        temp("simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.corr.txt.gz")
+        temp("simulations/slim/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.corr.txt.gz")
     shell:
-        "python src/alleles2correlations.py {input} {sample_size} {L} {w} | gzip -c > {output}"
+        "python src/alleles2correlations.py {input} {wildcards.n} {L} {w} | gzip -c > {output}"
 
 rule parse_slim:
     input:
-        "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
+        "simulations/slim/sampled/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.txt"
     output:
-        temp("simulations/slim/{typ}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz")
+        temp("simulations/slim/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.wsfs.txt.gz")
     shell:
         "python src/parse_slim.py {input} {L} {w} {output}"
 
+rule subsample_slim:
+    input:
+        "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
+    output:
+        "simulations/slim/sampled/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.txt"
+    shell:
+        "python src/subsample_slim_output.py {sim_sample_size} {wildcards.n} < {input} > {output}"
+        
 rule slim:
     output:
         "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
+    wildcard_constraints:
+        typ="\[a-z]+"
     shell:
         "slim -d fsel={wildcards.fsel} src/slim/{wildcards.typ}.slim > {output}"
 
