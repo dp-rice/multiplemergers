@@ -40,6 +40,13 @@ rule test:
     shell:
         "echo Test > {output}"
     
+rule query_gazave_vcf:
+    output:
+        "data/GazaveEtal/variants.txt"
+    input:
+        "data/GazaveEtal/NR_all_final_masked.vcf"
+    shell:
+        "bcftools query -Hf '%CHROM  %POS  %REF  %ALT %INFO/AN %INFO/AC %INFO/AF\\n' {input} > {output}"
 
 #rule all:
 #	input:		
