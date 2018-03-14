@@ -40,6 +40,15 @@ rule test:
     shell:
         "echo Test > {output}"
     
+# Use the ocr engine tesseract to extract the target table from table S2.
+# We will manually clean it up to generate gazave_targets.txt
+rule ocr_gazave_table:
+    input:
+        "data/Gazave/gazave_targets.png"
+    output:
+        "data/Gazave/gazave_targets_raw.txt"
+    shell:
+        "tesseract {input} {output}"
 
 #rule all:
 #	input:		
