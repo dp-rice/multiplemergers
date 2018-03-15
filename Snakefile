@@ -46,7 +46,8 @@ rule query_gazave_vcf:
     input:
         "data/GazaveEtal/NR_all_final_masked.vcf"
     shell:
-        "bcftools query -Hf '%CHROM  %POS  %REF  %ALT %INFO/AN %INFO/AC %INFO/AF\\n' {input} > {output}"
+        "bcftools query -Hf '%CHROM  %POS  %REF  %ALT %INFO/AN %INFO/AC %INFO/AF\\n' {input} | "
+        "sed '1s/.*/CHROM POS REF ALT AN AC AF/' > {output}"
 
 #rule all:
 #	input:		
