@@ -68,6 +68,22 @@ rule align_dpgp3_all:
         expand(DATA_PATH + "{CHROM}.alignment.txt.gz", CHROM=CHROMS)
 
 '''
+    Subsample, get minor allele counts and number observed for each site
+'''
+rule get_mac:
+    input:
+        DATA_PATH + "{chrom}.alignment.txt.gz"
+    output:
+        DATA_PATH + "{chrom}.mac.txt.gz"
+    shell:
+        "gunzip -c < {input} | python src/alignment2mac.py 100 "
+        "| gzip -c > {output}"
+
+rule get_mac_all:
+    input:
+        expand(DATA_PATH + "{CHROM}.mac.txt.gz", CHROM=CHROMS)
+
+'''
     Subsample, filter missing data, and get minor allele frequencies.
 '''
 rule get_maf:

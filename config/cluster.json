@@ -10,6 +10,11 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
+    "get_mac":
+    {
+        "time" : "0:20:00"
+    },
+
     "merge_correlations":
     {
         "time" : "0:20:00"
