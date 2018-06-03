@@ -39,18 +39,3 @@ rule test:
         "sandbox/test.txt"
     shell:
         "echo Test > {output}"
-    
-rule query_gazave_vcf:
-    output:
-        "data/GazaveEtal/variants.txt"
-    input:
-        "data/GazaveEtal/NR_all_final_masked.vcf"
-    shell:
-        "bcftools query -Hf '%CHROM  %POS  %REF  %ALT %INFO/AN %INFO/AC %INFO/AF\\n' {input} | "
-        "sed '1s/.*/CHROM POS REF ALT AN AC AF/' > {output}"
-
-#rule all:
-#	input:		
-#            expand('data/1kg_phase3_sfs/ALL.chr{CHROM}.{pop}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.frq.count', pop=POPS, CHROM=[22]),
-#            expand('plots/geodist/{name}_maf_{maf}_total_1kg_geodist3.png', name=INDIVS, maf=[0.01, 0.05]),
-#            expand('data/logl_ashare/total/{maf}.logl.hwe_table.txt', maf=[0.1, 0.05, 0.02])
