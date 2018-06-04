@@ -83,3 +83,19 @@ rule mac2fastNeutrino:
 rule mac2fastNeutrino_all:
     input:
         expand(DATA_PATH + "{CHROM}.sfs.txt", CHROM=CHROMS)
+
+'''
+    Run fastNeutrino on DPGP windowed SFS.
+'''
+rule fastNeutrino:
+    input:
+        data="data/DPGP3/windowed_sfs/{chrom}.sfs.txt"
+        model="fastNeutrino/models/{model}.txt"
+    output:
+        "fastNeutrino/fitted_params/{chrom}.{model}.txt"
+    shell:
+        "fastNeutrino --foldSpectrum --maxB 20 --maxRandomRestarts 10 "
+        "--modelFile {input.model} "
+        "--inferredModelOutputFile {output} "
+        "< {input.data} "
+        "2> fastNeutrino/log/{chrom}.{model}.log"
