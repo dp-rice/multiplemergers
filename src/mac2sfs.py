@@ -1,7 +1,7 @@
-#import sys
 import argparse
 import numpy as np
 import helpers as h
+from scipy.stats import hypergeom
 
 def downsample_sfs(n_obs, allele_count, n_downsample):
     """
@@ -15,7 +15,14 @@ def downsample_sfs(n_obs, allele_count, n_downsample):
     Returns:
     sfs -- the expected downsampled SFS as a length--n_downsample + 1 numpy array
     """
-    return np.zeros(n_obs+1)
+    # If fewer than n_downsample observations, return zeros.
+    if n_downsample > n_obs:
+        sfs = np.zeros(n_downsample+1)
+    # Otherwise, use hypergeometric probability as expected sfs
+    else:
+        x = np.arange(0, n_downsample+1)
+        sfs = hypergeom(n_obs, allele_count, n_downsample).pmf(x)
+    return sfs
 
 parser = argparse.ArgumentParser(description='''Calculate windowed
                     and downsampled site frequency spectrum.''')
@@ -50,7 +57,7 @@ data = h.loadints(args.data_file, args.chrom_len, 2)
 sfs = np.zeros(n_ds+1, args.chrom_len // w + 1)
 # Calculate downsampled sfs
 for pos in fourDsites:
-    sfs[:, pos//w] =  downsample_sfs(data[pos,0], data[pos,1], n_ds)
+    sfs[:, pos//w] +=  downsample_sfs(data[pos,0], data[pos,1], n_ds)
 
 # Print header
 print(n_ds, args.chrom_len // w + 1)
