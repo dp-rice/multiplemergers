@@ -7,10 +7,10 @@ import os
 # ----- Definitions for the project ----- #
 
 CHROMS = ['Chr' + c for c in ['2L', '2R', '3L', '3R']]
-CHROM_LENGTHS = {'chr2L':23011544,
-                'chr2R':21146708,
-                'chr3L':24543557,
-                'chr3R':27905053}
+CHROM_LENGTHS = {'Chr2L':23011544,
+                'Chr2R':21146708,
+                'Chr3L':24543557,
+                'Chr3R':27905053}
 DATA_PATH = "/project/jnovembre/data/external_public/DPGP3/"
 
 # REF_GENOME = "/home/abiddanda/novembre_lab/data/external_public/reference_genomes/hs37d5.fa"
@@ -90,19 +90,21 @@ rule get_mac_all:
     Convert minor allele counts to downsampled SFS for fastNeutrino.
     Downsample to 90 samples. Use a window size of 100Kb.
 '''
-rule fastNeutrino_sfs:
+rule mac2fastNeutrino:
     input:
         DATA_PATH + "{chrom}.mac.txt.gz",
         "data/dmel-4Dsites.txt"
     output:
         "data/DPGP3/windowed_sfs/{chrom}.sfs.txt"
+    params:
+        chr_len = lambda wildcards: CHROM_LENGTHS[wildcards.chrom]
     shell:
         '''
-        python src/mac2sfs.py
-            {chrom} CHROM_LENGTHS[{chrom}] 100000 90 {input} > {output}
+        python src/mac2sfs.py \
+            {wildcards.chrom} {params.chr_len} 100000 90 {input} > {output}
         '''
 
-rule fastNeutrino_sfs_all:
+rule mac2fastNeutrino_all:
     input:
         expand(DATA_PATH + "{CHROM}.sfs.txt", CHROM=CHROMS)
 

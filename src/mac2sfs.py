@@ -43,10 +43,10 @@ with open(args.fourfold_file) as infile:
                     if line.startswith(chrom)]
 
 # Import allele-count data
-data = h.loadints(args.data_file, args.chrom_len, 2)
+# data = h.loadints(args.data_file, args.chrom_len, 2)
 
 print(fourDsites[:10])
-print(data.shape)
+# print(data.shape)
 
 # Initialize per-locus SFS matrix
 
