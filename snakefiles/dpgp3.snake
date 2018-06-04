@@ -82,7 +82,7 @@ rule mac2fastNeutrino:
 
 rule mac2fastNeutrino_all:
     input:
-        expand(DATA_PATH + "{CHROM}.sfs.txt", CHROM=CHROMS)
+        expand("data/DPGP3/windowed_sfs/{CHROM}.sfs.txt", CHROM=CHROMS)
 
 '''
     Run fastNeutrino on DPGP windowed SFS.
