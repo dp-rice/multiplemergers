@@ -54,7 +54,7 @@ with open(args.fourfold_file) as infile:
 data = h.loadints(args.data_file, args.chrom_len, 2)
 
 # Initialize per-locus SFS matrix
-sfs = np.zeros(n_ds+1, args.chrom_len // w + 1)
+sfs = np.zeros((n_ds+1, args.chrom_len // w + 1))
 # Calculate downsampled sfs
 for pos in fourDsites:
     sfs[:, pos//w] +=  downsample_sfs(data[pos,0], data[pos,1], n_ds)
