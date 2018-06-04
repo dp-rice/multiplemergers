@@ -15,7 +15,7 @@ def downsample_sfs(n_obs, allele_count, n_downsample):
     Returns:
     sfs -- the expected downsampled SFS as a length--n_downsample + 1 numpy array
     """
-    pass
+    return np.zeros(n_obs+1)
 
 parser = argparse.ArgumentParser(description='''Calculate windowed
                     and downsampled site frequency spectrum.''')
@@ -32,10 +32,11 @@ parser.add_argument('data_file', type=str,
 parser.add_argument('fourfold_file', type=str,
                     help='File containing a list of four-fold degenerate sites')
 args = parser.parse_args()
+w = args.window_size
+n_ds = args.n_downsample
 
 # Strip off the "chr" from chromosme names.
 chrom = args.chromosome[3:]
-
 # Import 4-fold degenerate sites
 with open(args.fourfold_file) as infile:
     # Convert 4d sites from one-indexed to zero-indexed.
@@ -43,15 +44,16 @@ with open(args.fourfold_file) as infile:
                     if line.startswith(chrom)]
 
 # Import allele-count data
-# data = h.loadints(args.data_file, args.chrom_len, 2)
-
-print(fourDsites[:10])
-# print(data.shape)
+data = h.loadints(args.data_file, args.chrom_len, 2)
 
 # Initialize per-locus SFS matrix
-
+sfs = np.zeros(n_ds+1, args.chrom_len // w + 1)
 # Calculate downsampled sfs
+for pos in fourDsites:
+    sfs[:, pos//w] =  downsample_sfs(data[pos,0], data[pos,1], n_ds)
 
 # Print header
-
+print(n_ds, args.chrom_len // w + 1)
 # Print SFS
+for row in sfs:
+    print(' '.join(map(str,row)))
