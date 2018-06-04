@@ -94,7 +94,7 @@ rule fastNeutrino:
     output:
         "fastNeutrino/fitted_params/{chrom}.{model}.txt"
     shell:
-        "fastNeutrino --foldSpectrum --maxB 20 --maxRandomRestarts 10 "
+        "fastNeutrino --foldSpectrum --adaptiveMaxB 0.95 --maxRandomRestarts 10 "
         "--modelFile {input.modelfile} "
         "--inferredModelOutputFile {output} "
         "< {input.datafile} "
