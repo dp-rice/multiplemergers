@@ -13,31 +13,7 @@ CHROM_LENGTHS = {'Chr2L':23011544,
                 'Chr3R':27905053}
 DATA_PATH = "/project/jnovembre/data/external_public/DPGP3/"
 
-# REF_GENOME = "/home/abiddanda/novembre_lab/data/external_public/reference_genomes/hs37d5.fa"
-
-# PBWT = 'bin/pbwt/pbwt'
-
-
-# GEODIST_FILE = "/home/abiddanda/novembre_lab/data/external_public/geodist/newll"
-
-# GEODIST_PROJECT = "/home/abiddanda/novembre_lab/abiddanda/hackathonDec2016"
-
-# INDIVS = ['BOT2016', 'Yamnaya', 'Yana', 'Kolyma_River']
-
-# ---- Useful Functions ---- #
-
-# base = lambda x:os.path.splitext(x)[0]
-
 # ------  Rules ----- #
-
-'''
-    Download raw DPGP3 consensus sequences.
-'''
-# rule download_dpgp3:
-#     output:
-#         DATA_PATH + "dpgp3_sequences.tar.bz2"
-#     shell:
-#         "wget http://pooldata.genetics.wisc.edu/dpgp3_sequences.tar.bz2 -O {output}"
 
 '''
     Untar the consensus sequence archive.
@@ -107,71 +83,3 @@ rule mac2fastNeutrino:
 rule mac2fastNeutrino_all:
     input:
         expand(DATA_PATH + "{CHROM}.sfs.txt", CHROM=CHROMS)
-
-### OLD ###
-'''
-    Subsample, filter missing data, and get minor allele frequencies.
-'''
-rule get_maf:
-    input:
-        DATA_PATH + "{chrom}.alignment.txt.gz"
-    output:
-        DATA_PATH + "{chrom}.maf.txt.gz"
-    shell:
-        "gunzip -c < {input} | python src/alignment2maf.py 100 "
-        "| gzip -c > {output}"
-
-rule get_maf_all:
-    input:
-        expand(DATA_PATH + "{CHROM}.maf.txt.gz", CHROM=CHROMS)
-
-'''
-    Filter out all sites with missing data
-'''
-rule filter_missing_data:
-    input:
-        alignment = DATA_PATH + "{chrom}.alignment.txt.gz",
-        samples = DATA_PATH + "inversions/noninverted_{chrom}.txt"
-    output:
-        DATA_PATH + "{chrom}.alignment.N0.txt.gz"
-    shell:
-        "NSAMPLES=$(wc -l < {input.samples}); "
-        "gunzip -c < {input.alignment} | python src/filter_missing_data.py $NSAMPLES 0 "
-        "| gzip -c > {output}"
-
-'''
-    Filter out all sites with missing data for all chromosomes
-'''
-rule filter_missing_data_all:
-    input:
-        expand(DATA_PATH + "{CHROM}.alignment.N0.txt.gz", CHROM=CHROMS)
-
-'''
-    Calculate SFS in windows
-'''
-rule calculate_windowed_sfs:
-    input:
-        alignment = DATA_PATH + "{chrom}.alignment.N0.txt.gz",
-        samples = DATA_PATH + "inversions/noninverted_{chrom}.txt"
-    output:
-        "data/DPGP3/windowed_sfs/{chrom}.windows.N0.{window_size}.txt.gz"
-    shell:
-        "NSAMPLES=$(wc -l < {input.samples}); "
-        "gunzip -c < {input.alignment} | python src/filter_missing_data.py $NSAMPLES 0 "
-        "| gzip -c > {output}"
-
-# '''
-#     Convert to PBWT format (only variants that are polymorphic)
-# '''
-# rule conv_pbwt:
-#     input:
-#         vcf= DATA_PATH + '/vcfs/samtools.combined.chr{CHROM}.release1.rn.vcf.gz'
-#     output:
-#         tmp_vcf  = temp('data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.vcf.gz'),
-#         tmp_vcf_idx = temp('data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.vcf.gz.tbi'),
-#         pbwt = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.pbwt',
-#         sites = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.sites',
-#         samples = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.samples',
-#     run:
-#         shell('bcftools view -m2 -M2 -v snps {input.vcf} | bgzip > {output.tmp_vcf} ; tabix {output.tmp_vcf}')
-#         shell('%s -readVcfGT {output.tmp_vcf} -write {output.pbwt} -writeSites {output.sites} -writeSamples {output.samples}' % PBWT)
