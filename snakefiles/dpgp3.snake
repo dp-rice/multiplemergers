@@ -11,6 +11,17 @@ CHROM_LENGTHS = {'Chr2L':23011544,
                 'Chr2R':21146708,
                 'Chr3L':24543557,
                 'Chr3R':27905053}
+
+### The Starting and Ending locus positions (in 100KB) for fastNeutrino
+LOCUS_START = {'Chr2L':10,
+                'Chr2R':60,
+                'Chr3L':10,
+                'Chr3R':100}
+LOCUS_END = {'Chr2L':170,
+                'Chr2R':190,
+                'Chr3L':170,
+                'Chr3R':260}
+
 DATA_PATH = "/project/jnovembre/data/external_public/DPGP3/"
 
 # ------  Rules ----- #
@@ -84,6 +95,7 @@ rule mac2fastNeutrino_all:
     input:
         expand("data/DPGP3/windowed_sfs/{CHROM}.sfs.txt", CHROM=CHROMS)
 
+
 '''
     Run fastNeutrino on DPGP windowed SFS.
 '''
@@ -93,9 +105,25 @@ rule fastNeutrino:
         modelfile="fastNeutrino/models/{model}.txt"
     output:
         "fastNeutrino/fitted_params/{chrom}.{model}.txt"
+    params:
+        start = lambda wildcards: LOCUS_START[wildcards.chrom],
+        end = lambda wildcards: LOCUS_END[wildcards.chrom]
     shell:
         "fastNeutrino --foldSpectrum --adaptiveMaxB 0.95 --maxRandomRestarts 10 "
+        "--locusStartIdx {params.start} "
+        "--locusEndIdx {params.end} "
         "--modelFile {input.modelfile} "
         "--inferredModelOutputFile {output} "
         "< {input.datafile} "
         "> fastNeutrino/log/{wildcards.chrom}.{wildcards.model}.log"
+
+MODELS=['2EpochC',
+        '2EpochE',
+        '3EpochCC',
+        '3EpochCE',
+        '3EpochEE']
+rule fastNeutrino_all:
+    input:
+        expand("fastNeutrino/fitted_params/{CHROM}.{MODEL}.txt",
+            CHROM=CHROMS,
+            MODEL=MODELS)
