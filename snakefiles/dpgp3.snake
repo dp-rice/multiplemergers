@@ -109,7 +109,7 @@ rule fastNeutrino:
         start = lambda wildcards: LOCUS_START[wildcards.chrom],
         end = lambda wildcards: LOCUS_END[wildcards.chrom]
     shell:
-        "fastNeutrino --foldSpectrum --adaptiveMaxB 0.95 --maxRandomRestarts 10 "
+        "fastNeutrino --foldSpectrum --maxB 30 --maxRandomRestarts 100 "
         "--locusStartIdx {params.start} "
         "--locusEndIdx {params.end} "
         "--modelFile {input.modelfile} "
@@ -117,27 +117,15 @@ rule fastNeutrino:
         "< {input.datafile} "
         "> fastNeutrino/log/{wildcards.chrom}.{wildcards.model}.log"
 
-MODELS=['2EpochC',
-        '2EpochE',
-        '3EpochCC',
-        '3EpochCE',
-        '3EpochEE']
-MODELS += ['{}Epoch_fixed'.format(i) for i in range(4,11)]
-MODELS += ['{}Epoch_free'.format(i) for i in range(2,11)]
+MODELS=['2EpochConst',
+        '2EpochExp',
+        '3EpochConstConst',
+        '3EpochConstExp',
+        '3EpochExpConst',
+        '3EpochExpExp']
 
 rule fastNeutrino_all:
     input:
         expand("fastNeutrino/fitted_params/{CHROM}.{MODEL}.txt",
             CHROM=CHROMS,
             MODEL=MODELS)
-
-# Fix ancestral size (for now). Using value from Ragsdale & Gutenkunst
-N_ANC = 3e5
-rule write_model:
-    output:
-        "fastNeutrino/models/{num_epochs}Epoch_{spacing_type}.txt"
-    shell:
-        "python src/write_fastNeutrino_input.py {N_ANC} "
-        "{wildcards.num_epochs} "
-        "--spacing={wildcards.spacing_type} "
-        "> {output}"
