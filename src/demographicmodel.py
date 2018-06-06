@@ -4,7 +4,7 @@ import functools
 class DemographicModel:
     '''Stores piecewise-exponential demographic models.'''
 
-    def __init__(self):
+    def __init__(self, filename=None):
         # Number of epochs. Must equal the lengths of the following lists:
         self.num_epochs = 0
         # Epoch start times
@@ -13,6 +13,10 @@ class DemographicModel:
         self.sizes = []
         # Epoch growth rates (forward in time)
         self.rates = []
+
+        # If a fastNeutrino output file is specified, read it.
+        if filename is not None:
+            self.read_fastNeutrino_output(filename)
 
     def read_fastNeutrino_output(self, model_fn):
         '''Read epochs from a fastNeutrino fitted parameters output file.'''
