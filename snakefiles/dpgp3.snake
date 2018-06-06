@@ -122,8 +122,22 @@ MODELS=['2EpochC',
         '3EpochCC',
         '3EpochCE',
         '3EpochEE']
+MODELS += ['{}Epoch_fixed'.format(i) for i in range(4,11)]
+MODELS += ['{}Epoch_free'.format(i) for i in range(2,11)]
+
 rule fastNeutrino_all:
     input:
         expand("fastNeutrino/fitted_params/{CHROM}.{MODEL}.txt",
             CHROM=CHROMS,
             MODEL=MODELS)
+
+# Fix ancestral size (for now). Using value from Ragsdale & Gutenkunst
+N_ANC = 3e5
+rule write_model:
+    output:
+        "fastNeutrino/models/{num_epochs}Epoch_{spacing_type}.txt"
+    shell:
+        "python src/write_fastNeutrino_input.py {N_ANC} "
+        "{wildcards.num_epochs} "
+        "--spacing={wildcards.spacing_type} "
+        "> {output}"
