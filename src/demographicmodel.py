@@ -49,7 +49,7 @@ class DemographicModel:
 
     def add_epoch(self, time, size, rate):
         '''Add new epoch to the demographic model.'''
-        if self.num_epochs == 0 or time > self.times[-1]:
+        if self.num_epochs == 0 or time >= self.times[-1]:
             self.num_epochs += 1
             self.times.append(time)
             self.sizes.append(size)
