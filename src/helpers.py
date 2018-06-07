@@ -119,7 +119,7 @@ def normalizecorr(readcorrout, n_samples):
 
 
 # This is faster than numpy loadtxt because it pre-allocates the space
-def loadints(fn, rows, cols): 
+def loadints(fn, rows, cols):
     ret = np.zeros((rows, cols), dtype=int)
     with gzip.open(fn, 'rb') as infile:
         i = 0
@@ -225,7 +225,7 @@ def import_msprime_sfs(file_list, n_samples):
                 mSFS[i,:] = np.array(line.split(), dtype=float)
                 jSFS_triu[i,:] = np.array(datafile.readline().split())
                 break
-    
+
     # Unpack the joint SFS from 1D to 2D array
     jSFS = np.zeros((n_files, n_samples-1, n_samples-1))
     for i in range(n_files):
@@ -279,3 +279,18 @@ def import_msprime_corr(file_list, n_samples, normalize=True):
         for old, new in zip(data, new_data):
             old[i] = new
     return pi, sfs, jsfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
+
+# fastNeutrino I/O
+def get_sfs_from_fastNeutrino(log_fn):
+    '''Get expected and observed SFS from fastneutrino log'''
+    with open(log_fn) as infile:
+        for line in infile:
+            if line == 'Expected folded spectrum under inferred demographic model:\n':
+                es_line = infile.readline()
+            elif line == 'Observed folded spectrum in data:\n':
+                os_line = infile.readline()
+            elif line.startswith('KL divergence (observed || expected) ='):
+                kl_divergence = line.split('=')[1].strip()
+    expected_spectrum = np.array(es_line.split(), dtype=float)
+    observed_spectrum = np.array(os_line.split(), dtype=float)
+    return expected_spectrum, observed_spectrum, kl_divergence

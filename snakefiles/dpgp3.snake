@@ -7,34 +7,24 @@ import os
 # ----- Definitions for the project ----- #
 
 CHROMS = ['Chr' + c for c in ['2L', '2R', '3L', '3R']]
+CHROM_LENGTHS = {'Chr2L':23011544,
+                'Chr2R':21146708,
+                'Chr3L':24543557,
+                'Chr3R':27905053}
+
+### The Starting and Ending locus positions (in 100KB) for fastNeutrino
+LOCUS_START = {'Chr2L':10,
+                'Chr2R':60,
+                'Chr3L':10,
+                'Chr3R':100}
+LOCUS_END = {'Chr2L':170,
+                'Chr2R':190,
+                'Chr3L':170,
+                'Chr3R':260}
 
 DATA_PATH = "/project/jnovembre/data/external_public/DPGP3/"
 
-# REF_GENOME = "/home/abiddanda/novembre_lab/data/external_public/reference_genomes/hs37d5.fa"
-
-# PBWT = 'bin/pbwt/pbwt'
-
-
-# GEODIST_FILE = "/home/abiddanda/novembre_lab/data/external_public/geodist/newll"
-
-# GEODIST_PROJECT = "/home/abiddanda/novembre_lab/abiddanda/hackathonDec2016"
-
-# INDIVS = ['BOT2016', 'Yamnaya', 'Yana', 'Kolyma_River']
-
-# ---- Useful Functions ---- #
-
-# base = lambda x:os.path.splitext(x)[0]
-
-# ------  Rules ----- # 
-
-'''
-    Download raw DPGP3 consensus sequences.
-'''
-# rule download_dpgp3:
-#     output:
-#         DATA_PATH + "dpgp3_sequences.tar.bz2"
-#     shell:
-#         "wget http://pooldata.genetics.wisc.edu/dpgp3_sequences.tar.bz2 -O {output}"
+# ------  Rules ----- #
 
 '''
     Untar the consensus sequence archive.
@@ -84,68 +74,58 @@ rule get_mac_all:
         expand(DATA_PATH + "{CHROM}.mac.txt.gz", CHROM=CHROMS)
 
 '''
-    Subsample, filter missing data, and get minor allele frequencies.
+    Convert minor allele counts to downsampled SFS for fastNeutrino.
+    Downsample to 90 samples. Use a window size of 100Kb.
 '''
-rule get_maf:
+rule mac2fastNeutrino:
     input:
-        DATA_PATH + "{chrom}.alignment.txt.gz"
+        DATA_PATH + "{chrom}.mac.txt.gz",
+        "data/dmel-4Dsites.txt"
     output:
-        DATA_PATH + "{chrom}.maf.txt.gz"
+        "data/DPGP3/windowed_sfs/{chrom}.sfs.txt"
+    params:
+        chr_len = lambda wildcards: CHROM_LENGTHS[wildcards.chrom]
     shell:
-        "gunzip -c < {input} | python src/alignment2maf.py 100 "
-        "| gzip -c > {output}"
+        '''
+        python src/mac2sfs.py \
+            {wildcards.chrom} {params.chr_len} 100000 90 {input} > {output}
+        '''
 
-rule get_maf_all:
+rule mac2fastNeutrino_all:
     input:
-        expand(DATA_PATH + "{CHROM}.maf.txt.gz", CHROM=CHROMS)
+        expand("data/DPGP3/windowed_sfs/{CHROM}.sfs.txt", CHROM=CHROMS)
+
 
 '''
-    Filter out all sites with missing data
+    Run fastNeutrino on DPGP windowed SFS.
 '''
-rule filter_missing_data:
+rule fastNeutrino:
     input:
-        alignment = DATA_PATH + "{chrom}.alignment.txt.gz",
-        samples = DATA_PATH + "inversions/noninverted_{chrom}.txt"
+        datafile="data/DPGP3/windowed_sfs/{chrom}.sfs.txt",
+        modelfile="fastNeutrino/models/{model}.txt"
     output:
-        DATA_PATH + "{chrom}.alignment.N0.txt.gz"
+        "fastNeutrino/fitted_params/{chrom}.{model}.txt"
+    params:
+        start = lambda wildcards: LOCUS_START[wildcards.chrom],
+        end = lambda wildcards: LOCUS_END[wildcards.chrom]
     shell:
-        "NSAMPLES=$(wc -l < {input.samples}); "
-        "gunzip -c < {input.alignment} | python src/filter_missing_data.py $NSAMPLES 0 "
-        "| gzip -c > {output}"
+        "fastNeutrino --foldSpectrum --maxB 30 --maxRandomRestarts 100 "
+        "--locusStartIdx {params.start} "
+        "--locusEndIdx {params.end} "
+        "--modelFile {input.modelfile} "
+        "--inferredModelOutputFile {output} "
+        "< {input.datafile} "
+        "> fastNeutrino/log/{wildcards.chrom}.{wildcards.model}.log"
 
-'''
-    Filter out all sites with missing data for all chromosomes
-'''
-rule filter_missing_data_all:
+MODELS=['2EpochConst',
+        '2EpochExp',
+        '3EpochConstConst',
+        '3EpochConstExp',
+        '3EpochExpConst',
+        '3EpochExpExp']
+
+rule fastNeutrino_all:
     input:
-        expand(DATA_PATH + "{CHROM}.alignment.N0.txt.gz", CHROM=CHROMS)
-
-'''
-    Calculate SFS in windows
-'''
-rule calculate_windowed_sfs:
-    input:
-        alignment = DATA_PATH + "{chrom}.alignment.N0.txt.gz",
-        samples = DATA_PATH + "inversions/noninverted_{chrom}.txt"
-    output:
-        "data/DPGP3/windowed_sfs/{chrom}.windows.N0.{window_size}.txt.gz"
-    shell:
-        "NSAMPLES=$(wc -l < {input.samples}); "
-        "gunzip -c < {input.alignment} | python src/filter_missing_data.py $NSAMPLES 0 "
-        "| gzip -c > {output}"
-
-# '''
-#     Convert to PBWT format (only variants that are polymorphic)
-# '''
-# rule conv_pbwt:
-#     input:
-#         vcf= DATA_PATH + '/vcfs/samtools.combined.chr{CHROM}.release1.rn.vcf.gz'
-#     output:
-#         tmp_vcf  = temp('data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.vcf.gz'),
-#         tmp_vcf_idx = temp('data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.vcf.gz.tbi'),
-#         pbwt = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.pbwt',
-#         sites = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.sites',
-#         samples = 'data/pbwt_files/samtools.combined.chr{CHROM}.release1.rn.filt.samples',
-#     run:
-#         shell('bcftools view -m2 -M2 -v snps {input.vcf} | bgzip > {output.tmp_vcf} ; tabix {output.tmp_vcf}')
-#         shell('%s -readVcfGT {output.tmp_vcf} -write {output.pbwt} -writeSites {output.sites} -writeSamples {output.samples}' % PBWT)
+        expand("fastNeutrino/fitted_params/{CHROM}.{MODEL}.txt",
+            CHROM=CHROMS,
+            MODEL=MODELS)

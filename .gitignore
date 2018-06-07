@@ -4,3 +4,9 @@
 *.log
 *.pdf
 *.pyc
+.snakemake
+*.DS_Store
+notebooks/.ipynb_checkpoints/
+simulations/
+sandbox/
+data/
