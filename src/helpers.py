@@ -281,7 +281,7 @@ def import_msprime_corr(file_list, n_samples, normalize=True):
     return pi, sfs, jsfs, pi_corr, lolo_corr, lohi_corr, hihi_corr
 
 # fastNeutrino I/O
-def get_spectra(log_fn):
+def get_sfs_from_fastNeutrino(log_fn):
     '''Get expected and observed SFS from fastneutrino log'''
     with open(log_fn) as infile:
         for line in infile:
@@ -289,6 +289,8 @@ def get_spectra(log_fn):
                 es_line = infile.readline()
             elif line == 'Observed folded spectrum in data:\n':
                 os_line = infile.readline()
+            elif line.startswith('KL divergence (observed || expected) ='):
+                kl_divergence = line.split('=')[1].strip()
     expected_spectrum = np.array(es_line.split(), dtype=float)
     observed_spectrum = np.array(os_line.split(), dtype=float)
-    return expected_spectrum, observed_spectrum
+    return expected_spectrum, observed_spectrum, kl_divergence
