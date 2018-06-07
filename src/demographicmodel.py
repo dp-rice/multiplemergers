@@ -70,6 +70,15 @@ class DemographicModel:
                          for args in zip(self.sizes, self.times, self.rates)]
             return np.piecewise(T, conditions, functions)
 
+    def rescale(self, scale=None):
+        '''Renormalize model parameters by a timescale. (Default=N_0)'''
+        if scale == None:
+            scale = self.sizes[0]
+        self.sizes = [s/scale for s in self.sizes]
+        self.times = [t/scale for t in self.times]
+        self.rates = [r*scale for r in self.rates]
+        return scale
+
 def exponential_growth(n0, t0, r, T):
     '''Calculate N(t) for exponentially-growing population back in time'''
     return n0*np.exp(-(T-t0)*r)
