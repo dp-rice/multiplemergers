@@ -91,6 +91,11 @@ rule steppingstone_all:
         expand("simulations/msprime/jsfs_steppingstone_n-50_d-50_M-{M}_r-{r}.txt", r=RS[:-2]/100, M=MS[2:]),
         expand("simulations/msprime/jsfs_steppingstone_n-50_d-50_M-{M}_r-{r}.txt", r=RS[:-1]/1000, M=MS[:2])
 
+rule fastNeutrino2msprime_all:
+    input:
+        expand("simulations/msprime/jsfs_fastNeutrino_n-{n}_{CHROM}_3EpochConstConst_r-{r}.txt",
+                n=SAMPLE_SIZES, r=RS, CHROM=CHROMS)
+
 rule constant_rate:
     output:
         "simulations/msprime/jsfs_n-{n}_a-{alpha}_r-{r}.txt"
@@ -130,12 +135,13 @@ rule steppingstone:
 
 rule fastNeutrino2msprime:
     output:
-        "simulations/msprime/jsfs_n-{n}_fastNeutrino_{chrom}_{model}_r-{r}.txt"
+        "simulations/msprime/jsfs_fastNeutrino_n-{n}_{chrom}_{model}_r-{r}.txt"
     input:
         "fastNeutrino/fitted_params/{chrom}.{model}.txt"
     shell:
         "python src/simulate_joint_sfs.py "
         "$(python src/fastNeutrino2params.py {input}) "
-        "nSamples {wildcards.n} --nLoci 100000 "
+        "--nSamples {wildcards.n} --nLoci 100000 "
         "-r {wildcards.r} "
         "> {output}"
+

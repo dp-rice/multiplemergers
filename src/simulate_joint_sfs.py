@@ -6,7 +6,7 @@ import argparse
 # sys.path.insert(1, '/users/danielrice/msprime-lambda/')
 # sys.path.insert(1, '/home/dpr/mmc_genomics/src/msprime-lambda/')
 import os
-module_path = os.path.abspath(os.path.join('../src/msprime_lambda/'))
+module_path = os.path.abspath(os.path.join('src/msprime-lambda/'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 
