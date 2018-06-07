@@ -59,7 +59,7 @@ rule subsample_slim:
         "simulations/slim/sampled/{typ}_n-{n}_fsel-{fsel}_rep-{rep}.txt"
     shell:
         "python src/subsample_slim_output.py {sim_sample_size} {wildcards.n} < {input} > {output}"
-        
+
 rule slim:
     output:
         "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
@@ -128,93 +128,14 @@ rule steppingstone:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "--migration_type steppingstone -d {wildcards.dstep} -M {wildcards.M} -r {wildcards.r} > {output}"
 
-
-
-
-### OLD ###
-'''
-rule unlinked_loci_bsc:
+rule fastNeutrino2msprime:
     output:
-        "simulations/jsfs_a-1.01_unlinked.txt"
-    shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "--alpha 1.01 --unlinked > {output}"
-
-rule unlinked_loci:
-    output:
-        "simulations/jsfs_a-2.0_unlinked_rep-{rep}.txt"
-    shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "--alpha 2.0 --unlinked > {output}"
-
-rule unlinked_loci_all:
+        "simulations/msprime/jsfs_n-{n}_fastNeutrino_{chrom}_{model}_r-{r}.txt"
     input:
-        expand("simulations/jsfs_a-2.0_unlinked_rep-{rep}.txt", rep=np.arange(100)) 
-
-rule constant_rate_short:
-    output:
-        "simulations/jsfs_a-{alpha}_r-{r}_rep-{rep}.txt"
+        "fastNeutrino/fitted_params/{chrom}.{model}.txt"
     shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 10000 "
-        "--alpha {wildcards.alpha} -r {wildcards.r} > {output}"
-
-rule alpha1:
-    input:
-        expand("simulations/jsfs_a-1.01_r-{r}_rep-{rep}.txt", r=RS, rep=np.arange(10))
-
-rule constant_rate_all:
-    input:
-        expand("simulations/jsfs_a-{alpha}_r-{r}.txt", alpha=ALPHAS, r=RS)
-'''
-
-'''
-rule exponential_growth:
-    output:
-        "simulations/jsfs_g-{g}_r-{r}.txt"
-    shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "-G {wildcards.g} -r {wildcards.r} > {output}"
-
-rule exponential_growth_all:
-    input:
-        expand("simulations/jsfs_g-{g}_r-{r}.txt", g=GS, r=RS)
-
-rule step_growth:
-    output:
-        "simulations/jsfs_T-{T}_S-{S}_r-{r}.txt"
-    shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "-T {wildcards.T} -S {wildcards.S} -r {wildcards.r} > {output}"
-
-rule step_growth_all:
-    input:
-        expand("simulations/jsfs_T-{T}_S-{S}_r-{r}.txt", r=RS, T=TS, S=SS)
-'''
-
-'''
-rule two_deme:
-    output:
-        "simulations/jsfs_d-2_M-{M}_r-{r}.txt"
-    shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "-d 2 -M {wildcards.M} -r {wildcards.r} > {output}"
-
-rule two_deme_all:
-    input:
-        expand("simulations/jsfs_d-2_M-{M}_r-{r}.txt", r=RS[:-2], M=MS[2:]),
-        expand("simulations/jsfs_d-2_M-{M}_r-{r}.txt", r=RS[:-1]/10, M=MS[:2])
-'''
-
-'''
-rule steppingstone:
-    output:
-        "simulations/jsfs_steppingstone_d-{dstep}_M-{M}_r-{r}.txt"
-    shell:
-        "python src/simulate_joint_sfs.py --nSamples 100 --nLoci 100000 "
-        "--migration_type steppingstone -d {wildcards.dstep} -M {wildcards.M} -r {wildcards.r} > {output}"
-
-rule steppingstone_all:
-    input:
-        expand("simulations/jsfs_steppingstone_d-100_M-{M}_r-{r}.txt", r=RS[:-2]/100, M=MS[2:]),
-        expand("simulations/jsfs_steppingstone_d-100_M-{M}_r-{r}.txt", r=RS[:-1]/1000, M=MS[:2])
-'''
+        "python src/simulate_joint_sfs.py "
+        "$(python src/fastNeutrino2params.py {input}) "
+        "nSamples {wildcards.n} --nLoci 100000 "
+        "-r {wildcards.r} "
+        "> {output}"

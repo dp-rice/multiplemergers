@@ -1,5 +1,6 @@
 import numpy as np
 import functools
+import sys
 
 class DemographicModel:
     '''Stores piecewise-exponential demographic models.'''
@@ -78,6 +79,13 @@ class DemographicModel:
         self.times = [t/scale for t in self.times]
         self.rates = [r*scale for r in self.rates]
         return scale
+
+    def print_msprime_flags(self):
+        '''Print model params as flags simulate_joint_sfs.py'''
+        # WARNING: only works for constant-time epochs (for now)
+        flags = '-T ' + ' '.join(map(str, self.times))
+        flags += ' -S ' + ' '.join(map(str, self.sizes))
+        sys.stdout.write(flags)
 
 def exponential_growth(n0, t0, r, T):
     '''Calculate N(t) for exponentially-growing population back in time'''

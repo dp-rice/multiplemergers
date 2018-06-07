@@ -1,0 +1,4 @@
+# fastNeutrino --foldSpectrum --maxB 30 --maxRandomRestarts 100 --locusStartIdx 10 --locusEndIdx 170 --modelFile fastNeutrino/models/3EpochExpExp.txt --inferredModelOutputFile fastNeutrino/fitted_params/Chr3L.3EpochExpExp.txt
+300000
+e	467.34926	805.111	-0.295123
+e	9.0241473e+124	8908.94	0.0345308
