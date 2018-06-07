@@ -4,7 +4,12 @@ import argparse
 
 #FIXME: this is a hack to use my local version of msprime
 # sys.path.insert(1, '/users/danielrice/msprime-lambda/')
-sys.path.insert(1, '/home/dpr/mmc_genomics/src/msprime-lambda/')
+# sys.path.insert(1, '/home/dpr/mmc_genomics/src/msprime-lambda/')
+import os
+module_path = os.path.abspath(os.path.join('../src/msprime_lambda/'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
 import msprime
 import jsfs
 
@@ -27,7 +32,7 @@ parser.add_argument("-Tc", "--coalescent_time", nargs='*', type=float, default=[
 parser.add_argument("--unlinked", action='store_true', default=False,
                     help='Simulate unlinked trees, i.e. r->Infinity.')
 parser.add_argument("-r", "--recombination_rate", type=float, default=0.0, help="per-locus recombination rate per coal unit")
-parser.add_argument("-G", "--growth_rate", type=float, default=0.0, help="population growth rate DEFAULT=0.0") 
+parser.add_argument("-G", "--growth_rate", type=float, default=0.0, help="population growth rate DEFAULT=0.0")
 parser.add_argument("-a", "--alpha", type=float, default=2.0, help="Beta-coalescent parameter alpha. DEFAULT=2.0 (Kingman)")
 
 # Population size changes
@@ -105,7 +110,7 @@ sys.stdout.write('#ALPHA={}\n'.format(args.alpha))
 # SET PARAMETERS
 
 # Set defaults
-migration_matrix = None 
+migration_matrix = None
 population_configurations = None
 demographic_events = []
 
@@ -129,7 +134,7 @@ if args.demes:
     population_configurations = [msprime.PopulationConfiguration(
                                         sample_size=samples_per_deme,
                                         growth_rate=args.growth_rate,
-                                        multiple_merger_para=args.alpha) 
+                                        multiple_merger_para=args.alpha)
                                     for d in range(args.demes)]
     sys.stdout.write('#DEMES={}\n#MIGRATION_RATE={}\n'.format(args.demes, args.migration_rate))
     sys.stdout.write('#MIGRATION_TYPE={}\n'.format(args.migration_type))
