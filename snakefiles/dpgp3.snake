@@ -74,12 +74,28 @@ rule get_mac_all:
         expand(DATA_PATH + "{CHROM}.mac.txt.gz", CHROM=CHROMS)
 
 '''
+    Make a copy of the minor allele count files in the data directory
+'''
+rule copy_mac:
+    input:
+        DATA_PATH + "{chrom}.mac.txt.gz"
+    output:
+        "data/DPGP3/minor_allele_counts/{chrom}.mac.txt.gz"
+    shell:
+        "mkdir -p data/DPGP3/minor_allele_counts/; "
+        "cp {input} {output}"
+
+rule copy_mac_all:
+    input:
+        expand("data/DPGP3/minor_allele_counts/{CHROM}.mac.txt.gz", CHROM=CHROMS)
+
+'''
     Convert minor allele counts to downsampled SFS for fastNeutrino.
     Downsample to 90 samples. Use a window size of 100Kb.
 '''
 rule mac2fastNeutrino:
     input:
-        DATA_PATH + "{chrom}.mac.txt.gz",
+        "data/DPGP3/minor_allele_counts/{chrom}.mac.txt.gz",
         "data/dmel-4Dsites.txt"
     output:
         "data/DPGP3/windowed_sfs/{chrom}.sfs.txt"
