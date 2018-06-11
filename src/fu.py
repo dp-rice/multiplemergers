@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import binom
 
 '''
 Implement formulas for the moments of the number of leaves subtended by branches
@@ -10,8 +11,11 @@ def marginal_leaf_prob(n):
     Calculate the probability that a branch at level k has i leaves.
     Return as an (n-1)x(n-1) array.
     '''
-    p_ki = np.zeros((n-1,n-1))
-    return p_ki
+    k = np.arange(2, n+1)
+    i = np.arange(1, n)
+    num = (k[None,:]-1) * binom(n-k[None,:], i[:,None]-1)
+    den = i * binom(n-1, i)
+    return num / den[:,None]
 
 def joint_leaf_prob(n):
     '''
