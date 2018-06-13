@@ -1,6 +1,6 @@
 import numpy as np
 import fu
-from scipy.special import binom
+from scipy.special import binom, expi, loggamma
 
 class TwoSFS():
     '''
@@ -81,8 +81,39 @@ def time_first_moments(n, r):
     if r == 0:
         return 1.0 / binom(k,2)
     else:
-        # TODO:
-        return np.zeros(n-1)
+        j = np.arange(2,n+1)
+        x_j = expected_coalescence_time(j, r)
+        alpha_jk = zivkovic_alpha(n)
+        sign_jk = (-1)**(j[:,None] + k[None,:])
+        return np.dot(x_j, sign_jk*alpha_jk)
+        #return -np.dot(
+
+def expected_coalescence_time(j,r):
+    '''
+    Return expected waiting time to first coalescence starting from j
+    if $N(t) = exp(rt)$.
+    '''
+    # FIXME: Underflow/overflow for small values of r
+    b = binom(j,2)
+    return -np.exp(b/r)*expi(-b/r) / r
+
+def zivkovic_alpha(n):
+    '''Calculate alpha_njk according to Zivkovic eq. 1'''
+    j = np.arange(2,n+1)
+    k = np.arange(2,n+1)
+    # Terms involving only j and n
+    loga_n = np.log(n) + 2*loggamma(n)
+    loga_j = loga_n + np.log(2*j-1) - loggamma(n-j+1) - loggamma(n+j)
+    # Terms involving only k
+    loga_k = -(np.log(k) + 2*loggamma(k))
+    # Terms involving both:
+    s = j[:,None] + k[None,:]
+    d = j[:,None] - k[None,:]
+    loga = loga_j[:,None] + loga_k[None:] + loggamma(s-1) - loggamma(d+1)
+    # Take real part (im should be zero) and set nan to zero.
+    alpha = np.exp(np.real(loga))
+    alpha[np.isnan(alpha)] = 0
+    return alpha
 
 def time_second_moments(n, r):
     '''
@@ -94,7 +125,9 @@ def time_second_moments(n, r):
 
 if __name__ == '__main__':
     n = 10
+    #print(zivkovic_alpha(n))
     k = np.arange(2,n+1)
     i = np.arange(1,n)
-    tsfs = TwoSFS(n, growth_rate=0)
-    print(tsfs.get_sfs() * i)
+    for g in [0.0, 0.001, 0.01, 0.1, 1.0]:
+        tsfs = TwoSFS(n, growth_rate=g)
+        print(g, tsfs.get_sfs() * i)
