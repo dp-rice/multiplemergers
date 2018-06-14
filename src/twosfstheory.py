@@ -86,16 +86,21 @@ def time_first_moments(n, r):
         alpha_jk = zivkovic_alpha(n)
         sign_jk = (-1)**(j[:,None] + k[None,:])
         return np.dot(x_j, sign_jk*alpha_jk)
-        #return -np.dot(
 
 def expected_coalescence_time(j,r):
     '''
     Return expected waiting time to first coalescence starting from j
     if $N(t) = exp(rt)$.
     '''
-    # FIXME: Underflow/overflow for small values of r
-    b = binom(j,2)
-    return -np.exp(b/r)*expi(-b/r) / r
+    x = binom(j,2) / r
+    # Use an asymptotic expansion for large arguments
+    return np.piecewise(x, [x<=100, x>100], [f,f_large]) / r
+def f(x):
+    '''Helper function for expected_coalescence_time'''
+    return -np.exp(x)*expi(-x)
+def f_large(x):
+    '''Asymptotic expansion of f(x) for large x'''
+    return 1/x - 1/x**2
 
 def zivkovic_alpha(n):
     '''Calculate alpha_njk according to Zivkovic eq. 1'''
@@ -128,6 +133,6 @@ if __name__ == '__main__':
     #print(zivkovic_alpha(n))
     k = np.arange(2,n+1)
     i = np.arange(1,n)
-    for g in [0.0, 0.001, 0.01, 0.1, 1.0]:
+    for g in [0.0, 0.001, 0.01, 0.1, 1.0, 10.0]:
         tsfs = TwoSFS(n, growth_rate=g)
         print(g, tsfs.get_sfs() * i)
