@@ -74,7 +74,7 @@ def fold_two_sfs(two_sfs):
 
 def time_first_moments(n, r):
     '''
-    Calculate expected coalescence times using Eriksson eq 9.
+    Calculate expected inter-coalescence times using Eriksson eq 9.
     applied to an exponentially growing population with rate r
     '''
     k = np.arange(2,n+1)
