@@ -4,7 +4,7 @@ from numpy.polynomial.laguerre import laggauss
 from math import factorial
 from functools import partial
 
-n = 4
+n = 6
 g = 0
 
 def zivkovic_alpha(n):
@@ -65,9 +65,22 @@ def marginal_leaf_prob(n):
     p[:,:,0] = 0
     return p
 
-# def twist_leaf_probs(p_nki):
-#     p_kkpj = np.zeros_like(p_nki)
-#     return p_kkpj
+def joint_leaf_prob(n):
+    p_nki = marginal_leaf_prob(n)
+
+    r = np.arange(n+1)
+    bin_kkp = binom(r[None,:]-1, r[:,None]-1)
+
+    p1_ki = p_nki[n]
+
+    p2_kkpj = np.zeros_like(p_nki)
+    for k in range(1,n+1):
+        p2_kkpj[k,(k-1):,:] = p_nki[n-k+1,:(n+1)-(k-1),:]
+
+    pstar_kkpij = bin_kkp[:,:,None,None] \
+                * p1_ki[:,None,:,None] \
+                * p2_kkpj[:,:,None,:]
+    return pstar_kkpij
 
 alpha = zivkovic_alpha(n)
 p_nki = marginal_leaf_prob(n)
@@ -112,6 +125,23 @@ G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), B)
 Ett_kpk[np.diag_indices(n+1)] = np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
 
 Ett_kpk[n,n] = laguerre_integral(partial(lambda_inv_sq, g=g), B[n])
+
+Sigma_ij1 = np.zeros((n+1,n+1))
+for i in range(1,n):
+    for j in range(1,i):
+        for u in [1,2]:
+            for k in range(2,n):
+                for kp in range(k+1,n+1):
+                    val = (-1)**u * k*(k-1) / binom(kp-1, k-u) \
+                          * p_nki[n,k-u+1, i] * p_nki[n-(k-u+2)+1, kp-k+1, j] \
+                          * Ett_kpk[kp, k]
+                    Sigma_ij1[i,j] += val
+print(Sigma_ij1.shape)
+
+joint_leaf_prob(n)
+
+Sigma_ij2 = np.zeros((n+1,n+1))
+Sigma_ij3 = np.zeros((n+1,n+1))
 
 # print(p_nki[:,:,2])
 # print(twist_leaf_probs(p_nki))
