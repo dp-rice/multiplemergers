@@ -4,7 +4,7 @@ from numpy.polynomial.laguerre import laggauss
 from math import factorial
 from functools import partial
 
-n = 6
+n = 4
 g = 0
 
 def zivkovic_alpha(n):
@@ -65,11 +65,12 @@ def marginal_leaf_prob(n):
     p[:,:,0] = 0
     return p
 
-def joint_leaf_prob(n):
+def pstar(n):
     p_nki = marginal_leaf_prob(n)
 
     r = np.arange(n+1)
     bin_kkp = binom(r[None,:]-1, r[:,None]-1)
+    bin_kkp[np.isnan(bin_kkp)] = 0
 
     p1_ki = p_nki[n]
 
@@ -126,19 +127,31 @@ Ett_kpk[np.diag_indices(n+1)] = np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
 
 Ett_kpk[n,n] = laguerre_integral(partial(lambda_inv_sq, g=g), B[n])
 
+pstar_kkpij = pstar(n)
 Sigma_ij1 = np.zeros((n+1,n+1))
-for i in range(1,n):
-    for j in range(1,i):
-        for u in [1,2]:
-            for k in range(2,n):
-                for kp in range(k+1,n+1):
-                    val = (-1)**u * k*(k-1) / binom(kp-1, k-u) \
-                          * p_nki[n,k-u+1, i] * p_nki[n-(k-u+2)+1, kp-k+1, j] \
-                          * Ett_kpk[kp, k]
-                    Sigma_ij1[i,j] += val
-print(Sigma_ij1.shape)
+for u in [1,2]:
+    for k in range(2,n):
+        for kp in range(k+1,n+1):
+            val = (-1)**u * k*(k-1) / binom(kp-1, k-u) \
+                  * pstar_kkpij[k-u+2, kp, :, :] \
+                  * Ett_kpk[kp, k]
+            Sigma_ij1[np.tril_indices(n+1,-1)] += val[np.tril_indices(n+1,-1)]
+print(Sigma_ij1[:10,:10])
+exit()
 
-joint_leaf_prob(n)
+k_vec = K[None,:]
+kp_vec = K[:,None]
+Sigma_ij1 = np.zeros((n+1,n+1))
+for u in [1,2]:
+    prefactor_kpk = k_vec*(k_vec-1)/binom(kp_vec-1, k_vec-u)
+    prefactor_kpk[:,:2] = 0
+    prefactor_kpk[np.triu_indices(n+1)] = 0
+
+    pstar_kkpij = np.zeros_like(pstar)
+    pstar_kkpij[:(n+1)-(2-u)] = pstar[2-u:]
+
+    Sigma_ij1 += (-1)**u * np.tensordot(prefactor_kpk*Ett_kpk, pstar_kkpij)
+print(Sigma_ij1)
 
 Sigma_ij2 = np.zeros((n+1,n+1))
 Sigma_ij3 = np.zeros((n+1,n+1))
