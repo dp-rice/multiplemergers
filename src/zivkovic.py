@@ -7,13 +7,6 @@ from functools import partial
 n = 4
 g = 0
 
-k = np.arange(n+1)
-
-b = binom(k,2)
-b_diff = b[:,None] - b[None,:]
-b_diff[b_diff<0] = 0
-print(b_diff)
-
 def zivkovic_alpha(n):
     r = np.arange(n+1)
     vec_n = r[:,None,None]
@@ -72,40 +65,54 @@ def marginal_leaf_prob(n):
     p[:,:,0] = 0
     return p
 
+# def twist_leaf_probs(p_nki):
+#     p_kkpj = np.zeros_like(p_nki)
+#     return p_kkpj
+
 alpha = zivkovic_alpha(n)
 p_nki = marginal_leaf_prob(n)
 
+K = np.arange(n+1)
+B = binom(K,2)
 
-I1_j = laguerre_integral(partial(lambda_inv, g=g), b)
+I1_j = laguerre_integral(partial(lambda_inv, g=g), B)
 I1_j[np.isinf(I1_j)] = 0
-sign_jk = (-1)**(k[:,None]+k[None,:])
+I1_j[np.isnan(I1_j)] = 0
+sign_jk = (-1)**(K[:,None]+K[None,:])
 alpha_jk = alpha[n]
 T_k = I1_j @ (sign_jk*alpha_jk)
 T_k[:2] = 0
 p_ki = p_nki[n]
-sfs_i = (k*T_k) @ p_ki
+sfs_i = (K*T_k) @ p_ki
 
 print(sfs_i)
 
-# print(laguerre_double_integral(lambda_inv_eq2, b))
-# print(2/b**2)
-#
-# print(laguerre_double_integral(lambda_inv_eq3, b))
-# print(1/(b[None,:]*b[:,None]))
-
-prefactor = sign_jk * (b[:,None] - b[None,:]) / b[:,None]
-prefactor[:,:2] = 0
-prefactor[np.triu_indices(n+1)] = 0
-I_ji = prefactor * laguerre_double_integral(partial(lambda_inv_eq3, g=g), b)
+prefactor_ji = sign_jk * (B[:,None] - B[None,:]) / B[:,None]
+prefactor_ji[:,:2] = 0
+prefactor_ji[np.triu_indices(n+1)] = 0
+G_ji = laguerre_double_integral(partial(lambda_inv_eq3, g=g), B)
+I_ji = prefactor_ji * G_ji
 I_ji[:,:2] = 0
 I_ji[np.triu_indices(n+1)] = 0
 
 A_kpjk = I_ji @ alpha
 # TODO: vectorize
 Ett_kpk = np.zeros((n+1,n+1))
-for kp in k:
-    Ett_kpk[kp] = sign_jk[kp,:] * (alpha[n,:,kp] @ A_kpjk[kp])
-Ett_kpk[:,:2] = 0
-Ett_kpk[np.triu_indices(n+1)] = 0
+for kp in range(2,n+1):
+    Ett_kpk[kp,2:kp] = (sign_jk[kp,:] * (alpha[n,:,kp] @ A_kpjk[kp]))[2:kp]
 
-print(Ett_kpk)
+j_vec = K[:,None]
+k_vec = K[None,:]
+prefactor_jk = (-1)**(j_vec+k_vec+1) * binom(k_vec+1, 2) / binom(j_vec, 2)
+prefactor_jk[:,:2] = 0
+prefactor_jk[np.triu_indices(n+1)] = 0
+alpha_jk = np.zeros((n+1,n+1))
+alpha_jk[:,:-1] = alpha[n,:,1:]
+G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), B)
+Ett_kpk[np.diag_indices(n+1)] = np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
+
+Ett_kpk[n,n] = laguerre_integral(partial(lambda_inv_sq, g=g), B[n])
+
+# print(p_nki[:,:,2])
+# print(twist_leaf_probs(p_nki))
+# print(Ett_kpk/(T_k[:,None]*T_k[None,:]))
