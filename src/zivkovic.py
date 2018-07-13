@@ -127,35 +127,19 @@ Ett_kpk[np.diag_indices(n+1)] = np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
 
 Ett_kpk[n,n] = laguerre_integral(partial(lambda_inv_sq, g=g), B[n])
 
-pstar_kkpij = pstar(n)
-Sigma_ij1 = np.zeros((n+1,n+1))
-for u in [1,2]:
-    for k in range(2,n):
-        for kp in range(k+1,n+1):
-            val = (-1)**u * k*(k-1) / binom(kp-1, k-u) \
-                  * pstar_kkpij[k-u+2, kp, :, :] \
-                  * Ett_kpk[kp, k]
-            Sigma_ij1[np.tril_indices(n+1,-1)] += val[np.tril_indices(n+1,-1)]
-print(Sigma_ij1[:10,:10])
-exit()
-
 k_vec = K[None,:]
 kp_vec = K[:,None]
 Sigma_ij1 = np.zeros((n+1,n+1))
 for u in [1,2]:
-    prefactor_kpk = k_vec*(k_vec-1)/binom(kp_vec-1, k_vec-u)
+    prefactor_kpk = (-1)**u * k_vec*(k_vec-1)/binom(kp_vec-1, k_vec-u)
     prefactor_kpk[:,:2] = 0
     prefactor_kpk[np.triu_indices(n+1)] = 0
+    A_kpk = prefactor_kpk * Ett_kpk
 
-    pstar_kkpij = np.zeros_like(pstar)
-    pstar_kkpij[:(n+1)-(2-u)] = pstar[2-u:]
-
-    Sigma_ij1 += (-1)**u * np.tensordot(prefactor_kpk*Ett_kpk, pstar_kkpij)
-print(Sigma_ij1)
+    B_kkpij = np.zeros_like(pstar_kkpij)
+    B_kkpij[:(n+1)-(2-u)] = pstar_kkpij[2-u:]
+    Sigma_ij1 += np.tensordot(A_kpk, B_kkpij, axes=([1,0],[0,1]))
+Sigma_ij1[np.triu_indices(n+1)] = 0
 
 Sigma_ij2 = np.zeros((n+1,n+1))
 Sigma_ij3 = np.zeros((n+1,n+1))
-
-# print(p_nki[:,:,2])
-# print(twist_leaf_probs(p_nki))
-# print(Ett_kpk/(T_k[:,None]*T_k[None,:]))
