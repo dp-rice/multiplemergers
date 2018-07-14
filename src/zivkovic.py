@@ -84,7 +84,7 @@ def diagonal_signs(n):
     r = np.arange(n+1)
     return (-1)**(r[:,None]+r[None,:])
 
-def sfs(n, g):
+def sigma_i(n, g):
     alpha = zivkovic_alpha(n)
     p_nki = marginal_leaf_prob(n)
     K = np.arange(n+1)
@@ -181,7 +181,26 @@ def sigma_ij2a(n, Ett_kpk):
     return ret
 
 def sigma_ij2b(n, Ett_kpk):
-    return 0
+    # TODO: CHECK ME
+    pstar_kkpij = pstar(n)
+
+    r = np.arange(n+1)
+    kp = r[:,None]
+    k  = r[None,:]
+    A_kpk = Ett_kpk * k * (k-1) / binom(kp-1, k-1)
+    A_kpk[np.isnan(A_kpk)] = 0
+
+    B_kkpij = np.zeros((n+1,n+1,n+1,n+1))
+    for u in [1,2]:
+        for v in [1,2]:
+            pstar_shift = np.roll(pstar_kkpij, u-v, axis=0)
+            for j in range(1,n):
+                B_kkpij[:,:,:(n+1)-j,j] += np.diagonal(pstar_shift,
+                                                offset=j, axis1=2, axis2=3) \
+                                        + pstar_shift[:,:,j:,j]
+    ret = np.tensordot(A_kpk, B_kkpij, ([1,0],[0,1]))
+    ret[np.triu_indices(n+1)] = 0
+    return ret
 
 def sigma_ij3(n, Ett_kpk):
     kp = np.arange(n+1)
@@ -198,17 +217,23 @@ def main():
     n = 4
     g = 0
 
-    SFS_i = sfs(n,g)
+    Sigma_i = sigma_i(n,g)
     Ett_kpk = time_second_moments(n,g)
     Sigma_ij1 = sigma_ij1(n, Ett_kpk)
     Sigma_ij2 = sigma_ij2(n, Ett_kpk)
     Sigma_ij3 = sigma_ij3(n, Ett_kpk)
-    print("SFS:\n", SFS_i, '\n')
+    Sigma_ij = Sigma_ij1 + Sigma_ij2 + Sigma_ij3
+    Cov_ij = Sigma_ij - Sigma_i[:,None]*Sigma_i[None,:]
+    Cov_ij[np.triu_indices(n+1)] = 0
+
+    print("SFS:\n", Sigma_i, '\n')
     print("Sigma_ij1:\n", Sigma_ij1, '\n')
     print("Sigma_ij2:\n", Sigma_ij2, '\n')
     print("Sigma_ij3:\n", Sigma_ij3, '\n')
+    print("Sigma_ij:\n", Sigma_ij, '\n')
+    print("Cov_ij:\n", Cov_ij[1:-1,1:-1], '\n')
 
-    print(Ett_kpk)
+    # print(Ett_kpk)
     # print(marginal_leaf_prob(n)[n])
 
     # print(marginal_leaf_prob(n)[n,:,3])
