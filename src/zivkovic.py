@@ -83,16 +83,22 @@ def pstar(n):
                 * p2_kkpj[:,:,None,:]
     return pstar_kkpij
 
+def diagonal_signs(n):
+    r = np.arange(n+1)
+    return (-1)**(r[:,None]+r[None,:])
+
 alpha = zivkovic_alpha(n)
 p_nki = marginal_leaf_prob(n)
+pstar_kkpij = pstar(n)
 
 K = np.arange(n+1)
 B = binom(K,2)
+### <SFS> ###
 
 I1_j = laguerre_integral(partial(lambda_inv, g=g), B)
 I1_j[np.isinf(I1_j)] = 0
 I1_j[np.isnan(I1_j)] = 0
-sign_jk = (-1)**(K[:,None]+K[None,:])
+sign_jk = diagonal_signs(n)
 alpha_jk = alpha[n]
 T_k = I1_j @ (sign_jk*alpha_jk)
 T_k[:2] = 0
@@ -101,7 +107,13 @@ sfs_i = (K*T_k) @ p_ki
 
 print(sfs_i)
 
-prefactor_ji = sign_jk * (B[:,None] - B[None,:]) / B[:,None]
+### <T_k' T_k> ###
+
+# 2 <= k < k' <= n
+sign_kpk = diagonal_signs(n)
+sign_ji = diagonal_signs(n)
+
+prefactor_ji = sign_ji * (B[:,None] - B[None,:]) / B[:,None]
 prefactor_ji[:,:2] = 0
 prefactor_ji[np.triu_indices(n+1)] = 0
 G_ji = laguerre_double_integral(partial(lambda_inv_eq3, g=g), B)
@@ -109,23 +121,25 @@ I_ji = prefactor_ji * G_ji
 I_ji[:,:2] = 0
 I_ji[np.triu_indices(n+1)] = 0
 
-A_kpjk = I_ji @ alpha
-# TODO: vectorize
-Ett_kpk = np.zeros((n+1,n+1))
-for kp in range(2,n+1):
-    Ett_kpk[kp,2:kp] = (sign_jk[kp,:] * (alpha[n,:,kp] @ A_kpjk[kp]))[2:kp]
+A_kpjik = (alpha[n].T)[:,:,None,None] * alpha[:,None,:,:]
+Ett_kpk = sign_kpk * np.tensordot(A_kpjik, I_ji, axes=([1,2],[0,1]))
+Ett_kpk[:,:2] = 0
+Ett_kpk[np.triu_indices(n+1)] = 0
 
+# k' = k < n
 j_vec = K[:,None]
 k_vec = K[None,:]
 prefactor_jk = (-1)**(j_vec+k_vec+1) * binom(k_vec+1, 2) / binom(j_vec, 2)
 prefactor_jk[:,:2] = 0
 prefactor_jk[np.triu_indices(n+1)] = 0
-alpha_jk = np.zeros((n+1,n+1))
-alpha_jk[:,:-1] = alpha[n,:,1:]
+alpha_jk = np.roll(alpha[n], -1, axis=1)
 G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), B)
 Ett_kpk[np.diag_indices(n+1)] = np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
 
+# k' = k = n
 Ett_kpk[n,n] = laguerre_integral(partial(lambda_inv_sq, g=g), B[n])
+
+### SIGMA_ij1 ###
 
 k_vec = K[None,:]
 kp_vec = K[:,None]
@@ -135,11 +149,15 @@ for u in [1,2]:
     prefactor_kpk[:,:2] = 0
     prefactor_kpk[np.triu_indices(n+1)] = 0
     A_kpk = prefactor_kpk * Ett_kpk
-
-    B_kkpij = np.zeros_like(pstar_kkpij)
-    B_kkpij[:(n+1)-(2-u)] = pstar_kkpij[2-u:]
+    B_kkpij = np.roll(pstar_kkpij, u-2, axis=0)
     Sigma_ij1 += np.tensordot(A_kpk, B_kkpij, axes=([1,0],[0,1]))
 Sigma_ij1[np.triu_indices(n+1)] = 0
+print(Sigma_ij1)
+
+### SIGMA_ij2 ###
 
 Sigma_ij2 = np.zeros((n+1,n+1))
+
+### SIGMA_ij3 ###
+
 Sigma_ij3 = np.zeros((n+1,n+1))
