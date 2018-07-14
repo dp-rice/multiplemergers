@@ -87,72 +87,88 @@ def diagonal_signs(n):
     r = np.arange(n+1)
     return (-1)**(r[:,None]+r[None,:])
 
-alpha = zivkovic_alpha(n)
-p_nki = marginal_leaf_prob(n)
-pstar_kkpij = pstar(n)
-
-K = np.arange(n+1)
-B = binom(K,2)
-### <SFS> ###
-
-I1_j = laguerre_integral(partial(lambda_inv, g=g), B)
-I1_j[np.isinf(I1_j)] = 0
-I1_j[np.isnan(I1_j)] = 0
-sign_jk = diagonal_signs(n)
-alpha_jk = alpha[n]
-T_k = I1_j @ (sign_jk*alpha_jk)
-T_k[:2] = 0
-p_ki = p_nki[n]
-sfs_i = (K*T_k) @ p_ki
-
-print(sfs_i)
+def sfs(n, g):
+    alpha = zivkovic_alpha(n)
+    p_nki = marginal_leaf_prob(n)
+    K = np.arange(n+1)
+    B = binom(K,2)
+    I1_j = laguerre_integral(partial(lambda_inv, g=g), B)
+    I1_j[np.isinf(I1_j)] = 0
+    I1_j[np.isnan(I1_j)] = 0
+    sign_jk = diagonal_signs(n)
+    alpha_jk = alpha[n]
+    T_k = I1_j @ (sign_jk*alpha_jk)
+    T_k[:2] = 0
+    p_ki = p_nki[n]
+    return (K*T_k) @ p_ki
 
 ### <T_k' T_k> ###
+# TODO: make this take a lambda_inv function and param dictionary
+def time_second_moments(n, g):
+    alpha = zivkovic_alpha(n)
+    moments = np.zeros((n+1, n+1))
+    moments[np.tril_indices(n+1)] = sec_moments_off_diag(n, g, alpha)
+    moments[np.diag_indices(n+1)] = sec_moments_diagonal(n, g, alpha)
+    moments[n,n] = sec_moments_corner(n, g)
+    return moments
 
-# 2 <= k < k' <= n
-sign_kpk = diagonal_signs(n)
-sign_ji = diagonal_signs(n)
+def sec_moments_off_diag(n, g, alpha):
+    # 2 <= k < k' <= n
+    sign_kpk = diagonal_signs(n)
+    sign_ji = diagonal_signs(n)
+    B = binom(np.arange(n+1), 2)
 
-prefactor_ji = sign_ji * (B[:,None] - B[None,:]) / B[:,None]
-prefactor_ji[:,:2] = 0
-prefactor_ji[np.triu_indices(n+1)] = 0
-G_ji = laguerre_double_integral(partial(lambda_inv_eq3, g=g), B)
-I_ji = prefactor_ji * G_ji
-I_ji[:,:2] = 0
-I_ji[np.triu_indices(n+1)] = 0
+    prefactor_ji = sign_ji * (B[:,None] - B[None,:]) / B[:,None]
+    prefactor_ji[:,:2] = 0
+    prefactor_ji[np.triu_indices(n+1)] = 0
+    G_ji = laguerre_double_integral(partial(lambda_inv_eq3, g=g), B)
+    I_ji = prefactor_ji * G_ji
+    I_ji[:,:2] = 0
+    I_ji[np.triu_indices(n+1)] = 0
 
-A_kpjik = (alpha[n].T)[:,:,None,None] * alpha[:,None,:,:]
-Ett_kpk = sign_kpk * np.tensordot(A_kpjik, I_ji, axes=([1,2],[0,1]))
-Ett_kpk[:,:2] = 0
-Ett_kpk[np.triu_indices(n+1)] = 0
+    A_kpjik = (alpha[n].T)[:,:,None,None] * alpha[:,None,:,:]
+    ret = sign_kpk * np.tensordot(A_kpjik, I_ji, axes=([1,2],[0,1]))
+    ret[:,:2] = 0
+    return ret[np.tril_indices(n+1)]
 
-# k' = k < n
-j_vec = K[:,None]
-k_vec = K[None,:]
-prefactor_jk = (-1)**(j_vec+k_vec+1) * binom(k_vec+1, 2) / binom(j_vec, 2)
-prefactor_jk[:,:2] = 0
-prefactor_jk[np.triu_indices(n+1)] = 0
-alpha_jk = np.roll(alpha[n], -1, axis=1)
-G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), B)
-Ett_kpk[np.diag_indices(n+1)] = np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
+def sec_moments_diagonal(n,g,alpha):
+    # k' = k < n
+    r = np.arange(n+1)
+    j_vec = r[:,None]
+    k_vec = r[None,:]
+    prefactor_jk = (-1)**(j_vec+k_vec+1) * binom(k_vec+1, 2) / binom(j_vec, 2)
+    prefactor_jk[:,:2] = 0
+    prefactor_jk[np.triu_indices(n+1)] = 0
+    alpha_jk = np.roll(alpha[n], -1, axis=1)
+    G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), binom(r,2))
+    return np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
 
-# k' = k = n
-Ett_kpk[n,n] = laguerre_integral(partial(lambda_inv_sq, g=g), B[n])
+def sec_moments_corner(n,g):
+    # k' = k = n
+    return laguerre_integral(partial(lambda_inv_sq, g=g), binom(n,2))
 
-### SIGMA_ij1 ###
+def sigma_ij1(n, Ett_kpk):
+    ### SIGMA_ij1 ###
+    pstar_kkpij = pstar(n)
 
-k_vec = K[None,:]
-kp_vec = K[:,None]
-Sigma_ij1 = np.zeros((n+1,n+1))
-for u in [1,2]:
-    prefactor_kpk = (-1)**u * k_vec*(k_vec-1)/binom(kp_vec-1, k_vec-u)
-    prefactor_kpk[:,:2] = 0
-    prefactor_kpk[np.triu_indices(n+1)] = 0
-    A_kpk = prefactor_kpk * Ett_kpk
-    B_kkpij = np.roll(pstar_kkpij, u-2, axis=0)
-    Sigma_ij1 += np.tensordot(A_kpk, B_kkpij, axes=([1,0],[0,1]))
-Sigma_ij1[np.triu_indices(n+1)] = 0
-print(Sigma_ij1)
+    r = np.arange(n+1)
+    k_vec = r[None,:]
+    kp_vec = r[:,None]
+    Sigma_ij1 = np.zeros((n+1,n+1))
+    for u in [1,2]:
+        prefactor_kpk = (-1)**u * k_vec*(k_vec-1)/binom(kp_vec-1, k_vec-u)
+        prefactor_kpk[:,:2] = 0
+        prefactor_kpk[np.triu_indices(n+1)] = 0
+        A_kpk = prefactor_kpk * Ett_kpk
+        B_kkpij = np.roll(pstar_kkpij, u-2, axis=0)
+        Sigma_ij1 += np.tensordot(A_kpk, B_kkpij, axes=([1,0],[0,1]))
+    Sigma_ij1[np.triu_indices(n+1)] = 0
+    return Sigma_ij1
+
+
+print(sfs(n,g))
+Ett_kpk = time_second_moments(n,g)
+print(sigma_ij1(n, Ett_kpk))
 
 ### SIGMA_ij2 ###
 
