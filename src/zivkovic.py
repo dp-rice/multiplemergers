@@ -4,9 +4,6 @@ from numpy.polynomial.laguerre import laggauss
 from math import factorial
 from functools import partial
 
-n = 4
-g = 0
-
 def zivkovic_alpha(n):
     r = np.arange(n+1)
     vec_n = r[:,None,None]
@@ -148,7 +145,6 @@ def sec_moments_corner(n,g):
     return laguerre_integral(partial(lambda_inv_sq, g=g), binom(n,2))
 
 def sigma_ij1(n, Ett_kpk):
-    ### SIGMA_ij1 ###
     pstar_kkpij = pstar(n)
 
     r = np.arange(n+1)
@@ -165,15 +161,33 @@ def sigma_ij1(n, Ett_kpk):
     Sigma_ij1[np.triu_indices(n+1)] = 0
     return Sigma_ij1
 
+def sigma_ij2(n, Ett_kpk):
+    pass
 
-print(sfs(n,g))
-Ett_kpk = time_second_moments(n,g)
-print(sigma_ij1(n, Ett_kpk))
+def sigma_ij3(n, Ett_kpk):
+    kp = np.arange(n+1)
+    p_kpi = marginal_leaf_prob(n)[n]
+    pfold_kpi = p_kpi + p_kpi[:,::-1]
+    val_i = np.zeros(n+1)
+    val_i[(n//2)+1:n] = (2*Ett_kpk[2,2])/(n-1) \
+                      + ((2*Ett_kpk[3:,2]/(kp[3:]-1)) \
+                      @ pfold_kpi[3:,(n//2)+1:n])
+    ret = np.diag(val_i)
+    return np.fliplr(ret)
 
-### SIGMA_ij2 ###
+def main():
+    n = 5
+    g = 0
 
-Sigma_ij2 = np.zeros((n+1,n+1))
+    SFS_i = sfs(n,g)
+    Ett_kpk = time_second_moments(n,g)
+    Sigma_ij1 = sigma_ij1(n, Ett_kpk)
+    Sigma_ij2 = sigma_ij2(n, Ett_kpk)
+    Sigma_ij3 = sigma_ij3(n, Ett_kpk)
+    print("SFS:\n", SFS_i, '\n')
+    print("Sigma_ij1:\n", Sigma_ij1, '\n')
+    print("Sigma_ij2:\n", Sigma_ij2, '\n')
+    print("Sigma_ij3:\n", Sigma_ij3, '\n')
 
-### SIGMA_ij3 ###
-
-Sigma_ij3 = np.zeros((n+1,n+1))
+if __name__ == '__main__':
+    main()
