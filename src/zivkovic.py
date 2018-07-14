@@ -162,7 +162,26 @@ def sigma_ij1(n, Ett_kpk):
     return Sigma_ij1
 
 def sigma_ij2(n, Ett_kpk):
-    pass
+    term1 = sigma_ij2a(n, Ett_kpk)
+    term2 = sigma_ij2b(n, Ett_kpk)
+    return term1 + term2
+
+def sigma_ij2a(n, Ett_kpk):
+    p_ki = marginal_leaf_prob(n)[n]
+    p_kij = np.zeros((n+1,n+1,n+1))
+    for j in range(1, n):
+        p_kij[:,1:,j] = np.pad(p_ki[:-1,j:],
+                                ((1,0),(0,j)),
+                                mode='constant')[:,1:]
+    k = np.arange(n+1)
+    Et2_k = Ett_kpk[np.diag_indices(n+1)]
+    A_k = Et2_k * k * (k-1)**2 / (n-k+1)
+    ret = np.tensordot(A_k[3:], p_kij[3:], axes=(0,0))
+    ret[np.triu_indices(n+1)] = 0
+    return ret
+
+def sigma_ij2b(n, Ett_kpk):
+    return 0
 
 def sigma_ij3(n, Ett_kpk):
     kp = np.arange(n+1)
@@ -176,7 +195,7 @@ def sigma_ij3(n, Ett_kpk):
     return np.fliplr(ret)
 
 def main():
-    n = 5
+    n = 4
     g = 0
 
     SFS_i = sfs(n,g)
@@ -188,6 +207,13 @@ def main():
     print("Sigma_ij1:\n", Sigma_ij1, '\n')
     print("Sigma_ij2:\n", Sigma_ij2, '\n')
     print("Sigma_ij3:\n", Sigma_ij3, '\n')
+
+    print(Ett_kpk)
+    # print(marginal_leaf_prob(n)[n])
+
+    # print(marginal_leaf_prob(n)[n,:,3])
+    # print(Ett_kpk[3,3])
+    # print(Ett_kpk[4,4])
 
 if __name__ == '__main__':
     main()
