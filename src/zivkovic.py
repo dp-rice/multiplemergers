@@ -189,6 +189,7 @@ def sigma_ij2b(n, Ett_kpk):
     k  = r[None,:]
     A_kpk = Ett_kpk * k * (k-1) / binom(kp-1, k-1)
     A_kpk[np.isnan(A_kpk)] = 0
+    A_kpk[np.triu_indices(n+1)] = 0
 
     B_kkpij = np.zeros((n+1,n+1,n+1,n+1))
     for u in [1,2]:
@@ -196,7 +197,7 @@ def sigma_ij2b(n, Ett_kpk):
             pstar_shift = np.roll(pstar_kkpij, u-v, axis=0)
             for j in range(1,n):
                 B_kkpij[:,:,:(n+1)-j,j] += np.diagonal(pstar_shift,
-                                                offset=j, axis1=2, axis2=3) \
+                                                offset=-j, axis1=2, axis2=3) \
                                         + pstar_shift[:,:,j:,j]
     ret = np.tensordot(A_kpk, B_kkpij, ([1,0],[0,1]))
     ret[np.triu_indices(n+1)] = 0
@@ -233,12 +234,6 @@ def main():
     print("Sigma_ij:\n", Sigma_ij, '\n')
     print("Cov_ij:\n", Cov_ij[1:-1,1:-1], '\n')
 
-    # print(Ett_kpk)
-    # print(marginal_leaf_prob(n)[n])
-
-    # print(marginal_leaf_prob(n)[n,:,3])
-    # print(Ett_kpk[3,3])
-    # print(Ett_kpk[4,4])
-
+    print(Sigma_ij.T[1:-1,1:-1][np.triu_indices(n-1)] / 4)
 if __name__ == '__main__':
     main()
