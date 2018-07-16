@@ -32,7 +32,7 @@ def lambda_inv_eq3(x,y,g=0):
 def lambda_inv_sq(x, g=0):
     return lambda_inv(x, g=g)**2
 
-def laguerre_integral(f, x_scale, degree=10):
+def laguerre_integral(f, x_scale, degree=40):
     lag_x, lag_w = laggauss(degree)
     if np.isscalar(x_scale):
         scaled_x = lag_x / x_scale
@@ -40,7 +40,7 @@ def laguerre_integral(f, x_scale, degree=10):
         scaled_x = lag_x[:,None] / x_scale[None,:]
     return lag_w @ f(scaled_x)
 
-def laguerre_double_integral(f, x_scale,  degree=10):
+def laguerre_double_integral(f, x_scale,  degree=40):
     lag_x, lag_w = laggauss(degree)
     if np.isscalar(x_scale):
         scaled_x = lag_x / x_scale
@@ -90,6 +90,7 @@ def sigma_i(n, g):
     K = np.arange(n+1)
     B = binom(K,2)
     I1_j = laguerre_integral(partial(lambda_inv, g=g), B)
+    
     I1_j[np.isinf(I1_j)] = 0
     I1_j[np.isnan(I1_j)] = 0
     sign_jk = diagonal_signs(n)
