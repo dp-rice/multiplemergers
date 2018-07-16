@@ -32,7 +32,7 @@ def lambda_inv_eq3(x,y,g=0):
 def lambda_inv_sq(x, g=0):
     return lambda_inv(x, g=g)**2
 
-def laguerre_integral(f, x_scale, degree=20):
+def laguerre_integral(f, x_scale, degree=10):
     lag_x, lag_w = laggauss(degree)
     if np.isscalar(x_scale):
         scaled_x = lag_x / x_scale
@@ -40,7 +40,7 @@ def laguerre_integral(f, x_scale, degree=20):
         scaled_x = lag_x[:,None] / x_scale[None,:]
     return lag_w @ f(scaled_x)
 
-def laguerre_double_integral(f, x_scale,  degree=20):
+def laguerre_double_integral(f, x_scale,  degree=10):
     lag_x, lag_w = laggauss(degree)
     if np.isscalar(x_scale):
         scaled_x = lag_x / x_scale
@@ -215,53 +215,27 @@ def sigma_ij3(n, Ett_kpk):
     return np.fliplr(ret)
 
 def sigma_ij(n, g):
+    Sigma_i = sigma_i(n, g)
     Ett_kpk = time_second_moments(n,g)
     Sigma_ij1 = sigma_ij1(n, Ett_kpk)
     Sigma_ij2 = sigma_ij2(n, Ett_kpk)
     Sigma_ij3 = sigma_ij3(n, Ett_kpk)
-    return Sigma_ij1 + Sigma_ij2 + Sigma_ij3
 
-def eta_i(n, g):
-    Sigma_i = sigma_i(n,g)
-    eta_i = Sigma_i + Sigma_i[::-1]
-    k = np.arange((n+1))
-    return eta_i / (1+(k == n-k).astype(float))
-
-def eta_ij(n, g):
-    Sigma_i = sigma_i(n,g)
-    Sigma_ij = sigma_ij(n,g)
-    Cov_ij = Sigma_ij - Sigma_i[:,None]*Sigma_i[None,:]
-    Cov_ij[np.triu_indices(n+1)] = 0
-    Cov_ij += Cov_ij.T
-    return fold_cov(n, Cov_ij)
-
-def fold_cov(n, Cov_ij):
-    folded = Cov_ij + Cov_ij[:,::-1] + Cov_ij[::-1,:] + Cov_ij[::-1,::-1]
-    folded[np.diag_indices(n+1)] = 0
-    k = np.arange(n+1)
-    divisor = 1 + (k == n-k).astype(float)
-    i_max = n//2 + 1
-    return (folded / (divisor[:,None]*divisor[None,:]))[:i_max,:i_max]
+    Sigma_ij = Sigma_ij1 + Sigma_ij2 + Sigma_ij3
+    Sigma_ij += Sigma_ij.T
+    Sigma_ij -= np.outer(Sigma_i, Sigma_i)
+    Sigma_ij[np.diag_indices(n+1)] = 0
+    return Sigma_ij
 
 def main():
-    n = 40
+    n = 4
     g = 0
 
     Sigma_i = sigma_i(n,g)
     Sigma_ij = sigma_ij(n,g)
-    Cov_ij = Sigma_ij - Sigma_i[:,None]*Sigma_i[None,:]
-    Cov_ij[np.triu_indices(n+1)] = 0
-    Cov_ij += Cov_ij.T
 
     print("SFS:\n", Sigma_i, '\n')
     print("Sigma_ij:\n", Sigma_ij, '\n')
-    print("Cov_ij:\n", Cov_ij[1:-1,1:-1], '\n')
-    print("eta_ij:\n",fold_cov(n, Cov_ij))
-
-    gs = np.logspace(-2,2,9)
-    for g in gs:
-        Sigma_i = sigma_i(n,g)
-        print("{}\t{}".format(g, eta_ij(n,g)[1,2] / (Sigma_i[1]*Sigma_i[2])))
 
 if __name__ == '__main__':
     main()
