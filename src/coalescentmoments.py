@@ -264,12 +264,12 @@ def sfs_moments(N, alpha, m2=True):
             return sfs_m1(N, G, Pnkb)
 
 def fold_sfs_moments(N, M1, M2):
-    M1_folded = np.zeros(N/2)
-    for i in range(N/2):
+    M1_folded = np.zeros(N//2)
+    for i in range(N//2):
          M1_folded[i] = (M1[i] + M1[N-i-2]) / (1.0 + (i==N-i-2))
 
-    M2_folded = np.zeros((N/2, N/2))
-    for i in range(N/2):
+    M2_folded = np.zeros((N//2, N//2))
+    for i in range(N//2):
         for j in range(i):
             M2_folded[i,j] = (M2[i,j] + M2[N-i-2,j] + M2[i,N-j-2] + M2[N-i-2,N-j-2]) / ((1.0+(i==N-i-2))*(1.0+(j==N-j-2)))
             M2_folded[j,i] = M2_folded[i,j]
