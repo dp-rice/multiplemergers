@@ -1,8 +1,5 @@
-execfile('scripts/CBcm.py')
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
-# from scipy.special import gamma
 from scipy.special import beta, binom
 
 # Schweinsberg 2003 Eq. 12
@@ -284,15 +281,15 @@ if __name__ == "__main__":
     alpha = 2
     M1, M2 = sfs_moments(N, alpha)
     M1_fu, M2_fu = fu_moments(N)
-    print 'For n = {}:'.format(N)
+    print('For n = {}:'.format(N))
     if np.allclose(M1_fu, M1):
-        print '\tfirst moments equal Fu expectation.'
+        print('\tfirst moments equal Fu expectation.')
     else:
-        print '\tfirst moments DO NOT equal Fu expectation!'
+        print('\tfirst moments DO NOT equal Fu expectation!')
     if np.allclose(M2_fu, M2):
-        print '\tsecond moments equal Fu expectation.'
+        print('\tsecond moments equal Fu expectation.')
     else:
-        print '\tsecond moments DO NOT equal Fu expectation!'
+        print('\tsecond moments DO NOT equal Fu expectation!')
 
 # M1_sq = M1[None,:] * M1[:,None]
 
