@@ -19,20 +19,32 @@ def zivkovic_alpha(n):
     alpha[np.isnan(alpha)] = 0
     return alpha
 
-def lambda_inv(x, g=0):
+def lambda_inv(mode, **params):
+    funcs = {"constant": lambda x: x,
+            "exponential": lambda_inv_exponential,
+            "two-epoch": lambda_inv_2epoch}
+    return partial(funcs[mode], **params)
+
+def lambda_inv_eq2(mode, **params):
+    func = lambda_inv(mode, **params)
+    return lambda x, y: (func(y+x) - func(x))**2
+
+def lambda_inv_eq3(mode, **params):
+    func = lambda_inv(mode, **params)
+    return lambda x, y: func(x) * (func(y+x) - func(x))
+
+def lambda_inv_sq(mode, **params):
+    func = lambda_inv(mode, **params)
+    return lambda x:  func(x)**2
+
+def lambda_inv_exponential(x, g=0):
     if g == 0:
         return x
     else:
         return np.log(1+x*g)/g
 
-def lambda_inv_eq2(x,y,g=0):
-    return (lambda_inv(y+x,g) - lambda_inv(x,g))**2
-
-def lambda_inv_eq3(x,y,g=0):
-    return lambda_inv(x,g) * (lambda_inv(y+x,g) - lambda_inv(x,g))
-
-def lambda_inv_sq(x, g=0):
-    return lambda_inv(x, g=g)**2
+def lambda_inv_2epoch(x, tau=0, f=1):
+    return np.piecewise(x, [x>tau], [lambda y: tau + f*(y-tau), lambda y: y])
 
 def laguerre_integral(f, x_scale, degree=LAGDEGREE):
     lag_x, lag_w = laggauss(degree)
@@ -86,13 +98,16 @@ def diagonal_signs(n):
     r = np.arange(n+1)
     return (-1)**(r[:,None]+r[None,:])
 
-def sigma_i(n, g):
+def sigma_i(n, mode, **params):
     alpha = zivkovic_alpha(n)
     p_nki = marginal_leaf_prob(n)
     K = np.arange(n+1)
     B = binom(K,2)
-    I1_j = laguerre_integral(partial(lambda_inv, g=g), B)
-    
+    if mode == 'constant':
+        I1_j = 1 / B
+    else:
+        I1_j = laguerre_integral(lambda_inv(mode, **params), B)
+
     I1_j[np.isinf(I1_j)] = 0
     I1_j[np.isnan(I1_j)] = 0
     sign_jk = diagonal_signs(n)
@@ -103,16 +118,15 @@ def sigma_i(n, g):
     return (K*T_k) @ p_ki
 
 ### <T_k' T_k> ###
-# TODO: make this take a lambda_inv function and param dictionary
-def time_second_moments(n, g):
+def time_second_moments(n, mode, **params):
     alpha = zivkovic_alpha(n)
     moments = np.zeros((n+1, n+1))
-    moments[np.tril_indices(n+1)] = sec_moments_off_diag(n, g, alpha)
-    moments[np.diag_indices(n+1)] = sec_moments_diagonal(n, g, alpha)
-    moments[n,n] = sec_moments_corner(n, g)
+    moments[np.tril_indices(n+1)] = sec_moments_off_diag(n, alpha, mode, **params)
+    moments[np.diag_indices(n+1)] = sec_moments_diagonal(n, alpha, mode, **params)
+    moments[n,n] = sec_moments_corner(n, mode, **params)
     return moments
 
-def sec_moments_off_diag(n, g, alpha):
+def sec_moments_off_diag(n, alpha, mode, **params):
     # 2 <= k < k' <= n
     sign_kpk = diagonal_signs(n)
     sign_ji = diagonal_signs(n)
@@ -121,7 +135,13 @@ def sec_moments_off_diag(n, g, alpha):
     prefactor_ji = sign_ji * (B[:,None] - B[None,:]) / B[:,None]
     prefactor_ji[:,:2] = 0
     prefactor_ji[np.triu_indices(n+1)] = 0
-    G_ji = laguerre_double_integral(partial(lambda_inv_eq3, g=g), B)
+
+    # G_ji = laguerre_double_integral(lambda_inv_eq3(mode, **params), B)
+    if mode == 'constant':
+        G_ji = 1 / np.outer(B,B)
+    else:
+        G_ji = laguerre_double_integral(lambda_inv_eq3(mode, **params), B)
+    #G_ji = laguerre_double_integral(partial(lambda_inv_eq3, g=g), B)
     I_ji = prefactor_ji * G_ji
     I_ji[:,:2] = 0
     I_ji[np.triu_indices(n+1)] = 0
@@ -131,7 +151,7 @@ def sec_moments_off_diag(n, g, alpha):
     ret[:,:2] = 0
     return ret[np.tril_indices(n+1)]
 
-def sec_moments_diagonal(n,g,alpha):
+def sec_moments_diagonal(n,alpha, mode, **params):
     # k' = k < n
     r = np.arange(n+1)
     j_vec = r[:,None]
@@ -140,12 +160,22 @@ def sec_moments_diagonal(n,g,alpha):
     prefactor_jk[:,:2] = 0
     prefactor_jk[np.triu_indices(n+1)] = 0
     alpha_jk = np.roll(alpha[n], -1, axis=1)
-    G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), binom(r,2))
+
+    B = binom(r,2)
+    # G_jk = laguerre_double_integral(lambda_inv_eq2(mode, **params), B)
+    # print(G_jk)
+    # print(G_jk)
+    if mode == 'constant':
+        G_jk = (2 / (B**2))[None,:]
+    else:
+        G_jk = laguerre_double_integral(lambda_inv_eq2(mode, **params), B)
+    # G_jk = laguerre_double_integral(partial(lambda_inv_eq2, g=g), binom(r,2))
     return np.nansum(G_jk*alpha_jk*prefactor_jk, axis=0)
 
-def sec_moments_corner(n,g):
+def sec_moments_corner(n, mode, **params):
     # k' = k = n
-    return laguerre_integral(partial(lambda_inv_sq, g=g), binom(n,2))
+    return laguerre_integral(lambda_inv_sq(mode, **params), binom(n,2))
+    # return laguerre_integral(partial(lambda_inv_sq, g=g), binom(n,2))
 
 def sigma_ij1(n, Ett_kpk):
     pstar_kkpij = pstar(n)
@@ -184,7 +214,6 @@ def sigma_ij2a(n, Ett_kpk):
     return ret
 
 def sigma_ij2b(n, Ett_kpk):
-    # TODO: CHECK ME
     pstar_kkpij = pstar(n)
 
     r = np.arange(n+1)
@@ -217,9 +246,9 @@ def sigma_ij3(n, Ett_kpk):
     ret = np.diag(val_i)
     return np.fliplr(ret)
 
-def sigma_ij(n, g):
-    Sigma_i = sigma_i(n, g)
-    Ett_kpk = time_second_moments(n,g)
+def sigma_ij(n, mode, **params):
+    Sigma_i = sigma_i(n, mode, **params)
+    Ett_kpk = time_second_moments(n, mode, **params)
     Sigma_ij1 = sigma_ij1(n, Ett_kpk)
     Sigma_ij2 = sigma_ij2(n, Ett_kpk)
     Sigma_ij3 = sigma_ij3(n, Ett_kpk)
@@ -232,11 +261,28 @@ def sigma_ij(n, g):
 
 def main():
     n = 4
-    g = 0
 
-    Sigma_i = sigma_i(n,g)
-    Sigma_ij = sigma_ij(n,g)
+    print("Constant")
+    mode = "constant"
+    params = dict()
+    Sigma_i = sigma_i(n, mode, **params)
+    Sigma_ij = sigma_ij(n, mode, **params)
+    print("SFS:\n", Sigma_i, '\n')
+    print("Sigma_ij:\n", Sigma_ij, '\n')
 
+    print("Exp. growth, g=1")
+    mode = "exponential"
+    params = {"g":1}
+    Sigma_i = sigma_i(n, mode, **params)
+    Sigma_ij = sigma_ij(n, mode, **params)
+    print("SFS:\n", Sigma_i, '\n')
+    print("Sigma_ij:\n", Sigma_ij, '\n')
+
+    print("Two-epoch, tau=1, f=0.5")
+    mode = "two-epoch"
+    params = {"tau":1, "f":0.5}
+    Sigma_i = sigma_i(n, mode, **params)
+    Sigma_ij = sigma_ij(n, mode, **params)
     print("SFS:\n", Sigma_i, '\n')
     print("Sigma_ij:\n", Sigma_ij, '\n')
 
