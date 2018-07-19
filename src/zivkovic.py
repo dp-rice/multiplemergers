@@ -4,6 +4,8 @@ from numpy.polynomial.laguerre import laggauss
 from math import factorial
 from functools import partial
 
+LAGDEGREE = 40
+
 def zivkovic_alpha(n):
     r = np.arange(n+1)
     vec_n = r[:,None,None]
@@ -32,7 +34,7 @@ def lambda_inv_eq3(x,y,g=0):
 def lambda_inv_sq(x, g=0):
     return lambda_inv(x, g=g)**2
 
-def laguerre_integral(f, x_scale, degree=40):
+def laguerre_integral(f, x_scale, degree=LAGDEGREE):
     lag_x, lag_w = laggauss(degree)
     if np.isscalar(x_scale):
         scaled_x = lag_x / x_scale
@@ -40,7 +42,7 @@ def laguerre_integral(f, x_scale, degree=40):
         scaled_x = lag_x[:,None] / x_scale[None,:]
     return lag_w @ f(scaled_x)
 
-def laguerre_double_integral(f, x_scale,  degree=40):
+def laguerre_double_integral(f, x_scale, degree=LAGDEGREE):
     lag_x, lag_w = laggauss(degree)
     if np.isscalar(x_scale):
         scaled_x = lag_x / x_scale
