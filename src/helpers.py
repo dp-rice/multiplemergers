@@ -8,12 +8,12 @@ def pairwise_diversity(allele_counts, sample_size):
 
 
 def folded_sfs(minor_allele_counts, sample_size):
-    bins=np.arange(1, (sample_size+1)//2 + 2)
+    bins=np.arange(1, sample_size//2 + 2)
     return np.histogram(minor_allele_counts, bins=bins)[0]
 
 
 def sfs2pi(sfs, sample_size):
-    counts = np.arange(1, (sample_size+1)//2 + 1)
+    counts = np.arange(1, sample_size//2 + 1)
     pi_weights = pairwise_diversity(counts, sample_size)
     return pi_weights.dot(sfs)
 

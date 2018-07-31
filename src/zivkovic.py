@@ -260,7 +260,7 @@ def sigma_ij(n, mode, **params):
     return Sigma_ij
 
 def main():
-    n = 4
+    n = 5
 
     print("Constant")
     mode = "constant"
