@@ -10,13 +10,20 @@
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{\printtext{\bibstring{in}\intitlepunct}}}
 
-\newcommand{\floor}[1]{\lfloor #1 \rfloor}
-\newcommand{\E}[1]{\left< #1 \right>}
+
 \newcommand{\eq}[1]{Eq.~(\ref{#1})}
 \newcommand{\Eq}[1]{Equation~(\ref{#1})}
 \newcommand{\eqs}[2]{Eq.~(\ref{#1})~and~(\ref{#2})}
+\newcommand{\fig}[1]{Fig.~\ref{#1}}
+\newcommand{\Fig}[1]{Figure~\ref{#1}}
+\newcommand{\figs}[2]{Fig.~\ref{#1}~and~\ref{#2}}
+
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\E}[1]{\left< #1 \right>}
+
 \DeclareMathOperator{\pmi}{pmi}
 \DeclareMathOperator{\fpmi}{fpmi}
+\DeclareMathOperator{\wfpmi}{wfpmi}
 \DeclareMathOperator{\hilopmi}{hilopmi}
 
 
@@ -218,6 +225,13 @@ On the other hand, multiple mergers alter both the coalescent time distribution 
 These two effects are convolved in the SFS, making it difficult to distinguish between population growth and multiple mergers.
 Our hope is that the 2-SFS contains additional information about the distribution of genealogies, once distortions in coalescent times are accounted for.
 
+For plotting purposes, we will also use a weighted version of the $\fpmi$:
+\begin{align}
+    \wfpmi(i,j:d) = \frac{\E{\eta_{ij}}}{\mu^2 \E{T_2}^2} \fpmi(i,j;d),
+\end{align}
+where $T_2$ is the coalescence time for a sample of size two.
+This weighting emphasizes the most common pairs of minor allele counts, while maintaining invariance to the mutation and pairwise coalescence rates.
+
 \subsection*{Coarse-grained frequencies}
 
 With finite data, estimates of the 2-SFS will be noisy.
@@ -244,54 +258,91 @@ One could similarly calculate five other pointwise mutual information statistics
 
 \subsection*{Population growth vs. the beta coalescent in non-recombining loci}
 
-\begin{itemize}
-    \item Want to calculate PMI for 2-SFS for various models.
-    \item implemented Fu and Birkner formulas
-    \item \cite{ZivkovicWiehe2008} extended Fu to variable population size.
-    \item We implemented their formula for exponential growth and piecewise constant, but in principle could be extended to other models.
-    \item Figure 1 shows weighted PMI $\text{wPMI}(i,j) = \E{\eta_{ij}} \text{PMI}(i,j)$.
-    \item weighted to highlight regions of the 2-SFS with the most mutations.
-    \item Observations:
-    \begin{enumerate}
-        \item population growth does not qualitatively change the PMI, even though it distorts the SFS a lot.
-        \item more multiple mergers leads more positive elements.
-        \item Positive associations off-diagonal. Presumably due to uneven branching. Going to ignore because turns out to be sensitive to recombination.
-        \item Positive associations between high- and low-frequency mutations. This is the signal we'll focus on.
-    \end{enumerate}
-    \item Suggests a coarse-graining of the SFS into high- and low-frequency mutations.
-    \item Definition of hi-lo corr given cutoff and distance.
-\end{itemize}
+In this section, we compare the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
+We wrote a \texttt{python} package to compute the SFS, 2-SFS, and $\fpmi$ numerically.
+This package uses the results of \cite{Fu1995} for the time-homogeneous Kingman coalescent, \cite{ZivkovicWiehe2008} for the time-inhomogeneous Kingman coalescent, and \cite{BirknerEtAl2013} for the beta coalescent.
+(See Methods for details.)
 
-[Next: Intuition and $n=4$ calculations.]
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/figure1.pdf}
+\caption{Weighted frequency pointwise mutual information for three coalescent models: the time-homogeneous Kingman coalescent, the Kingman coalescent with exponential growth ($g=4$), and the beta coalescent ($\alpha=1.45$). For all models $n=39$. Growth and $\alpha$ parameters were chosen to generate average SFS with similar Tajima's D. The diagonal $i=j$ is masked. \label{fig:nonrecombining_pmi}}
+\end{figure}
 
-% \begin{figure}
-% \centering
-% \includegraphics[width=0.8\textwidth]{figures/trees.png}
-% \caption{Possible genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue.  \label{fig:trees}}
-% \end{figure}
-%
-% We can get an intuitive understanding for this result by considering a sample of size 4. In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
-% Furthermore, the total branch length is independent of the topology.
-% As a result, there is a trade-off between the branch length leading to singleton/tripleton mutations and the branch length leading to doubletons: loci with topology (A) will have more opportunities for the former and loci with topology (B) will have more opportunities for the latter.
-% Conditional on observing a doubleton at a locus, it is thus more likely that the locus has topology (B) and so the expected number of singletons is lower.
-% In terms of the joint site frequency spectrum, we have $\E{\phi_{12}} < \E{\phi_{1}} \E{\phi_{2}}$.
-%
-% On the other hand, multiple mergers induce correlations between the tree topology and the total branch length.
-% For example, topology (C) has less overall opportunity for singletons as well as doubletons than (A) or (B), even though the expected proportion of singletons is higher.
-% Thus, observing \emph{any mutation at all} makes topology (C) less likely and the expected number of other mutations at all frequencies more likely.
-% If multiple-mergers events are frequent enough, this effect may dominate the tradeoff between (A) and (B) and lead to $\E{\phi_{12}} > \E{\phi_{1}} \E{\phi_{2}}$.
-%
-% There are two limitations of these existing results.
-% First, they only apply to time-homogeneous coalescent processes and thus do not distinguish between multiple-mergers coalescents and Kingman models with time-varying population size.
-% Second, they assume a non-recombining locus and may break down for sites separated by a finite genetic distance.
+\Fig{fig:nonrecombining_pmi} shows the $\wfpmi$ for constant-$N$ Kingman coalescent; the Kingman coalescent with exponential growth, $N(t)=N_0 \exp(-g \frac{t}{N_0})$; and a beta coalescent intermediate between the Kingman and Bolthausen-Sznitman coalescents.
+We find that while exponential growth with $g=4$ has a substantial effect on the SFS (Tajima's D = $-0.39 \pi$, where $\pi$ is the average pairwise diversity), it does not qualitatively change the $\fpmi$.
+In particular, $\fpmi_{i,j} < 0$ for all $i \neq j$, just as in the constant-$N$ Kingman coalescent.
+
+On the other hand, a beta coalescent that generates similar distortions in the SFS ($\alpha=1.45$, Tajima's D = $-0.42 \pi$) also generates positive $\fpmi$.
+The effect of multiple mergers is strongest on $\fpmi$ between high and low minor allele counts.
+This justifies coarse-graining the SFS and 2-SFS into high-- and low--minor allele count bins as defined above.
+
+[fpmi vs tajima's D]
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/figure2.pdf}
+\caption{[CAPTION] \label{fig:pmi_vs_tajimasd}}
+\end{figure}
+
+\subsection*{Samples of four chromosomes}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/trees.png}
+\caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note, there is a third multiple-merger topology, not shown.) \label{fig:trees}}
+\end{figure}
+
+We can get an intuitive understanding for the result above by considering a sample four chromosomes.
+In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
+Furthermore, the total branch length is independent of the topology \cite{Wakeley2009}.
+As a result, there is a trade-off between the length of branches leading to singleton/tripleton mutations on one hand, and the branch length leading to doubletons on the other.
+Genealogies with topology (A) will have more opportunities for the former and loci with topology (B) will have more opportunities for the latter.
+Conditional on observing a doubleton at a site, it is thus more likely that the genealogy has topology (B) and so the expected number of singletons at sites with the same genealogy is lower than average.
+In terms of the 2-SFS, we have $\E{\eta_{12}} < \E{\eta_{1}} \E{\eta_{2}}$.
+
+On the other hand, multiple mergers induce correlations between the tree topology and the total branch length.
+For example, topology (C) has less opportunity for singletons \emph{and} less opportunity for doubletons than (A) or (B), even though the expected proportion of singletons is higher.
+Thus, observing \emph{any mutation at all} makes topology (C) less likely and the expected number of other mutations at all frequencies higher.
+If multiple-mergers events are frequent enough, this effect may dominate the tradeoff between (A) and (B) so that $\E{\eta_{12}} > \E{\eta_{1}} \E{\eta_{2}}$.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/figure3.pdf}
+\caption{[CAPTION] \label{fig:sdpmi_vs_sdratio}}
+\end{figure}
+
+[Singleton/doubleton fpmi versus singleton/doubleton ratio]
 
 \subsection*{Pointwise mutual information between recombining sites}
+
 [Coalescent simulations with recombination (it still works).]
 
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/figure4.pdf}
+\caption{[CAPTION] \label{fig:wpmi_recombination}}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/figure5.pdf}
+\caption{[CAPTION] \label{fig:hilo_vs_d}}
+\end{figure}
+
 \subsection*{Linked selective sweeps}
+
 [Forward-time simulations of linked sweeps (still works).]
 
 \subsection*{Application to \textit{Drosophila melanogaster}}
+
+[Data processing (see methods). Reduce to $n=100$ per chromosome. Treat chromosomes separately. Get 4-D sites.]
+
+[Compute SFS. Use fastNeutrino to fit a demographic model. Model is:]
+
+[Use msprime to simulate under the model. Compute 2-SFS]
+
+[Compute data hi-lo correlation. Compare to simulations]
 
 \section*{Discussion}
 \begin{itemize}
@@ -299,14 +350,16 @@ One could similarly calculate five other pointwise mutual information statistics
     \item Single-locus tests that rely on trees (Seger whale lice, Neher with viruses)
     \item Multi-locus tests that compare vs genomic background
     \item Could extend to a local method to look for variation in ``multiple-merger-ness''
-    \item Could also extend
+    \item Could also develop a formal hypothesis testing procedure.
+    \item Otherwise, should hilo should be a standard check. Possibly incorporate into model fitting packages.
+    \item Interesting to test across species.
 \end{itemize}
 
 Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 \section*{Methods}
 \begin{itemize}
-    \item Code to compute moments
+    \item Code to compute moments (currently piecewise-constant and exp. growth, but could be extended easily)
     \item Simulation code extending msprime
     \item Forward-time simulation with SLiM
     \item Drosophila
@@ -320,3 +373,7 @@ Tests of the standard Kingman coalescent based on the SFS originated with \cite{
 \printbibliography
 
 \end{document}
+
+% There are two limitations of these existing results.
+% First, they only apply to time-homogeneous coalescent processes and thus do not distinguish between multiple-mergers coalescents and Kingman models with time-varying population size.
+% Second, they assume a non-recombining locus and may break down for sites separated by a finite genetic distance.
