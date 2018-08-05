@@ -162,25 +162,25 @@ This result, combined with \eqs{eq:expected_sfs}{eq:expected_2sfs}, implies a ne
 \cite{BirknerEtAl2013} extended Fu's calculation to a family of multiple merger coalescents called beta coalescents.
 This one-parameter family interpolates between the Kingman coalescent and the Bolthausen-Sznitman coalescent as the parameter, $\alpha$, varies from 2 to 1.
 Beta coalescents arise in models with fat-tailed offspring distributions \autocite{Schweinsberg2003}, and the Bolthausen-Sznitman coalescent is the limiting distribution of genealogies in rapidly adapting populations \autocite{NeherHallatscheck2013}.
-Like Fu, Birkner et al.\ were primarily concerned with computing the sample variance of SFS-based summary statistics such as Tajima's D \autocite{Tajima1989}
+Like Fu, Birkner et al.\ were primarily concerned with computing the sample variance of SFS-based summary statistics such as Tajima's D \autocite{Tajima1989}.
 As a result, they were mostly interested in the diagonal terms of the SFS covariance matrix, which dominate that calculation.
 However, Figures 5 and 6 of \cite{BirknerEtAl2013} show positive correlations between $\xi_i$ and $\xi_j$ for $j \neq i, n-i$.
 Thus, unlike the standard Kingman coalescent, the beta coalescent can generate positive associations between mutations with different minor allele counts.
 
-Our goal is to demonstrate that this distinction in the two-site frequency spectrum between the multiple merger and Kingman coalescents:
-\begin{enumerate*}
-    \item applies to Kingman coalescents with time-varying coalescent rates,
-    \item is robust to recombination between the sites,
-    \item is also a feature of forward-time models with selection, and
-    \item can form the basis of a model-checking procedure for demographic inference methods.
-\end{enumerate*}
+Our goal is to demonstrate that this distinction in the 2-SFS between the multiple merger and Kingman coalescents
+\begin{enumerate*}[label=(\roman*), before=\unskip{: }, itemjoin={{; }}, itemjoin*={{, and }}]
+    \item applies to Kingman coalescents with time-varying coalescent rates
+    \item is robust to recombination between the sites
+    \item is also a feature of forward-time models with selection
+    \item can form the basis of a model-checking procedure for demographic inference methods
+\end{enumerate*}.
 To this end, we will make use of the fact that the 2-SFS may be interpreted as a joint probability distribution to define the following useful transformation.
 
 \subsection*{Frequency pointwise mutual information}
 
 Given a coalescent model, the minor allele count at an arbitrary site is a random variable with probability mass function $p(i) = \E{\eta_i}$, where we define $\eta_0$ to be the fraction of monomorphic sites.
 Similarly, the minor allele counts at a pair of sites separated by $d$ bases is a pair of random variables with joint probability mass function $p_d(i,j) = \E{\eta_{ij}(d)}$.
-We are interested in quantifying the dependence between the minor allele counts at these sites, particularly for $i\neq j$.
+We are interested in quantifying the dependence between minor allele counts at a given pair of sites, particularly for $i\neq j$.
 
 A general measure of the dependence between a pair of random variables is the \textit{mutual information} \autocite{CoverThomas1991}.
 The mutual information between random variables $X$ and $Y$ is a functional of their joint probability mass function, $p(x,y)$, defined as
@@ -189,11 +189,11 @@ The mutual information between random variables $X$ and $Y$ is a functional of t
     \label{eq:mutual_information}
 \end{align}
 where, with slight abuse of notation, $p(x) = \sum_y p(x,y)$ and vice versa.
-Equivalently, the mutual information is the Kullback-Leibler divergence between the true joint distribution of $X$ and $Y$ and the joint distribution of independent random variables with the same marginal distributions \autocite{CoverThomas1991}.
+Equivalently, the mutual information is the Kullback-Leibler divergence between the true joint distribution of $X$ and $Y$ and the joint distribution of two independent random variables with the same marginal distributions as $X$ and $Y$ \autocite{CoverThomas1991}.
 Thus, mutual information captures generic, possibly nonlinear, dependence between $X$ and $Y$.
 
 We would like to measure the association between alleles at particular frequencies, rather than the overall dependence between allele frequencies at nearby sites (which would be a measure of linkage disequilibrium).
-\Eq{eq:mutual_information} shows that the $I$ is the expectation, relative to $p(x,y)$, of a quantity known as the \textit{pointwise mutual information}, where
+\Eq{eq:mutual_information} shows that $I[p(x,y)]$ is the expectation, relative to $p(x,y)$, of a quantity known as the \textit{pointwise mutual information}, where
 \begin{align}
     \pmi(x,y) = \log \frac{p(x,y)}{p(x)p(y)} = \log \frac{p(x|y)}{p(x)} = \log \frac{p(y|x)}{p(y)}
 \end{align}
@@ -202,7 +202,7 @@ Pointwise mutual information measures the change in the probability that $X=x$ g
 When $X$ and $Y$ are independent, $\pmi(x,y) = 0$ for all $x,y$.
 On the other hand, when $X$ and $Y$ are not independent, $\pmi(x,y) > 0$ implies that $p(x|y) > p(x)$, and conversely for $\pmi(x,y) < 0$.
 
-As we have shown above, the folded 2-SFS is a joint probability distribution over minor allele counts.
+As we have shown above, the expected folded 2-SFS is a joint probability mass function over minor allele counts.
 We may thus define the \textit{frequency pointwise mutual information} as
 \begin{align}
     \fpmi(i,j;d) = \log \frac{\E{\eta_{i,j}(d)}}{\E{\eta_i} \E{\eta_j}}.
@@ -238,7 +238,7 @@ We can also compute the pointwise mutual information in this coarse-grained dist
                                 {\E{\eta_{\text{hi,lo}}(d; i_c)}}
                                 {\E{\eta_{\text{lo}}(i_c)}  \E{\eta_{\text{hi}}(i_c)}}.
 \end{align}
-One could similarly calculate five other pointwise mutual information statistics from the coarse-grained 2-SFS (e.g the PMI between monomorphic and high minor allele count sites), but we will not use these statistics here.
+One could similarly calculate five other pointwise mutual information statistics from the coarse-grained 2-SFS (e.g., the PMI between monomorphic sites and sites with high minor allele counts), but we will not use these statistics here.
 
 \section*{Results \label{sec:results}}
 
