@@ -6,6 +6,7 @@
 .snakemake
 *.DS_Store
 notebooks/.ipynb_checkpoints/
+notebooks/old_figures/
 simulations/
 sandbox/
 data/
