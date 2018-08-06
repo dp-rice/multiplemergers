@@ -2,7 +2,6 @@
 *.swp
 *.aux
 *.log
-*.pdf
 *.pyc
 .snakemake
 *.DS_Store
