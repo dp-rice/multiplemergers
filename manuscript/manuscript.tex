@@ -330,52 +330,137 @@ This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f
 
 \subsection*{Pointwise mutual information between recombining sites}
 
-[Coalescent simulations with recombination (it still works).]
+The previous sections have shown that $\fpmi$ between pairs of non-recombining sites can discriminate between the Kingman coalescent with population growth and the beta coalescent.
+However, most demographic inference is performed on regions of the genome with non-zero recombination rates.
+In fact, for large non-recombining loci, it is sometimes possible to reconstruct the gene genealogy exactly and calculate tree imbalance statistics directly (see e.g., \cite{Seger2010}).
+The advantage of the $\fpmi$ approach is that it can be computed on a genomic scale, as with the SFS.
+Therefore, it is important to assess the robustness of our approach to recombination between sites.
+
+To measure the relationship between $\fpmi$ and recombination, we ran coalescent simulations using a version of the program \texttt{msprime} \cite{KehellerEtAl201?} modified to allow for multiple mergers.
+In particular, we simulated a model where coalescent events are drawn from the distribution specified by the beta coalescent, as in our numerical calculations above.
+In this model, marginal genealogies will follow the beta coalescent distribution, and the average SFS will be given by the formula in \cite{BirknerEtAl2013}.
+We also simulated data from two models of population growth: exponential growth and a two-epoch piecewise-constant model.
+
+For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
+We chose values of $r$ so that the combined parameter $r\E{T_2}$ varied over several orders of magnitude, where $\E{T_2}$ was measured from the simulation output.
+For each locus, we measured $\{\tau_i : i = 1,\ldots,n-1\}$ in the two genealogies at each end of the loci.
+We then calculated the expectations $\{\E{\tau_i\}}$ and $\{\E{\tau_ij}\}$ by averaging over independent loci.
+These expectations allow us to calculate all of the 2-SFS statistics defined above.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure4.pdf}
-\caption{[CAPTION] \label{fig:wpmi_recombination}}
+\caption{Weighted frequency pointwise information for three recombination rates with sample size $n=100$. As in \Fig{fig:nonrecombining_pmi}, the diagonal elements are masked, and the growth and multiple-merger parameters were chosen to generate average SFS with similar Tajima's D. \label{fig:wpmi_recombination}}
 \end{figure}
+
+\Fig{fig:wpmi_recombination} shows the weighted $\fpmi$ for three genetic distances in a constant-$N$ Kingman coalescent, a Kingman coalescent with exponential growth, and a beta coalescent.
+As in the non-recombining case, the constant-$N$ and exponential-growth Kingman models have similar $\fpmi$.
+In both models, $\fpmi > 0$ for $i\approx j$ for $r\E{T_2} \sim 1$.
+This is presumably because trees at nearby sites contain clades with similar numbers of leaves.
+These positive correlations, however, do not extend to $i \gg j$, which is the signal of multiple mergers in our coarse-grained $\hilopmi$.
+On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E{T_2} > 1$.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure5.pdf}
-\caption{[CAPTION] \label{fig:hilo_vs_d}}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. The fourth row shows forward-time \texttt{SLiM} simulations with selection at linked sites. Lines are colored by the distortion in the SFS, as measured by Tajima's D. [List parameters here?] \label{fig:hilo_vs_d}}
 \end{figure}
+
+\Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d=r\E{T_2}$ and three different choices of $i_c$.
+Each curve represents a particular parameter combination and coalescent model and is colored by the distortion in the average SFS, which is independent of the recombination rate.
+At low recombination rates, $\hilopmi$ may be greater in growing populations than in constant-$N$ populations (dotted lines), but is always less than zero, consistent with the results for non-recombining sites.
+When $r\E{T_2}\geq 1$, $\hilopmi$ may be slightly positive for large $i_c$, but is smaller in growing populations than in the constant-$N$ Kingman model.
+In all Kingman models, $\hilopmi$ decays to zero for $r\E{T_2}\gg 1$.
+
+In contrast, the beta coalescent generates $\hilopmi$ that is consistently greater than the constant-$N$ Kingman.
+As with non-recombining sites, the $\hilopmi$ is also greater in the beta coalescent model then in models of population growth than generate similar distortions in the SFS.
+[IDEA: A plot of $\hilopmi$ at a fixed r vs Tajima's D for all the models together. Could make several plots, varying $r$ and $i_c$. This might be more convincing than the current figure.]
+This is true across recombination rates and high/low cutoff minor allele counts.
+These results demonstrate that $\hilopmi$ is capable of discriminating between coalescent models even when there is recombination between sites.
+
+There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not decay to zero at long distances in the beta coalescent.
+This is related to the results of \cite{EldonWakeley20??}, who showed that a model with ``jackpot'' reproductive events can generate infinite-range linkage disequilibrium.
+They showed that different scalings of rates of mutation, pairwise coalescence, multiple merger coalescence, and recombination lead to different behaviors of diversity and linkage disequilibrium.
+Our implementation of the beta coalescent model with recombination corresponds to a particular scaling limit where recombination does not have time to decorrelate trees during multiple mergers events, even at infinite genetic distances.
+We do not expect this behavior to be universal to multiple mergers coalescents with recombination.
 
 \subsection*{Linked selective sweeps}
 
-[Forward-time simulations of linked sweeps (still works).]
+Various authors have shown that natural selection can generate multiple merger coalescents at linked neutral sites (e.g., \cite{DurrettSchweinsberg2005, CoopRalph, NeherHallatscheck2013, DesaiEtAl, Seger}).
+However, our simulations of the beta coalescent with recombination are of an explicitly neutral model.
+Thus, they are at best an approximation to the selective models cited above.
+It is therefore important to verify that selection at linked sites can, in fact, generate the sorts of signals in $\fpmi$ that we have detected in the beta coalescent.
 
-\subsection*{Application to \textit{Drosophila melanogaster}}
+To test this proposition, we performed forward-time simulations of recurring selective sweeps using the software \texttt{SLiM} \autocite{MesserEtAl201?}.
+In these simulations, we simulated individual chromosomes with homogenous recombination and two types of mutations: neutral and beneficial with fixed selection coefficient $s$.
+Both types of mutations occurred at random, uniformly distributed across the length of the chromosome.
+By varying the recombination rate, mutation rates, population size, and selection coefficient, we were able to vary the rate of selective sweeps linked to neutral sites.
+After the populations reached steady-state, we sampled individuals and calculated $\{\eta_i\}$ and $\{\eta_{ij}(d)\}$ for the neutral mutations.
+(See Methods for details.)
 
-[Data processing (see methods). Reduce to $n=100$ per chromosome. Treat chromosomes separately. Get 4-D sites.]
+The bottom row of \fig{fig:hilo_vs_d} shows the results of these simulations.
+For intermediate genetic distances, $d r \E{T_2} \sim 1$, the effects of linked sweeps are qualitatively similar to the effects of the beta coalescent.
+That is, when sweeps are sufficiently frequent to distort the SFS, as measured by Tajima's D, they also increase $\hilopmi$.
+The primary difference between the forward-time sweeps and beta coalescent simulations, is that the distortions caused by sweeps decay to zero for $d r \E{T_2} \gg 1$.
+This is reasonable because the effect of a particular sweep on genealogies should be localized around the beneficial mutation.
+
+\subsection*{Coalescent model checking: application to \textit{Drosophila melanogaster}}
+
+Our results above show that $\fpmi$ and its coarse-grained analog, $\hilopmi$ are useful for distinguishing population growth from the effects of multiple mergers.
+This is true even when the population growth generates similar distortions in the SFS.
+We therefore propose the following model-checking procedure for demographic inference methods
+\begin{enumerate}[label=(\roman*), before=\unskip{: }]
+    \item Fit a demographic model to data using any relevant method.
+    \item Simulate genealogies under the fitted model (using \texttt{msprime} or other coalescent simulator). Calculate the $\fpmi(d)$ and $\hilopmi(d;i_c)$ predicted by the model.
+    \item Calculate $\fpmi(d)$ and $\hilopmi(d;i_c)$ from the data.
+    \item Compare true to predicted statistics. Evaluate model fit.
+\end{enumerate}
+This procedure checks whether the model is consistent with a dimension the data that was used in fitting the model.
+Inconsistency suggests that the inferred $N(t)$ may be an artifact of natural selection, skewed offspring distributions, etc., rather than reflecting the true historical population size.
+
+In this section, we illustrate the procedure just outlined by using genomic diversity data from the \textit{Drosophila melanogaster} DGPG3 panel \cite{LackEtAl2015}.
+The DPGP3 data consists of haploid consensus sequences from $\sim 200$ wild-caught flies from a Zambian population known to be relatively free of cosmopolitan admixture.
+Recently, several groups have used the DPGP3 data to estimate the population-size history of \textit{D. melanogaster} \autocite{TerhorstEtAl2017,RagsdaleGutenkunst2017}.
+On the other hand, it is widely believed that the genetic diversity of \textit{Drosophila} is strongly shaped by natural selection (e.g., \cite{Elyashiv??201?, GarudPetrov2016, others?})
+Thus, this data is a good candidate for demonstrating the utility of $\fpmi$ for assessing coalescent model fit.
+
+After filtering for coverage, removing chromosome arms with known inversions, downsampling to $n=100$ samples per autosomal chromosome arm, and identifying 4-fold degenerate sites, we selected the central region of each chromosome that have consistent high diversity (Methods).
+Because the average pairwise diversity varies between arms---possibly reflecting selection or different sets of segregating inversions---we performed all subsequent calculations on each arm independently.
+We fit a demographic model to the site frequency spectra of these central regions using \texttt{fastNeutrino} \cite{BhaskarEtal2015}.
+We fit a 3-epoch piecewise-constant model, with four free parameters: two changepoints and two population size ratios.
+We report our fitted parameters and those of a similar published model \autocite{RagsdaleGutenkunst2017} in Table~\ref{table:DPGP_params} [Make table].
+We then simulated under our fitted model using \texttt{msprime} and computed the expected and observed SFS, $\fpmi$, and $\hilopmi$ (\fig{fig:dpgp3}).
+
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure6.pdf}
-\caption{[CAPTION] \label{fig:dpgp3}}
+\caption{DPGP3 data and coalescent model predictions. First row: observed (blue) and expected (orange) site frequency spectrum compared to constant-$N$ Kingman coalescent (dotted lines). Second row: Expected (upper triangle) and observed (lower triangle) weighted $\fpmi$ averaged over all pairs of sites less than $15 d_c$ apart. Third row: Observed (blue) and expected (orange) $\hilopmi$ versus genetic distance. Cutoff minor allele count, $i_c, = 5$. Solid blue curves show cubic spline fit. Dotted lines show the expectation under the constant-$N$ Kingman coalescent. [Middle row needs colorbar] \label{fig:dpgp3}}
 \end{figure}
 
-[Compute SFS. Use fastNeutrino to fit a demographic model. Model is:]
-
-[Use msprime to simulate under the model. Compute 2-SFS]
-
-[Compute data hi-lo correlation. Compare to simulations]
+\begin{itemize}
+    \item Expected and observed SFS match (because we fit the model to that).
+    \item Both show excess of low-frequency SNPs.
+    \item At intermediate distance, can see that the $\fpmi$ is strongly positive in the data, but negative in the model.
+    \item This pattern extends to other genetic distances.
+    \item Correlations in the data decay at long distances. This is like the sweeps simulations, but we don't want to draw too strong a conclusion.
+\end{itemize} 
 
 \section*{Discussion}
 \begin{itemize}
-    \item Focus here on coalescent, but also relevant for diffusion methods
-    \item Single-locus tests that rely on trees (Seger whale lice, Neher with viruses)
-    \item Multi-locus tests that compare vs genomic background
-    \item Could extend to a local method to look for variation in ``multiple-merger-ness''
-    \item Could also develop a formal hypothesis testing procedure.
-    \item Otherwise, should hilo should be a standard check. Possibly incorporate into model fitting packages.
-    \item Interesting to test across species.
+    \item Review results.
+    \item Availability of code: models for computing moments numerically, scripts for running simulations. Notebooks for data analysis.
+    \item We focus here on coalescent-based methods, but also relevant for diffusion methods (because they imply a coalescent model)
+    \item Mention methods to fit multiple mergers coalescent to data (computationally difficult). Not really what we're trying to do here. Our goal is that you can exploit this extra dimension of the data you already have to check your model and make sure you're not fitting a signal of selection, etc with a demographic model.
+    \item Could also develop a formal hypothesis testing procedure, using the bootstrap, etc.
+    \item Compare with: Single-locus tests that rely on building trees (Seger whale lice, Neher with viruses)
+    \item Compare with: Multi-locus tests that compare a particular region to genomic background. (What if the background isn't neutral/Kingman?)
+    \item But: we could extend our method to a local method that looks for variation in ``multiple-merger-ness''
+    \item Multiple-mergers coalescent and recombination: open area of research
+    \item $\fpmi(d)$ should be a standard posterior check for demographic models. Possibly incorporate into model fitting packages.
+    \item Interesting to compare across species.
 \end{itemize}
 
-Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 \section*{Methods}
 \begin{itemize}
@@ -384,15 +469,19 @@ Tests of the standard Kingman coalescent based on the SFS originated with \cite{
     \item Forward-time simulation with SLiM
     \item Drosophila
     \begin{itemize}
-        \item data pre-processing
-        \item fitting demographic model with fastNeutrino
-        \item simulating demographic model (could maybe compute exactly)
+        \item data pre-processing: throw out inversions, downsampling to 100 chromosome, 4-D sites, filter for coverage
+        \item picking the central regions
+        \item fitting demographic model with fastNeutrino: fit 3-epoch piecewise constant to SFS. Report model parameters
+        \item simulating demographic model
+        \item computing statistics
     \end{itemize}
 \end{itemize}
 
 \printbibliography
 
 \end{document}
+
+% Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 % There are two limitations of these existing results.
 % First, they only apply to time-homogeneous coalescent processes and thus do not distinguish between multiple-mergers coalescents and Kingman models with time-varying population size.
