@@ -277,12 +277,18 @@ On the other hand, a beta coalescent that generates similar distortions in the S
 The effect of multiple mergers is strongest on $\fpmi$ between high and low minor allele counts.
 This justifies coarse-graining the SFS and 2-SFS into high-- and low--minor allele count bins as defined above.
 
-[fpmi vs tajima's D]
+Accordingly, we computed the coarse-grained $\hilopmi$ between singletons and non-singletons ($i_c = 1$) for a range of $g$ and $\alpha$.
+For the same parameters, we also calculated a normalized Tajima's D statistic:
+$(\hat{\theta}_W - \pi) / \pi$, where $\hat{\theta}_W$ is Watterson's estimator of the coalescent scaled mutation rate \autocite{Watterson19??}.
+The latter is a measure of the distortions in the SFS induced by population growth or multiple mergers and equals zero for the constant-$N$ Kingman coalescent.
+\Fig{fig:fpmi_vs_tajimasd} shows that as the population growth rate increases, distorting the SFS, $\hilopmi$ increases relative to the constant-$N$ Kingman, but plateaus at a negative value.
+On the other hand, beta coalescents that generate similar distortions in the SFS, generate larger changes in $\hilopmi$, including positive values.
+Thus, the 2-SFS in general, and $\hilopmi$ in particular, are capable of capturing the effects of multiple mergers beyond the distortions in branch lengths.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure2.pdf}
-\caption{[CAPTION] \label{fig:pmi_vs_tajimasd}}
+\caption{Pointwise mutual information between singletons and non-singletons for Kingman coalescents with exponential growth and beta coalescents. The exponential growth rate, $g$, ranges from 0.25 to 8.0 in coalescent time units. The beta coalescent parameter, $\alpha$, ranges from 1.75 (nearly Kingman) to 1.25 (nearly Bolthausen-Sznitman). \label{fig:fpmi_vs_tajimasd}}
 \end{figure}
 
 \subsection*{Samples of four chromosomes}
@@ -290,7 +296,7 @@ This justifies coarse-graining the SFS and 2-SFS into high-- and low--minor alle
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/trees.png}
-\caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note, there is a third multiple-merger topology, not shown.) \label{fig:trees}}
+\caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note: there is a third possible multiple-merger topology, not shown.) \label{fig:trees}}
 \end{figure}
 
 We can get an intuitive understanding for the result above by considering a sample four chromosomes.
@@ -309,10 +315,18 @@ If multiple-mergers events are frequent enough, this effect may dominate the tra
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure3.pdf}
-\caption{[CAPTION] \label{fig:sdpmi_vs_sdratio}}
+\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^-4$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
 \end{figure}
 
-[Singleton/doubleton fpmi versus singleton/doubleton ratio]
+As argued above, $\E{\eta_{12}}$ is also distorted by changes in the coalescent time distribution induced by population growth.
+\Fig{fig:sdpmi_vs_sdratio} demonstrates that $\fpmi$ accounts for this fact by normalizing by the SFS.
+\Fig{fig:sdpmi_vs_sdratio} plots $\fpmi_{12}$ against the ratio of singletons to doubletons $\eta_1 / \eta_2$ for the beta coalescent and two models of population growth: exponential growth and a piecewise-constant model with two epochs.
+In the latter model, we vary both the fold-change in $N$ and the time of the change.
+Like Tajima's D in the previous section, the singleton/doubleton ratio measures distortion the SFS relative to the constant-$N$ Kingman coalescent.
+(In fact, with $n=4$, this ratio captures \emph{all} of the distortion in the SFS.)
+As with the larger sample size (\fig{fig:fpmi_vs_tajimasd}), mulitple mergers generate larger distortions in $\fpmi$ than population growth does, accounting for the distortions in the SFS.
+Moreover, the two different models of growth collapse onto one another.
+This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f(\eta_1/\eta_2)$ for some function $f$.
 
 \subsection*{Pointwise mutual information between recombining sites}
 
