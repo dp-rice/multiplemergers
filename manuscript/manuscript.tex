@@ -315,7 +315,7 @@ If multiple-mergers events are frequent enough, this effect may dominate the tra
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure3.pdf}
-\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^-4$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
+\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^{-4}$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
 \end{figure}
 
 As argued above, $\E{\eta_{12}}$ is also distorted by changes in the coalescent time distribution induced by population growth.
@@ -330,69 +330,304 @@ This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f
 
 \subsection*{Pointwise mutual information between recombining sites}
 
-[Coalescent simulations with recombination (it still works).]
+The previous sections have shown that $\fpmi$ between pairs of non-recombining sites can discriminate between the Kingman coalescent with population growth and the beta coalescent.
+However, most demographic inference is performed on regions of the genome with non-zero recombination rates.
+In fact, for large non-recombining loci, it is sometimes possible to reconstruct the gene genealogy exactly and calculate tree imbalance statistics directly (see e.g., \cite{Seger2010}).
+The advantage of the $\fpmi$ approach is that it can be computed on a genomic scale, as with the SFS.
+Therefore, it is important to assess the robustness of our approach to recombination between sites.
+
+To measure the relationship between $\fpmi$ and recombination, we ran coalescent simulations using a version of the program \texttt{msprime} \cite{KehellerEtAl201?} modified to allow for multiple mergers.
+In particular, we simulated a model where coalescent events are drawn from the distribution specified by the beta coalescent, as in our numerical calculations above.
+In this model, marginal genealogies will follow the beta coalescent distribution, and the average SFS will be given by the formula in \cite{BirknerEtAl2013}.
+We also simulated data from two models of population growth: exponential growth and a two-epoch piecewise-constant model.
+
+For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
+We chose values of $r$ so that the combined parameter $r\E{T_2}$ varied over several orders of magnitude, where $\E{T_2}$ was measured from the simulation output.
+For each locus, we measured $\{\tau_i : i = 1,\ldots,n-1\}$ in the two genealogies at each end of the loci.
+We then calculated the expectations $\{\E{\tau_i\}}$ and $\{\E{\tau_ij}\}$ by averaging over independent loci.
+These expectations allow us to calculate all of the 2-SFS statistics defined above.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure4.pdf}
-\caption{[CAPTION] \label{fig:wpmi_recombination}}
+\caption{Weighted frequency pointwise information for three recombination rates with sample size $n=100$. As in \Fig{fig:nonrecombining_pmi}, the diagonal elements are masked, and the growth and multiple-merger parameters were chosen to generate average SFS with similar Tajima's D. \label{fig:wpmi_recombination}}
 \end{figure}
+
+\Fig{fig:wpmi_recombination} shows the weighted $\fpmi$ for three genetic distances in a constant-$N$ Kingman coalescent, a Kingman coalescent with exponential growth, and a beta coalescent.
+As in the non-recombining case, the constant-$N$ and exponential-growth Kingman models have similar $\fpmi$.
+In both models, $\fpmi > 0$ for $i\approx j$ for $r\E{T_2} \sim 1$.
+This is presumably because trees at nearby sites contain clades with similar numbers of leaves.
+These positive correlations, however, do not extend to $i \gg j$, which is the signal of multiple mergers in our coarse-grained $\hilopmi$.
+On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E{T_2} > 1$.
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure5.pdf}
-\caption{[CAPTION] \label{fig:hilo_vs_d}}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. \label{fig:hilo_vs_d}}
 \end{figure}
+
+\Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d=r\E{T_2}$ and three different choices of $i_c$.
+Each curve represents a particular parameter combination and coalescent model and is colored by the distortion in the average SFS, which is independent of the recombination rate.
+At low recombination rates, $\hilopmi$ may be greater in growing populations than in constant-$N$ populations (dotted lines), but is always less than zero, consistent with the results for non-recombining sites.
+When $r\E{T_2}\geq 1$, $\hilopmi$ may be slightly positive for large $i_c$, but is smaller in growing populations than in the constant-$N$ Kingman model.
+In all Kingman models, $\hilopmi$ decays to zero for $r\E{T_2}\gg 1$.
+
+In contrast, the beta coalescent generates $\hilopmi$ that is consistently greater than the constant-$N$ Kingman.
+As with non-recombining sites, the $\hilopmi$ is also greater in the beta coalescent model then in models of population growth than generate similar distortions in the SFS.
+[IDEA: A plot of $\hilopmi$ at a fixed r vs Tajima's D for all the models together. Could make several plots, varying $r$ and $i_c$. This might be more convincing than the current figure.]
+This is true across recombination rates and high/low cutoff minor allele counts.
+These results demonstrate that $\hilopmi$ is capable of discriminating between coalescent models even when there is recombination between sites.
+
+There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not decay to zero at long distances in the beta coalescent.
+This is related to the results of \cite{EldonWakeley20??}, who showed that a model with ``jackpot'' reproductive events can generate infinite-range linkage disequilibrium.
+They showed that different scalings of rates of mutation, pairwise coalescence, multiple merger coalescence, and recombination lead to different behaviors of diversity and linkage disequilibrium.
+Our implementation of the beta coalescent model with recombination corresponds to a particular scaling limit where recombination does not have time to decorrelate trees during multiple mergers events, even at infinite genetic distances.
+We do not expect this behavior to be universal to multiple mergers coalescents with recombination.
 
 \subsection*{Linked selective sweeps}
 
-[Forward-time simulations of linked sweeps (still works).]
+Various authors have shown that natural selection can generate multiple merger coalescents at linked neutral sites (e.g., \cite{DurrettSchweinsberg2005, CoopRalph, NeherHallatscheck2013, DesaiEtAl, Seger}).
+However, our simulations of the beta coalescent with recombination are of an explicitly neutral model.
+Thus, they are at best an approximation to the selective models cited above.
+It is therefore important to verify that selection at linked sites can, in fact, generate the sorts of signals in $\fpmi$ that we have detected in the beta coalescent.
 
-\subsection*{Application to \textit{Drosophila melanogaster}}
+To test this proposition, we performed forward-time simulations of recurring selective sweeps using the software \texttt{SLiM} \autocite{MesserEtAl201?}.
+In these simulations, we simulated individual chromosomes with homogenous recombination and two types of mutations: neutral and beneficial with fixed selection coefficient $s$.
+Both types of mutations occurred at random, uniformly distributed across the length of the chromosome.
+By varying the recombination rate, mutation rates, population size, and selection coefficient, we were able to vary the rate of selective sweeps linked to neutral sites.
+After the populations reached steady-state, we sampled individuals and calculated $\{\eta_i\}$ and $\{\eta_{ij}(d)\}$ for the neutral mutations.
+(See Methods for details.)
 
-[Data processing (see methods). Reduce to $n=100$ per chromosome. Treat chromosomes separately. Get 4-D sites.]
+The bottom row of \fig{fig:hilo_vs_d} shows the results of these simulations.
+For intermediate genetic distances, $d r \E{T_2} \sim 1$, the effects of linked sweeps are qualitatively similar to the effects of the beta coalescent.
+That is, when sweeps are sufficiently frequent to distort the SFS, as measured by Tajima's D, they also increase $\hilopmi$.
+The primary difference between the forward-time sweeps and beta coalescent simulations, is that the distortions caused by sweeps decay to zero for $d r \E{T_2} \gg 1$.
+This is reasonable because the effect of a particular sweep on genealogies should be localized around the beneficial mutation.
+
+\subsection*{Coalescent model checking: application to \textit{Drosophila melanogaster}}
+
+Our results above show that $\fpmi$ and its coarse-grained analog, $\hilopmi$ are useful for distinguishing population growth from the effects of multiple mergers.
+This is true even when the population growth generates similar distortions in the SFS.
+We therefore propose the following model-checking procedure for demographic inference methods
+\begin{enumerate}[label=(\roman*), before=\unskip{: }]
+    \item Fit a demographic model to data using any relevant method.
+    \item Simulate genealogies under the fitted model (using \texttt{msprime} or other coalescent simulator). Calculate the $\fpmi(d)$ and $\hilopmi(d;i_c)$ predicted by the model.
+    \item Calculate $\fpmi(d)$ and $\hilopmi(d;i_c)$ from the data.
+    \item Compare true to predicted statistics. Evaluate model fit.
+\end{enumerate}
+This procedure checks whether the model is consistent with a dimension the data that was used in fitting the model.
+Inconsistency suggests that the inferred $N(t)$ may be an artifact of natural selection, skewed offspring distributions, etc., rather than reflecting the true historical population size.
+
+In this section, we illustrate the procedure just outlined by using genomic diversity data from the \textit{Drosophila melanogaster} DGPG3 panel \cite{LackEtAl2015}.
+The DPGP3 data consists of haploid consensus sequences from $\sim 200$ wild-caught flies from a Zambian population known to be relatively free of cosmopolitan admixture.
+Recently, several groups have used the DPGP3 data to estimate the population-size history of \textit{D. melanogaster} \autocite{TerhorstEtAl2017,RagsdaleGutenkunst2017}.
+On the other hand, it is widely believed that the genetic diversity of \textit{Drosophila} is strongly shaped by natural selection (e.g., \cite{Elyashiv??201?, GarudPetrov2016, others?})
+Thus, this data is a good candidate for demonstrating the utility of $\fpmi$ for assessing coalescent model fit.
+
+After filtering for coverage, removing chromosome arms with known inversions, downsampling to $n=100$ samples per autosomal chromosome arm, and identifying 4-fold degenerate sites, we selected the central region of each chromosome that have consistent high diversity (Methods).
+Because the average pairwise diversity varies between arms---possibly reflecting selection or different sets of segregating inversions---we performed all subsequent calculations on each arm independently.
+We fit a demographic model to the site frequency spectra of these central regions using \texttt{fastNeutrino} \cite{BhaskarEtal2015}.
+We fit a 3-epoch piecewise-constant model, with four free parameters: two changepoints and two population size ratios.
+We report our fitted parameters in Table~\ref{tab:DPGP_params}.
+We then simulated under our fitted model using \texttt{msprime} and computed the expected and observed SFS, $\fpmi$, and $\hilopmi$ (\fig{fig:dpgp3}, See methods for details.).
 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure6.pdf}
-\caption{[CAPTION] \label{fig:dpgp3}}
+\caption{DPGP3 data and coalescent model predictions. First row: observed (blue) and expected (orange) site frequency spectrum compared to constant-$N$ Kingman coalescent (dotted lines). Second row: Expected (upper triangle) and observed (lower triangle) weighted $\fpmi$ averaged over all pairs of sites less than $15 d_c$ apart. Third row: Observed (blue) and expected (orange) $\hilopmi$ versus genetic distance. Cutoff minor allele count, $i_c, = 5$. Solid blue curves show cubic spline fit. Dotted lines show the expectation under the constant-$N$ Kingman coalescent. [Middle row needs colorbar] \label{fig:dpgp3}}
 \end{figure}
 
-[Compute SFS. Use fastNeutrino to fit a demographic model. Model is:]
+The first row of \fig{fig:dpgp3} shows that the expected SFS under the fit demographic models agree with the observed SFS, demonstrating that a time-varying $N(t)$ can explain this aspect of the data well.
+In contrast, the second row shows the expected and observed weighted $\fpmi$ for averaged over distances less than $15 d_c$ apart, where $d_c = 2/ (\pi \mu)$ is the distance scale corresponding to $r\E{T_2} = 1$.
+Here, the data shows strong positive associations between nearby alleles at different frequencies, while the model of population growth predicts weak negative associations except just off of the diagonal.
+This pattern extends across a range of genomic distances, $d/d_c \in (10^{-1}, 10^2)$ (\fig{fig:dpgp3}, third row).
+As a result, we may conclude that the data is not well explained by the Kingman coalescent with population growth.
 
-[Use msprime to simulate under the model. Compute 2-SFS]
+Note that the $\hilopmi$ decays toward zero at large distances.
+This matches the expectation from simulations with selective sweeps rather than the beta coalescent.
+However, we caution against concluding that sweeps are necessarily responsible for the deviations from the Kingman expectation.
 
-[Compute data hi-lo correlation. Compare to simulations]
 
 \section*{Discussion}
 \begin{itemize}
-    \item Focus here on coalescent, but also relevant for diffusion methods
-    \item Single-locus tests that rely on trees (Seger whale lice, Neher with viruses)
-    \item Multi-locus tests that compare vs genomic background
-    \item Could extend to a local method to look for variation in ``multiple-merger-ness''
-    \item Could also develop a formal hypothesis testing procedure.
-    \item Otherwise, should hilo should be a standard check. Possibly incorporate into model fitting packages.
-    \item Interesting to test across species.
+    \item Review results.
+    \item Availability of code: models for computing moments numerically, scripts for running simulations. Notebooks for data analysis.
+    \item We focus here on coalescent-based methods, but also relevant for diffusion methods (because they imply a coalescent model)
+    \item Mention methods to fit multiple mergers coalescent to data (computationally difficult). Not really what we're trying to do here. Our goal is that you can exploit this extra dimension of the data you already have to check your model and make sure you're not fitting a signal of selection, etc with a demographic model.
+    \item Could also develop a formal hypothesis testing procedure, using the bootstrap, etc.
+    \item Compare with: Single-locus tests that rely on building trees (Seger whale lice, Neher with viruses)
+    \item Compare with: Multi-locus tests that compare a particular region to genomic background. (What if the background isn't neutral/Kingman?)
+    \item But: we could extend our method to a local method that looks for variation in ``multiple-merger-ness''
+    \item Multiple-mergers coalescent and recombination: open area of research
+    \item $\fpmi(d)$ should be a standard posterior check for demographic models. Possibly incorporate into model fitting packages.
+    \item Interesting to compare across species.
 \end{itemize}
 
-Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 \section*{Methods}
-\begin{itemize}
-    \item Code to compute moments (currently piecewise-constant and exp. growth, but could be extended easily)
-    \item Simulation code extending msprime
-    \item Forward-time simulation with SLiM
-    \item Drosophila
-    \begin{itemize}
-        \item data pre-processing
-        \item fitting demographic model with fastNeutrino
-        \item simulating demographic model (could maybe compute exactly)
-    \end{itemize}
-\end{itemize}
+
+\subsection*{Computing branch-length moments}
+
+We implemented numerical computations of the moments of the branch lengths $\E{\tau_i}$ and $\E{\tau_{ij}}$ using the \texttt{python} numerical package \texttt{numpy} \autocite{numpy}.
+For the Kingman coalescent with time-varying coalescent rate, we used equations~(1)-(12) of \cite{ZivkovicWiehe2008}.
+To calculate the second moments of the coalescent time distribution for exponentially growing populations, we used Gaussian quadrature.
+For the beta coalescent, we implemented the recursion described by \cite{BirknerEtAl2013}.
+
+Functions for compute the branch-length moments are available [GITHUB].
+The Kingman coalescent code currently can compute moments for exponentially growing and two-epoch piecewise constant models, but could be extended to allow for other models.
+The formulas of \cite{ZivkovicWiehe2008} exhibit numerical instability related to the instability of \cite{GriffithsTavare1994}.
+They are therefore only practical for sample sizes up to $n \approx 40$.
+The recursion of \cite{BirknerEtAl2013} is $\mathcal{O}(n^4)$ [CHECK THIS] and is also only practical for samples up to $n \approx 50$.
+
+\subsection*{Coalescent simulations}
+
+Our beta coalescent simulation code is based on modifications to the \texttt{msprime} package made by Joe Zhu [link to github] to allow for multiple mergers.
+This code, together with \texttt{python} wrapper scripts and utility functions to run simulations and calculate the 2-SFS and $\fpmi$ from the \texttt{msprime} output is available [GITHUB].
+
+[Possibly move some of the description here]
+
+\subsection*{Forward-time simulations of selective sweeps}
+
+We simulated a model of recurring selective sweeps using the software \texttt{SLiM} \autocite{MesserEtAl201?}.
+In all of these simulations, we simulated a population of 500 diploids for $10^4$ generations.
+Each haploid genome consisted of a single genomic element $L=10^8$ basepairs long with recombination rate per basepair $r = 10^{-8}$ and overall mutation rate $\mu = 10^{-7}$.
+We simulated two types of mutations: neutral mutations and beneficial mutations with additive effects and selection coefficient $s=0.1$.
+With these parameters, $2Ns = 100$, so beneficial mutations are strongly selected and will sweep in $T_{\text{sweep}}\sim s^{-1} \log Ns \approx 50$ generations.
+Such sweeps will effect a region of the chromosome $d_{\text{sweep}} \sim (r T_{\text{sweep}})^{-1} \approx 2 \times 10^6$ basepairs long.
+Thus $d_{\text{sweep}} \ll L$, which will minimize edge effects of having a finite chromosome.
+
+In order to vary the effects of sweeps on neutral diversity, we varied the fraction of mutations that are beneficial $f_{\text{sel}}$ over several orders of magnitude: $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$.
+For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and computed $\eta_i$ and $\eta_{ij}$ of neutral mutations averaged over all replicates.
+
+\texttt{SLiM} parameter files, \texttt{python} wrapper scripts for parsing output, and \texttt{snakemake} files for running simulations are available [GITHUB].
+
+\subsection*{Analysis of \textit{D. melanogaster} data}
+
+The DPGP3 data set consists of haploid consensus sequences from $\sim 200$ files, obtained via the haploid embryo method of \cite{LangleyEtal2011}.
+The SNP calls underlying these sequences have been subjected to a variety of quality filters described in \cite{LackEtAl2015}.
+We obtained the DPGP3 consensus sequence files version 1.1 from \url{www.johnpool.net/genomes.html}.
+These files contain the sequence alignments of all flies in the sample on all chromosome arms.
+We also downloaded the Nov. 3, 2016 spreadsheet of inversions available at the link above.
+For each chromosome arm, we excluded any samples with an inversion in that arm and then down-sampled to $n=100$ by taking the first 100 remaining samples in alphanumeric order by sample name.
+(As a result, the data for each chromosome arm is from a slightly different subset of the individuals.)
+
+We calculated the average pairwise diversity, $\pi$, as a function of position for each autosomal chromosome arm (\fig{fig:dpgp_pi}).
+Pairwise diversity is high in the middle of each chromosome arm and lower near the centromeres and telomeres.
+Our modeling---and coalescent-based demographic inference methods in general---assumes that the distribution of gene genealogies is homogeneous along the chromosome.
+Therefore, we selected a 13-16~MB ``central'' region of each arm with relatively homogeneous $\pi$ for further analysis.
+The boundaries of these central regions are given in Table~\ref{tab:central_regions}.
+
+In order to ensure that the segregating mutations reflect true genetic diversity and not variation in calling errors, we excluded sites where fewer than 90 of the 100 samples have genotype calls.
+This leaves over 90\% of all sites and does not substantially alter the fraction of sites that are polymorphic in the sample (Table~\ref{tab:called_sites})
+
+We fit a demographic model to the folded SFS of fourfold degenerate sites for each chromosome arm separately using \texttt{fastNeutrino} \autocite{BhaskarEtAl2015}.
+We fit a three-epoch piecewise constant--$N$ model:
+\begin{align}
+    N(t) = \begin{cases}
+                N_1 & 0 \leq t \leq t_1 \\
+                N_2 & t_1 <  t \leq t_2 \\
+                N_{\text{anc}} & t > t_2,
+            \end{cases}
+    \label{eq:piecewise}
+\end{align}
+estimating both change-points ($t_1$ < $t_2$) and both population sizes ($N_1$, $N_2$).
+We specified the ancient population size $N_{\text{anc}} = 3\times 10^5$, as in \cite{RagsdaleGutenkunst2017}.
+For all four chromosomes, \texttt{fastNeutrino} inferred similar population growth.
+Fitted parameters are presented in Table~\ref{tab:DPGP_params}.
+We simulated the SFS and 2-SFS under the fitted parameters using \texttt{msprime}.
+
+In addition to the average SFS used to fit the model, we computed the average 2-SFS for pairs of sites at distances distances between 3~bp and 5~Kb.
+Because we are using four-fold degenerate sites, we only computed the 2-SFS for distances that are multiples of 3.
+For comparison between data and simulations, we scale the distances in basepairs by a critical distance $d_c = (r\E{T_2})^{-1}$.
+We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair per generation \autocite{dmelrec}.
+We estimated $\E{T_2}$ by $\pi / 2 \mu$.
+For $\pi$, we used the average pairwise diversity at fourfold degenerate sites in the central region of each chromosome arm.
+For $\mu$, we used a genome-wide mutation rate of $3 \times 10^{-9}$ per basepair per generation \autocite{dmelmu}.
+These estimates are not precise, but only serve to scale genetic distances to the right order of magnitude.
+
+A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} notebooks to replicate our data processing, model fitting, simulations, and analysis of the DPGP3 data are available [GITHUB].
 
 \printbibliography
 
+\clearpage
+
+\section*{Supplementary Figures and Tables}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/pi_vs_position.pdf}
+\caption{Average pairwise diversity, $\pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
+\label{fig:dpgp_pi}}
+\end{figure}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Boundaries of the homogeneous central regions of chromosomes (shown in \ref{fig:dpgp_pi}).}
+    \label{tab:central_regions}
+    \begin{tabular}{l|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Chr.} & \textbf{Start position (MB)} & \textbf{End position (MB)}\\
+      \hline
+      2L & 1 & 17\\
+      2R & 6 & 19\\
+      3L & 1 & 17\\
+      3R & 10 & 26
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Fraction of sites with at least 90 genotyped samples}
+    \label{tab:called_sites}
+    \begin{tabular}{l|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Chr.} & \textbf{All sites} & \textbf{Polymorphic sites}\\
+      \hline
+      2L & 0.913 & 0.924 \\
+      2R & 0.922 & 0.925 \\
+      3L & 0.919 & 0.920 \\
+      3R & 0.933 & 0.936
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Piecewise-constant model parameters fit to the SFS of each chromosome arm (see \eq{eq:piecewise}, $N_{\text{anc}}=3 \times 10^5$).}
+    \label{tab:DPGP_params}
+    \begin{tabular}{l|r|r|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+        \textbf{Chr.} & \textbf{$N_1 (\times 10^5)$} & \textbf{$N_2 (\times 10^5)$} & \textbf{$t_1 (\times 10^4)$} & \textbf{$t_2 (\times 10^4)$}\\
+        \hline
+        2L & 10.7 & 4.6 & 2.8 & 39.9 \\
+        2R &  9.1 & 3.9 & 1.6 &  8.8 \\
+        3L &  7.3 & 3.8 & 1.3 &  6.4 \\
+        3R &  9.7 & 5.1 & 2.2 &  8.6
+    \end{tabular}
+  \end{center}
+\end{table}
+
 \end{document}
+
+TODO:
+- Abstract
+- Discussion
+- Edit figures
+- Consistency of nomenclature, labeling, etc.
+- Check drosophila numbers. Get citations or remake figure.
+- Check references to Methods. (Should all be there and all have corresponding methods section.)
+- Get rest of citations
+- Code:
+    - organize
+    - clean
+    - comment
+    - post on Github
+
+Things that were done but not included in this ms:
+- Background selection (didn't run the right parameters to see the effect. Might be computationally challenging.)
+- 2-Deme model with migration. (Could include in SI.)
+- 1-D stepping-stone.
+
+OLD TEXT:
+% Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 % There are two limitations of these existing results.
 % First, they only apply to time-homogeneous coalescent processes and thus do not distinguish between multiple-mergers coalescents and Kingman models with time-varying population size.
