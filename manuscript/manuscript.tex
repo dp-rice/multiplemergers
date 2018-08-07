@@ -315,7 +315,7 @@ If multiple-mergers events are frequent enough, this effect may dominate the tra
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure3.pdf}
-\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^-4$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
+\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^{-4}$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
 \end{figure}
 
 As argued above, $\E{\eta_{12}}$ is also distorted by changes in the coalescent time distribution induced by population growth.
@@ -363,7 +363,7 @@ On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure5.pdf}
-\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. The fourth row shows forward-time \texttt{SLiM} simulations with selection at linked sites. Lines are colored by the distortion in the SFS, as measured by Tajima's D. [List parameters here?] \label{fig:hilo_vs_d}}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. \label{fig:hilo_vs_d}}
 \end{figure}
 
 \Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d=r\E{T_2}$ and three different choices of $i_c$.
@@ -428,8 +428,8 @@ After filtering for coverage, removing chromosome arms with known inversions, do
 Because the average pairwise diversity varies between arms---possibly reflecting selection or different sets of segregating inversions---we performed all subsequent calculations on each arm independently.
 We fit a demographic model to the site frequency spectra of these central regions using \texttt{fastNeutrino} \cite{BhaskarEtal2015}.
 We fit a 3-epoch piecewise-constant model, with four free parameters: two changepoints and two population size ratios.
-We report our fitted parameters and those of a similar published model \autocite{RagsdaleGutenkunst2017} in Table~\ref{tab:DPGP_params} [Make table].
-We then simulated under our fitted model using \texttt{msprime} and computed the expected and observed SFS, $\fpmi$, and $\hilopmi$ (\fig{fig:dpgp3}).
+We report our fitted parameters in Table~\ref{tab:DPGP_params}.
+We then simulated under our fitted model using \texttt{msprime} and computed the expected and observed SFS, $\fpmi$, and $\hilopmi$ (\fig{fig:dpgp3}, See methods for details.).
 
 \begin{figure}
 \centering
@@ -538,6 +538,13 @@ We simulated the SFS and 2-SFS under the fitted parameters using \texttt{msprime
 
 In addition to the average SFS used to fit the model, we computed the average 2-SFS for pairs of sites at distances distances between 3~bp and 5~Kb.
 Because we are using four-fold degenerate sites, we only computed the 2-SFS for distances that are multiples of 3.
+For comparison between data and simulations, we scale the distances in basepairs by a critical distance $d_c = (r\E{T_2})^{-1}$.
+We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair per generation \autocite{dmelrec}.
+We estimated $\E{T_2}$ by $\pi / 2 \mu$.
+For $\pi$, we used the average pairwise diversity at fourfold degenerate sites in the central region of each chromosome arm.
+For $\mu$, we used a genome-wide mutation rate of $3 \times 10^{-9}$ per basepair per generation \autocite{dmelmu}.
+These estimates are not precise, but only serve to scale genetic distances to the right order of magnitude.
+
 A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} notebooks to replicate our data processing, model fitting, simulations, and analysis of the DPGP3 data are available [GITHUB].
 
 \printbibliography
@@ -552,51 +559,6 @@ A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} not
 \caption{Average pairwise diversity, $\pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
 \label{fig:dpgp_pi}}
 \end{figure}
-
-\begin{table}[h!]
-  \begin{center}
-    \caption{[Table of parameters underlying Figure 2]}
-    \label{tab:nonrec_params}
-    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
-      % $\alpha$ & $\beta$ & $\gamma$ \\
-      % \hline
-      % 1 & 1110.1 & a\\
-      % 2 & 10.1 & b\\
-      % 3 & 23.113231 & c\\
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\begin{table}[h!]
-  \begin{center}
-    \caption{[Table of parameters underlying Figure 4]}
-    \label{tab:n4_params}
-    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
-      % $\alpha$ & $\beta$ & $\gamma$ \\
-      % \hline
-      % 1 & 1110.1 & a\\
-      % 2 & 10.1 & b\\
-      % 3 & 23.113231 & c\\
-    \end{tabular}
-  \end{center}
-\end{table}
-
-\begin{table}[h!]
-  \begin{center}
-    \caption{[Table of parameters underlying Figure 6]}
-    \label{tab:rec_params}
-    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
-      % $\alpha$ & $\beta$ & $\gamma$ \\
-      % \hline
-      % 1 & 1110.1 & a\\
-      % 2 & 10.1 & b\\
-      % 3 & 23.113231 & c\\
-    \end{tabular}
-  \end{center}
-\end{table}
 
 \begin{table}[h!]
   \begin{center}
@@ -649,10 +611,9 @@ TODO:
 - Abstract
 - Discussion
 - Edit figures
-- Parameter tables:
-    - fig 2
-    - fig 4
-    - fig 6
+- Consistency of nomenclature, labeling, etc.
+- Check drosophila numbers. Get citations or remake figure.
+- Check references to Methods. (Should all be there and all have corresponding methods section.)
 - Get rest of citations
 - Code:
     - organize
