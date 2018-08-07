@@ -428,9 +428,8 @@ After filtering for coverage, removing chromosome arms with known inversions, do
 Because the average pairwise diversity varies between arms---possibly reflecting selection or different sets of segregating inversions---we performed all subsequent calculations on each arm independently.
 We fit a demographic model to the site frequency spectra of these central regions using \texttt{fastNeutrino} \cite{BhaskarEtal2015}.
 We fit a 3-epoch piecewise-constant model, with four free parameters: two changepoints and two population size ratios.
-We report our fitted parameters and those of a similar published model \autocite{RagsdaleGutenkunst2017} in Table~\ref{table:DPGP_params} [Make table].
+We report our fitted parameters and those of a similar published model \autocite{RagsdaleGutenkunst2017} in Table~\ref{tab:DPGP_params} [Make table].
 We then simulated under our fitted model using \texttt{msprime} and computed the expected and observed SFS, $\fpmi$, and $\hilopmi$ (\fig{fig:dpgp3}).
-
 
 \begin{figure}
 \centering
@@ -438,13 +437,16 @@ We then simulated under our fitted model using \texttt{msprime} and computed the
 \caption{DPGP3 data and coalescent model predictions. First row: observed (blue) and expected (orange) site frequency spectrum compared to constant-$N$ Kingman coalescent (dotted lines). Second row: Expected (upper triangle) and observed (lower triangle) weighted $\fpmi$ averaged over all pairs of sites less than $15 d_c$ apart. Third row: Observed (blue) and expected (orange) $\hilopmi$ versus genetic distance. Cutoff minor allele count, $i_c, = 5$. Solid blue curves show cubic spline fit. Dotted lines show the expectation under the constant-$N$ Kingman coalescent. [Middle row needs colorbar] \label{fig:dpgp3}}
 \end{figure}
 
-\begin{itemize}
-    \item Expected and observed SFS match (because we fit the model to that).
-    \item Both show excess of low-frequency SNPs.
-    \item At intermediate distance, can see that the $\fpmi$ is strongly positive in the data, but negative in the model.
-    \item This pattern extends to other genetic distances.
-    \item Correlations in the data decay at long distances. This is like the sweeps simulations, but we don't want to draw too strong a conclusion.
-\end{itemize} 
+The first row of \fig{fig:dpgp3} shows that the expected SFS under the fit demographic models agree with the observed SFS, demonstrating that a time-varying $N(t)$ can explain this aspect of the data well.
+In contrast, the second row shows the expected and observed weighted $\fpmi$ for averaged over distances less than $15 d_c$ apart, where $d_c = 2/ (\pi \mu)$ is the distance scale corresponding to $r\E{T_2} = 1$.
+Here, the data shows strong positive associations between nearby alleles at different frequencies, while the model of population growth predicts weak negative associations except just off of the diagonal.
+This pattern extends across a range of genomic distances, $d/d_c \in (10^{-1}, 10^2)$ (\fig{fig:dpgp3}, third row).
+As a result, we may conclude that the data is not well explained by the Kingman coalescent with population growth.
+
+Note that the $\hilopmi$ decays toward zero at large distances.
+This matches the expectation from simulations with selective sweeps rather than the beta coalescent.
+However, we caution against concluding that sweeps are necessarily responsible for the deviations from the Kingman expectation.
+
 
 \section*{Discussion}
 \begin{itemize}
@@ -463,24 +465,138 @@ We then simulated under our fitted model using \texttt{msprime} and computed the
 
 
 \section*{Methods}
+
+\subsection*{Computing branch-length moments}
+
+We implemented numerical computations of the moments of the branch lengths $\E{\tau_i}$ and $\E{\tau_{ij}}$ using the \texttt{python} numerical package \texttt{numpy} \autocite{numpy}.
+For the Kingman coalescent with time-varying coalescent rate, we used equations~(1)-(12) of \cite{ZivkovicWiehe2008}.
+To calculate the second moments of the coalescent time distribution for exponentially growing populations, we used Gaussian quadrature.
+For the beta coalescent, we implemented the recursion described by \cite{BirknerEtAl2013}.
+
+Functions for compute the branch-length moments are available [GITHUB].
+The Kingman coalescent code currently can compute moments for exponentially growing and two-epoch piecewise constant models, but could be extended to allow for other models.
+The formulas of \cite{ZivkovicWiehe2008} exhibit numerical instability related to the instability of \cite{GriffithsTavare1994}.
+They are therefore only practical for sample sizes up to $n \approx 40$.
+The recursion of \cite{BirknerEtAl2013} is $\mathcal{O}(n^4)$ [CHECK THIS] and is also only practical for samples up to $n \approx 50$.
+
+\subsection*{Coalescent simulations}
+
+Our beta coalescent simulation code is based on modifications to the \texttt{msprime} package made by Joe Zhu [link to github] to allow for multiple mergers.
+This code, together with \texttt{python} wrapper scripts and utility functions to run simulations and calculate the 2-SFS and $\fpmi$ from the \texttt{msprime} output is available [GITHUB].
+
+[Possibly move some of the description here]
+
+\subsection*{Forward-time simulations of selective sweeps}
+
+We simulated a model of recurring selective sweeps using the software \texttt{SLiM} \autocite{MesserEtAl201?}.
+In all of these simulations, we simulated a population of 500 diploids for $10^4$ generations.
+Each haploid genome consisted of a single genomic element $L=10^8$ basepairs long with recombination rate per basepair $r = 10^{-8}$ and overall mutation rate $\mu = 10^{-7}$.
+We simulated two types of mutations: neutral mutations and beneficial mutations with additive effects and selection coefficient $s=0.1$.
+With these parameters, $2Ns = 100$, so beneficial mutations are strongly selected and will sweep in $T_{\text{sweep}}\sim s^{-1} \log Ns \approx 50$ generations.
+Such sweeps will effect a region of the chromosome $d_{\text{sweep}} \sim (r T_{\text{sweep}})^{-1} \approx 2 \times 10^6$ basepairs long.
+Thus $d_{\text{sweep}} \ll L$, which will minimize edge effects of having a finite chromosome.
+
+In order to vary the effects of sweeps on neutral diversity, we varied the fraction of mutations that are beneficial $f_{\text{sel}}$ over several orders of magnitude: $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$.
+For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and computed $\eta_i$ and $\eta_{ij}$ of neutral mutations averaged over all replicates.
+
+\texttt{SLiM} parameter files, \texttt{python} wrapper scripts for parsing output, and \texttt{snakemake} files for running simulations are available [GITHUB].
+
+\subsection*{Analysis of \textit{D. melanogaster} data}
+
+The DPGP3 data set consists of haploid consensus sequences from $\sim 200$ files, obtained via the haploid embryo method of \cite{LangleyEtal2011}.
+We obtained the DPGP3 consensus sequence files version 1.1 from \url{www.johnpool.net/genomes.html}.
+These files contain the sequence alignments of all flies in the sample on all chromosome arms.
+We also downloaded the Nov. 3, 2016 spreadsheet of inversions available at the link above.
+For each chromosome arm, we excluded any samples with an inversion in that arm and then down-sampled to $n=100$ by taking the first 100 remaining samples in alphanumeric order of sample name.
+(This means that the data for each chromosome arm is from a slightly different subset of the individuals.)
+
+
+
 \begin{itemize}
-    \item Code to compute moments (currently piecewise-constant and exp. growth, but could be extended easily)
-    \item Simulation code extending msprime
-    \item Forward-time simulation with SLiM
-    \item Drosophila
-    \begin{itemize}
-        \item data pre-processing: throw out inversions, downsampling to 100 chromosome, 4-D sites, filter for coverage
-        \item picking the central regions
-        \item fitting demographic model with fastNeutrino: fit 3-epoch piecewise constant to SFS. Report model parameters
-        \item simulating demographic model
-        \item computing statistics
-    \end{itemize}
+    \item data pre-processing: throw out inversions, downsampling to 100 chromosome, 4-D sites, filter for coverage
+    \item picking the central regions
+    \item fitting demographic model with fastNeutrino: fit 3-epoch piecewise constant to SFS. Report model parameters
+    \item simulating demographic model
+    \item computing statistics
 \end{itemize}
 
 \printbibliography
 
+\section*{Tables}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{[Table of parameters underlying Figure 2]}
+    \label{tab:nonrec_params}
+    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
+      % $\alpha$ & $\beta$ & $\gamma$ \\
+      % \hline
+      % 1 & 1110.1 & a\\
+      % 2 & 10.1 & b\\
+      % 3 & 23.113231 & c\\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{[Table of parameters underlying Figure 4]}
+    \label{tab:n4_params}
+    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
+      % $\alpha$ & $\beta$ & $\gamma$ \\
+      % \hline
+      % 1 & 1110.1 & a\\
+      % 2 & 10.1 & b\\
+      % 3 & 23.113231 & c\\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{[Table of parameters underlying Figure 6]}
+    \label{tab:rec_params}
+    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
+      % $\alpha$ & $\beta$ & $\gamma$ \\
+      % \hline
+      % 1 & 1110.1 & a\\
+      % 2 & 10.1 & b\\
+      % 3 & 23.113231 & c\\
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{[DPGP3 model fit]}
+    \label{tab:DPGP_params}
+    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
+      % $\alpha$ & $\beta$ & $\gamma$ \\
+      % \hline
+      % 1 & 1110.1 & a\\
+      % 2 & 10.1 & b\\
+      % 3 & 23.113231 & c\\
+    \end{tabular}
+  \end{center}
+\end{table}
+
 \end{document}
 
+TODO:
+- Abstract
+- Drosophila methods
+- Discussion
+- Parameter tables:
+    -
+- bibtex file
+- SI figures:
+    - Drosophila diversity
+    - Drosophila # called sites
+- Code
 % Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 % There are two limitations of these existing results.
