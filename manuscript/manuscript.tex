@@ -504,25 +504,54 @@ For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and comp
 \subsection*{Analysis of \textit{D. melanogaster} data}
 
 The DPGP3 data set consists of haploid consensus sequences from $\sim 200$ files, obtained via the haploid embryo method of \cite{LangleyEtal2011}.
+The SNP calls underlying these sequences have been subjected to a variety of quality filters described in \cite{LackEtAl2015}.
 We obtained the DPGP3 consensus sequence files version 1.1 from \url{www.johnpool.net/genomes.html}.
 These files contain the sequence alignments of all flies in the sample on all chromosome arms.
 We also downloaded the Nov. 3, 2016 spreadsheet of inversions available at the link above.
-For each chromosome arm, we excluded any samples with an inversion in that arm and then down-sampled to $n=100$ by taking the first 100 remaining samples in alphanumeric order of sample name.
-(This means that the data for each chromosome arm is from a slightly different subset of the individuals.)
+For each chromosome arm, we excluded any samples with an inversion in that arm and then down-sampled to $n=100$ by taking the first 100 remaining samples in alphanumeric order by sample name.
+(As a result, the data for each chromosome arm is from a slightly different subset of the individuals.)
 
+We calculated the average pairwise diversity, $\pi$, as a function of position for each autosomal chromosome arm (\fig{fig:dpgp_pi}).
+Pairwise diversity is high in the middle of each chromosome arm and lower near the centromeres and telomeres.
+Our modeling---and coalescent-based demographic inference methods in general---assumes that the distribution of gene genealogies is homogeneous along the chromosome.
+Therefore, we selected a 13-16~MB ``central'' region of each arm with relatively homogeneous $\pi$ for further analysis.
+The boundaries of these central regions are given in Table~\ref{tab:central_regions}.
 
+In order to ensure that the segregating mutations reflect true genetic diversity and not variation in calling errors, we excluded sites where fewer than 90 of the 100 samples have genotype calls.
+This leaves over 90\% of all sites and does not substantially alter the fraction of sites that are polymorphic in the sample (Table~\ref{tab:called_sites})
 
-\begin{itemize}
-    \item data pre-processing: throw out inversions, downsampling to 100 chromosome, 4-D sites, filter for coverage
-    \item picking the central regions
-    \item fitting demographic model with fastNeutrino: fit 3-epoch piecewise constant to SFS. Report model parameters
-    \item simulating demographic model
-    \item computing statistics
-\end{itemize}
+We fit a demographic model to the folded SFS of fourfold degenerate sites for each chromosome arm separately using \texttt{fastNeutrino} \autocite{BhaskarEtAl2015}.
+We fit a three-epoch piecewise constant--$N$ model:
+\begin{align}
+    N(t) = \begin{cases}
+                N_1 & 0 \leq t \leq t_1 \\
+                N_2 & t_1 <  t \leq t_2 \\
+                N_{\text{anc}} & t > t_2,
+            \end{cases}
+    \label{eq:piecewise}
+\end{align}
+estimating both change-points ($t_1$ < $t_2$) and both population sizes ($N_1$, $N_2$).
+We specified the ancient population size $N_{\text{anc}} = 3\times 10^5$, as in \cite{RagsdaleGutenkunst2017}.
+For all four chromosomes, \texttt{fastNeutrino} inferred similar population growth.
+Fitted parameters are presented in Table~\ref{tab:DPGP_params}.
+We simulated the SFS and 2-SFS under the fitted parameters using \texttt{msprime}.
+
+In addition to the average SFS used to fit the model, we computed the average 2-SFS for pairs of sites at distances distances between 3~bp and 5~Kb.
+Because we are using four-fold degenerate sites, we only computed the 2-SFS for distances that are multiples of 3.
+A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} notebooks to replicate our data processing, model fitting, simulations, and analysis of the DPGP3 data are available [GITHUB].
 
 \printbibliography
 
-\section*{Tables}
+\clearpage
+
+\section*{Supplementary Figures and Tables}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/pi_vs_position.pdf}
+\caption{Average pairwise diversity, $\pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
+\label{fig:dpgp_pi}}
+\end{figure}
 
 \begin{table}[h!]
   \begin{center}
@@ -571,15 +600,45 @@ For each chromosome arm, we excluded any samples with an inversion in that arm a
 
 \begin{table}[h!]
   \begin{center}
-    \caption{[DPGP3 model fit]}
+    \caption{Boundaries of the homogeneous central regions of chromosomes (shown in \ref{fig:dpgp_pi}).}
+    \label{tab:central_regions}
+    \begin{tabular}{l|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Chr.} & \textbf{Start position (MB)} & \textbf{End position (MB)}\\
+      \hline
+      2L & 1 & 17\\
+      2R & 6 & 19\\
+      3L & 1 & 17\\
+      3R & 10 & 26
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Fraction of sites with at least 90 genotyped samples}
+    \label{tab:called_sites}
+    \begin{tabular}{l|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+      \textbf{Chr.} & \textbf{All sites} & \textbf{Polymorphic sites}\\
+      \hline
+      2L & 0.913 & 0.924 \\
+      2R & 0.922 & 0.925 \\
+      3L & 0.919 & 0.920 \\
+      3R & 0.933 & 0.936
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[h!]
+  \begin{center}
+    \caption{Piecewise-constant model parameters fit to the SFS of each chromosome arm (see \eq{eq:piecewise}, $N_{\text{anc}}=3 \times 10^5$).}
     \label{tab:DPGP_params}
-    \begin{tabular}{l|c|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      % \textbf{Value 1} & \textbf{Value 2} & \textbf{Value 3}\\
-      % $\alpha$ & $\beta$ & $\gamma$ \\
-      % \hline
-      % 1 & 1110.1 & a\\
-      % 2 & 10.1 & b\\
-      % 3 & 23.113231 & c\\
+    \begin{tabular}{l|r|r|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+        \textbf{Chr.} & \textbf{$N_1 (\times 10^5)$} & \textbf{$N_2 (\times 10^5)$} & \textbf{$t_1 (\times 10^4)$} & \textbf{$t_2 (\times 10^4)$}\\
+        \hline
+        2L & 10.7 & 4.6 & 2.8 & 39.9 \\
+        2R &  9.1 & 3.9 & 1.6 &  8.8 \\
+        3L &  7.3 & 3.8 & 1.3 &  6.4 \\
+        3R &  9.7 & 5.1 & 2.2 &  8.6
     \end{tabular}
   \end{center}
 \end{table}
@@ -588,15 +647,25 @@ For each chromosome arm, we excluded any samples with an inversion in that arm a
 
 TODO:
 - Abstract
-- Drosophila methods
 - Discussion
+- Edit figures
 - Parameter tables:
-    -
-- bibtex file
-- SI figures:
-    - Drosophila diversity
-    - Drosophila # called sites
-- Code
+    - fig 2
+    - fig 4
+    - fig 6
+- Get rest of citations
+- Code:
+    - organize
+    - clean
+    - comment
+    - post on Github
+
+Things that were done but not included in this ms:
+- Background selection (didn't run the right parameters to see the effect. Might be computationally challenging.)
+- 2-Deme model with migration. (Could include in SI.)
+- 1-D stepping-stone.
+
+OLD TEXT:
 % Tests of the standard Kingman coalescent based on the SFS originated with \cite{Tajima1989}, \cite{FuLi1993}, and \cite{SimonsenEtAl1995} (see \cite{Achaz2009} for a unifying framework).
 
 % There are two limitations of these existing results.
