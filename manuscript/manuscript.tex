@@ -539,10 +539,10 @@ We simulated the SFS and 2-SFS under the fitted parameters using \texttt{msprime
 In addition to the average SFS used to fit the model, we computed the average 2-SFS for pairs of sites at distances distances between 3~bp and 5~Kb.
 Because we are using four-fold degenerate sites, we only computed the 2-SFS for distances that are multiples of 3.
 For comparison between data and simulations, we scale the distances in basepairs by a critical distance $d_c = (r\E{T_2})^{-1}$.
-We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair per generation \autocite{dmelrec}.
+We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair per generation \autocite{ComeronEtAl2012}.
 We estimated $\E{T_2}$ by $\pi / 2 \mu$.
 For $\pi$, we used the average pairwise diversity at fourfold degenerate sites in the central region of each chromosome arm.
-For $\mu$, we used a genome-wide mutation rate of $3 \times 10^{-9}$ per basepair per generation \autocite{dmelmu}.
+For $\mu$, we used a genome-wide mutation rate of $3 \times 10^{-9}$ per basepair per generation \autocite{KeightlyEtAl2014}.
 These estimates are not precise, but only serve to scale genetic distances to the right order of magnitude.
 
 A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} notebooks to replicate our data processing, model fitting, simulations, and analysis of the DPGP3 data are available [GITHUB].
