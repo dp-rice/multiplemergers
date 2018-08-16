@@ -118,7 +118,7 @@ In contrast, we are interested in detecting when the genome-wide background \emp
 One approach to identifying multiple mergers in genomic data is to use the SFS as a summary statistic.
 \cite{BirknerEtAl2013, BlathEtAl2016, SpenceEtAl2016} derived methods for computing the expected site frequency spectrum of (simultaneous-)multiple merger coalescents.
 \cite{EldonEtAl2015} showed that it is possible to distinguish between a multiple merger coalescent of the beta family and the Kingman coalescent with exponential growth using the SFS.
-\cite{RodelspergerEtAl2014} detected non-Kingman signatures of widespread linked selection in the nematode \textit{Pristionchus pacificus} by demonstrating that the site frequency spectrum is non-monotonic, a signature of multiple mergers \autocite{NeherHallatscheck2013, BirknerEtAl2013}.
+\cite{RodelspergerEtAl2014} detected widespread linked selection in the nematode \textit{Pristionchus pacificus} by demonstrating that the site frequency spectrum is non-monotonic, a signature of multiple mergers \autocite{NeherHallatscheck2013, BirknerEtAl2013}.
 
 However, existing methods have limitations for distinguishing multiple mergers from general models of population-size change.
 The primary signature of multiple mergers in the SFS is an overabundance of low-frequency mutations relative to the Kingman expectation, which is also the signature of population growth.
@@ -135,7 +135,7 @@ Together, these properties make the 2-SFS useful for demographic model-checking 
 We demonstrate this model-checking procedure on genomic diversity data from \textit{Drosophila melanogaster} \autocite{LackEtAl2015}.
 
 Following the notation of \cite{Fu1995}, the site frequency spectrum of a sample of $n$ haploid genomes is $\left\{ \xi_i : 1 \leq i < n \right\}$, where $\xi_i$ is the fraction of sites containing a mutation with derived allele count $i$ in the sample.
-In many cases, the ancestral allele is unknown and so the allele in $i$ samples and the complimentary allele in $n-i$ samples are indistinguishable.
+In many cases, the ancestral allele is unknown and so the allele in $i$ samples and the complementary allele in $n-i$ samples are indistinguishable.
 Therefore, we will mostly consider the \textit{folded} site frequency spectrum $\left\{ \eta_i = \xi_i + (1-\delta_{i,n-i}) \xi_{n-i}: 1 \leq i \leq \floor{n/2} \right\}$, where $\delta_{k,k'}$ is the Kronecker delta. %, where $\eta_i = \xi_i + \delta_{n-2i} \xi_{n-i}$.
 The SFS and folded SFS can be calculated from a set of single nucleotide polymorphisms (SNPs) without any information about their relative locations in the genome.
 
@@ -167,7 +167,7 @@ This one-parameter family interpolates between the Kingman coalescent and the Bo
 Beta coalescents arise in models with fat-tailed offspring distributions \autocite{Schweinsberg2003}, and the Bolthausen-Sznitman coalescent is the limiting distribution of genealogies in rapidly adapting populations \autocite{NeherHallatscheck2013}.
 Like Fu, Birkner et al.\ were primarily concerned with computing the sample variance of SFS-based summary statistics such as Tajima's D \autocite{Tajima1989}.
 As a result, they were mostly interested in the diagonal terms of the SFS covariance matrix, which dominate that calculation.
-However, Figures 5 and 6 of \cite{BirknerEtAl2013} show positive correlations between $\xi_i$ and $\xi_j$ for $j \neq i, n-i$.
+However, Figures 5 and 6 of \cite{BirknerEtAl2013} show positive correlations between $\xi_i$ and $\xi_j$ for $j \not\in \{i, n-i\}$.
 Thus, unlike the standard Kingman coalescent, the beta coalescent can generate positive associations between mutations with different minor allele counts.
 
 In the following, we demonstrate that this distinction in the 2-SFS between the multiple merger and Kingman coalescents
@@ -209,14 +209,14 @@ When $X$ and $Y$ are independent, $\pmi(x,y) = 0$ for all $x,y$.
 On the other hand, when $X$ and $Y$ are not independent, $\pmi(x,y) > 0$ implies that $p(x|y) > p(x)$, and conversely for $\pmi(x,y) < 0$.
 (The expectation of PMI over the joint distribution of $X$ and $Y$ is known as the mutual information of $X$ and $Y$ \autocite{CoverThomas1991}.)
 
-In our setting, the 2-SFS may be interpreted as a joint probability mass function over allele frequencies.
-Given a coalescent model, the minor allele count at an arbitrary site is a random variable with probability mass function $p(i) = \E{\eta_i}$, where we define $\eta_0$ to be the fraction of monomorphic sites.
+In our setting, the 2-SFS may be interpreted as a joint probability mass function over minor allele counts.
+Given a coalescent model, the minor allele count at an arbitrary site is a random variable over $\{0,\ldots,\floor{n/2}\}$ with probability mass function $p(i) = \E{\eta_i}$, where we define $\eta_0$ to be the fraction of monomorphic sites.
 Similarly, the minor allele counts at a pair of sites separated by $d$ bases is a pair of random variables with joint probability mass function $p_d(i,j) = \E{\eta_{ij}(d)}$.
-Comparing, \eq{eq:fpmi} with \eq{eq:pmi} shows that $\fpmi$ is the standard pointwise mutual information for pairs of allele frequencies.
+Comparing, \eq{eq:fpmi} with \eq{eq:pmi} shows that $\fpmi$ is the standard pointwise mutual information for pairs of minor allele counts.
 
 This transformation of the 2-SFS has several useful properties.
 First, because it is based on the minor allele frequencies, we may compute $\fpmi$ from data without knowing the ancestral allele.
-Moreover, the results of \cite{Fu1995} show that $\fpmi(i,j) < 0$ for $i\neq j$ for non-recombining sites under the time-homogeneous Kingman coalescent.
+Moreover, the results of \cite{Fu1995} imply that $\fpmi(i,j) < 0$ for $i\neq j$ for non-recombining sites under the time-homogeneous Kingman coalescent.
 
 The second benefit of computing $\fpmi$ from the 2-SFS is that it normalizes for distortions in the SFS.
 Population-size variation distorts the SFS by changing the distribution of waiting times.
@@ -279,7 +279,7 @@ For plotting purposes, we will also use a weighted version of the $\fpmi$:
 \end{align}
 where $T_2$ is the coalescence time for a sample of size two.
 The numerator of the weighting factor in \eq{eq:wfpmi} serves to emphasize the most common pairs of minor allele counts.
-The denominator, which is proportional to the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant under changes in the overall mutation and coalescence rates.
+The denominator, which is proportional to the square of the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant under changes in the overall mutation and coalescence rates.
 
 \subsection*{Computing branch-length moments}
 
@@ -302,7 +302,7 @@ This code, together with \texttt{python} wrapper scripts and utility functions t
 For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
 We chose values of $r$ so that the combined parameter $r\E{T_2}$ varied over several orders of magnitude, where $\E{T_2}$ was measured from the simulation output.
 For each locus, we measured $\{\tau_i : i = 1,\ldots,n-1\}$ in the two genealogies at each end of the loci.
-We then calculated the expectations $\{\E{\tau_i\}}$ and $\{\E{\tau_{ij}}\}$ by averaging over independent loci.
+We then calculated the expectations $\{\E{\tau_i}\}$ and $\{\E{\tau_{ij}}\}$ by averaging over independent loci.
 These expectations allow us to calculate all of the 2-SFS statistics defined above.
 
 \subsection*{Forward-time simulations of selective sweeps}
@@ -313,7 +313,7 @@ Each haploid genome consisted of a single genomic element $L=10^8$ basepairs lon
 We simulated two types of mutations: neutral mutations and beneficial mutations with additive effects and selection coefficient $s=0.1$.
 With these parameters, $2Ns = 100$, so beneficial mutations are strongly selected and will sweep in $T_{\text{sweep}}\sim s^{-1} \log Ns \approx 50$ generations.
 Such sweeps will effect a region of the chromosome $d_{\text{sweep}} \sim (r T_{\text{sweep}})^{-1} \approx 2 \times 10^6$ basepairs long.
-Thus $d_{\text{sweep}} \ll L$, which will minimize edge effects of having a finite chromosome.
+Thus $d_{\text{sweep}} \ll L$, which will minimize edge effects of simulating a finite chromosome.
 
 In order to vary the effects of sweeps on neutral diversity, we varied the fraction of mutations that are beneficial $f_{\text{sel}}$ over several orders of magnitude: $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$.
 For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and computed $\eta_i$ and $\eta_{ij}$ of neutral mutations averaged over all replicates.
@@ -322,7 +322,7 @@ For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and comp
 
 \subsection*{Analysis of \textit{D. melanogaster} data}
 
-The DPGP3 data set consists of haploid consensus sequences from $\sim 200$ files, obtained via the haploid embryo method of \cite{LangleyEtal2011}.
+We analyzed sequence data from the DPGP3 data set, which consists of haploid consensus sequences from $\sim 200$ flies, obtained via the haploid embryo method of \cite{LangleyEtal2011}.
 The SNP calls underlying these sequences have been subjected to a variety of quality filters described in \cite{LackEtAl2015}.
 We obtained the DPGP3 consensus sequence files version 1.1 from \url{www.johnpool.net/genomes.html}.
 These files contain the sequence alignments of all flies in the sample on all chromosome arms.
@@ -362,7 +362,7 @@ We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair 
 We estimated $\E{T_2}$ by $\Pi / 2 \mu$.
 For $\Pi$, we used the average pairwise diversity at fourfold degenerate sites in the central region of each chromosome arm.
 For $\mu$, we used a genome-wide mutation rate of $3 \times 10^{-9}$ per basepair per generation \autocite{KeightlyEtAl2014}.
-These estimates are not precise, but only serve to scale genetic distances to the right order of magnitude.
+These estimates are not precise, but only serve to scale genetic distances to the correct order of magnitude.
 
 A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} notebooks to replicate our data processing, model fitting, simulations, and analysis of the DPGP3 data are available [GITHUB].
 
@@ -370,9 +370,9 @@ A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} not
 
 \subsection*{Population growth versus the beta coalescent in non-recombining loci}
 
-In this section, we compare the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
+We compared the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
 We are interested in whether $\fpmi$ can distinguish among coalescent models that produce similar distortions in the SFS.
-To this end, we compute a version of Tajima's D \autocite{Tajima1983} normalized to be invariant under changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson19??}.
+To this end, we computed a version of Tajima's D \autocite{Tajima1983} normalized to be invariant under changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson19??}.
 Negative values of $D$ indicate an overabundance of low-frequency mutations relative to the time-homogeneous Kingman expectation.
 All results are computed numerically using the results of \cite{Fu1995}, \cite{ZivkovicWiehe2008}, and \cite{BirknerEtAl2013} (see Methods).
 
@@ -405,7 +405,7 @@ Thus, the 2-SFS in general, and $\hilopmi$ in particular, are capable of capturi
 
 The previous sections have shown that $\fpmi$ between pairs of non-recombining sites can discriminate between the Kingman coalescent with population growth and the beta coalescent.
 However, most demographic inference is performed on regions of the genome with non-zero recombination rates.
-In fact, for large non-recombining loci, it is sometimes possible to reconstruct the gene genealogy exactly and calculate tree imbalance statistics directly (see e.g., \cite{Seger2010}).
+In fact, for large non-recombining loci, it is sometimes possible to reconstruct the gene genealogy explicitly and calculate tree imbalance statistics (see e.g., \cite{Seger2010}).
 The advantage of the $\fpmi$ approach is that it can be computed on a genomic scale, as with the SFS.
 Therefore, it is important to assess the robustness of our approach to recombination between sites.
 
@@ -461,7 +461,7 @@ There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not d
 This is related to the results of \cite{EldonWakeley20??}, who showed that a model with ``jackpot'' reproductive events can generate infinite-range linkage disequilibrium.
 They showed that different scalings of rates of mutation, pairwise coalescence, multiple merger coalescence, and recombination lead to different behaviors of diversity and linkage disequilibrium.
 Our implementation of the beta coalescent model with recombination corresponds to a particular scaling limit where recombination does not have time to decorrelate trees during multiple mergers events, even at infinite genetic distances.
-We do not expect this behavior to be universal to multiple mergers coalescents with recombination.
+We do not expect this behavior to be universal in multiple mergers coalescents with recombination.
 
 \subsection*{Linked selective sweeps}
 
@@ -494,7 +494,7 @@ We therefore propose the following model-checking procedure for demographic infe
     \item Calculate $\fpmi(d)$ and $\hilopmi(d;i_c)$ from the data.
     \item Compare true to predicted statistics. Evaluate model fit.
 \end{enumerate}
-This procedure checks whether the model is consistent with a dimension the data that was used in fitting the model.
+This procedure checks whether the model is consistent with a dimension the data that was not used in fitting the model.
 Inconsistency suggests that the inferred $N(t)$ may be an artifact of natural selection, skewed offspring distributions, etc., rather than reflecting the true historical population size.
 
 In this section, we illustrate the procedure just outlined by using genomic diversity data from the \textit{Drosophila melanogaster} DGPG3 panel \cite{LackEtAl2015}.
@@ -531,7 +531,7 @@ However, we caution against concluding that sweeps are necessarily responsible f
 
 We have shown that $\fpmi$ and its binned analog $\hilopmi$ are sensitive to multiple mergers, but relatively invariant under population growth in the Kingman coalescent.
 These properties make them well-suited for coalescent model checking.
-We've demonstrated a model-checking procedure on data from \textit{D. melanogaster}, which is believed to be strongly shaped by natural selection, and found evidence that population growth can not explain the positive associations between high and low frequency mutations.
+We have demonstrated a model-checking procedure on data from \textit{D. melanogaster}, which is believed to be strongly shaped by natural selection, and found evidence that population growth can not explain the positive associations between high and low frequency mutations.
 
 \begin{figure}
 \centering
