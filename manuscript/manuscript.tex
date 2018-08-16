@@ -260,15 +260,16 @@ This suggests a binned SFS and 2-SFS:
 \end{align}
 where $i_c$ is an arbitrary cutoff between high and low minor allele frequency.
 Binning allows us to estimate the 2-SFS stably for large sample sizes, because we may adjust $i_c$ to ensure a large number of sites in both the high--minor allele count and low--minor allele count bins.
+It is possible to define less drastic coarse-graining schemes that strike a balance between sampling noise and preserving more detailed information about allele frequencies.
 
-We can also compute the pointwise mutual information in this coarse-grained distribution as
+We can also compute the pointwise mutual information in this binned distribution as
 \begin{align}
     \hilopmi(d; i_c) = \log \frac
                                 {\E{\eta_{\text{hi,lo}}(d; i_c)}}
                                 {\E{\eta_{\text{lo}}(i_c)}  \E{\eta_{\text{hi}}(i_c)}}.
 \end{align}
 One could similarly calculate five other pointwise mutual information statistics from the binning 2-SFS (e.g., the PMI between monomorphic sites and sites with high minor allele counts), but we will not use these statistics here.
-Also, it is possible to define less drastic coarse-graining schemes that strike a balance between sampling noise and preserving more detailed information about allele frequencies.
+
 
 \subsection*{Weighted $\fpmi$}
 For plotting purposes, we will also use a weighted version of the $\fpmi$:
@@ -387,9 +388,9 @@ In particular, $\fpmi_{i,j} < 0$ for all $i \neq j$, just as in the constant-$N$
 
 On the other hand, a beta coalescent that generates similar distortions in the SFS ($\alpha=1.45$, $D = -0.42$) also generates positive $\fpmi$.
 The effect of multiple mergers is strongest on $\fpmi$ between high and low minor allele counts.
-This justifies coarse-graining the SFS and 2-SFS into high-- and low--minor allele count bins as defined above.
+This justifies binning the SFS and 2-SFS into high-- and low--minor allele count bins as defined above.
 
-Accordingly, we computed the coarse-grained $\hilopmi$ between singletons and non-singletons ($i_c = 1$) for a range of $g$ and $\alpha$.
+Accordingly, we computed the binned $\hilopmi$ between singletons and non-singletons ($i_c = 1$) for a range of $g$ and $\alpha$.
 \Fig{fig:fpmi_vs_tajimasd} shows that as the population growth rate increases, distorting the SFS, $\hilopmi$ increases relative to the constant-$N$ Kingman, but plateaus at a negative value.
 On the other hand, beta coalescents that generate similar distortions in the SFS, generate larger changes in $\hilopmi$, including positive values.
 Thus, the 2-SFS in general, and $\hilopmi$ in particular, are capable of capturing the effects of multiple mergers beyond the distortions in branch lengths.
@@ -423,7 +424,7 @@ We also simulated data from two models of population growth: exponential growth 
 As in the non-recombining case, the constant-$N$ and exponential-growth Kingman models have similar $\fpmi$.
 In both models, $\fpmi > 0$ for $i\approx j$ for $r\E{T_2} \sim 1$.
 This is presumably because trees at nearby sites contain clades with similar numbers of leaves.
-These positive correlations do not extend to $i \gg j$, which is the signal of multiple mergers in our coarse-grained $\hilopmi$.
+These positive correlations do not extend to $i \gg j$, which is the signal of multiple mergers in our binned $\hilopmi$.
 On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E{T_2} > 1$.
 Thus, the signal of multiple mergers in $\fpmi$ is robust to recombination.
 
@@ -484,7 +485,7 @@ This is reasonable because the effect of a particular sweep on genealogies shoul
 
 \subsection*{Coalescent model checking: application to \textit{Drosophila melanogaster}}
 
-Our results above show that $\fpmi$ and its coarse-grained analog, $\hilopmi$ are useful for distinguishing population growth from the effects of multiple mergers.
+Our results above show that $\fpmi$ and its binned analog, $\hilopmi$ are useful for distinguishing population growth from the effects of multiple mergers.
 This is true even when the population growth generates similar distortions in the SFS.
 We therefore propose the following model-checking procedure for demographic inference methods
 \begin{enumerate}[label=(\roman*), before=\unskip{: }]
