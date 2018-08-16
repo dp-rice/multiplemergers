@@ -658,24 +658,44 @@ Either would reveal new information about the suitability of population genetic 
 \end{document}
 
 TODO:
-- Abstract
-- Discussion
-- Edit figures
-- Consistency of nomenclature, labeling, etc.
-- Check drosophila numbers. Get citations or remake figure.
-- Check references to Methods. (Should all be there and all have corresponding methods section.)
-- Get rest of citations
-- Code:
-    - organize
-    - clean
-    - comment
-    - post on Github
+- Text
+    - Abstract
+    - Consistency of nomenclature, labeling, etc.
+    - Insert links to github
+    - Get rest of citations
+    - Fix bibtex issues
+    - Copy edit text
+    - Copy edit bibliography
+- Figures
+    - Organize panels
+    - Remake figure 5 that got deleted
+    - Rename files
+    - Figure sizes (1-column vs 2-column)
+    - Typeface and font sizes
+    - Color schemes and color maps
+    - Consistency of plotted values (esp. pmi vs cov, base of log scales)
+- Notebooks
+    - Single notebook to make all non-data figures.
+    - Single notebook to do all DPGP3 exploratory and final analysis
+    - Reduce redundancy. Decide which helper functions belong in notebooks and which go in modules.
+    - Remove old/unused notebooks from repo.
+- Simulation output
+    - Figure out which files are necessary to reproduce figures
+    - Make tarball with simulations and include in repo (if reasonable size)
+- DPGP3 data
+    - Decide whether we need to post any processed data.
+- Code
+    - Conda environment and environment file
+    - Clean up snakefiles
+    - Compute 2-epoch moments exactly
+    - Organize modules, reduce redundancy
+    - Refactor functions into a consistent style
+    - Document
+    - Figure out what to do about msprime code
+    - Post on Github
 
 Left out of Discussion:
-\begin{itemize}
-    \item Mention methods to fit multiple mergers coalescent to data (computationally difficult). Not really what we're trying to do here. Our goal is that you can exploit this extra dimension of the data you already have to check your model and make sure you're not fitting a signal of selection, etc with a demographic model.
-    \item Compare with: Single-locus tests that rely on building trees (Seger whale lice, Neher with viruses)
-\end{itemize}
+Mention methods to fit multiple mergers coalescent to data (computationally difficult). Not really what we're trying to do here. Our goal is that you can exploit this extra dimension of the data you already have to check your model and make sure you're not fitting a signal of selection, etc with a demographic model.
 
 Things that were done but not included in this ms:
 - Background selection (didn't run the right parameters to see the effect. Might be computationally challenging.)
