@@ -378,7 +378,7 @@ All results are computed numerically using the results of \cite{Fu1995}, \cite{Z
 
 \begin{figure}
 \centering
-\includegraphics[width=0.5\textwidth]{figures/wfpmi_growth_beta.pdf}
+\includegraphics[width=0.5\textwidth]{figures/wfpmi_no_recombination.pdf}
 \caption{Weighted frequency pointwise mutual information for three coalescent models: the time-homogeneous Kingman coalescent, the Kingman coalescent with exponential growth ($g=4$), and the beta coalescent ($\alpha=1.45$). For all models $n=39$. Growth and $\alpha$ parameters were chosen to generate average SFS with similar Tajima's D. The diagonal $i=j$ is masked. \label{fig:nonrecombining_pmi}}
 \end{figure}
 
@@ -417,10 +417,10 @@ We also simulated data from two models of population growth: exponential growth 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/wfpmi_with_recombination.pdf}
-\caption{Weighted frequency pointwise information for three recombination rates with sample size $n=100$. As in \Fig{fig:nonrecombining_pmi}, the diagonal elements are masked, and the growth and multiple-merger parameters were chosen to generate average SFS with similar Tajima's D. \label{fig:wpmi_recombination}}
+\caption{Weighted frequency pointwise information for three recombination rates with sample size $n=100$. As in \Fig{fig:nonrecombining_pmi}, the diagonal elements are masked, and the growth and multiple-merger parameters were chosen to generate average SFS with similar Tajima's D. \label{fig:wfpmi_recombination}}
 \end{figure}
 
-\Fig{fig:wpmi_recombination} shows the weighted $\fpmi$ for three genetic distances in a constant-$N$ Kingman coalescent, a Kingman coalescent with exponential growth, and a beta coalescent.
+\Fig{fig:wfpmi_recombination} shows the weighted $\fpmi$ for three genetic distances in a constant-$N$ Kingman coalescent, a Kingman coalescent with exponential growth, and a beta coalescent.
 As in the non-recombining case, the constant-$N$ and exponential-growth Kingman models have similar $\fpmi$.
 In both models, $\fpmi > 0$ for $i\approx j$ for $r\E{T_2} \sim 1$.
 This is presumably because trees at nearby sites contain clades with similar numbers of leaves.
