@@ -423,8 +423,9 @@ We also simulated data from two models of population growth: exponential growth 
 As in the non-recombining case, the constant-$N$ and exponential-growth Kingman models have similar $\fpmi$.
 In both models, $\fpmi > 0$ for $i\approx j$ for $r\E{T_2} \sim 1$.
 This is presumably because trees at nearby sites contain clades with similar numbers of leaves.
-These positive correlations, however, do not extend to $i \gg j$, which is the signal of multiple mergers in our coarse-grained $\hilopmi$.
+These positive correlations do not extend to $i \gg j$, which is the signal of multiple mergers in our coarse-grained $\hilopmi$.
 On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E{T_2} > 1$.
+Thus, the signal of multiple mergers in $\fpmi$ is robust to recombination.
 
 \begin{figure}
 \centering
@@ -440,9 +441,20 @@ In all Kingman models, $\hilopmi$ decays to zero for $r\E{T_2}\gg 1$.
 
 In contrast, the beta coalescent generates $\hilopmi$ that is consistently greater than the constant-$N$ Kingman.
 As with non-recombining sites, the $\hilopmi$ is also greater in the beta coalescent model then in models of population growth than generate similar distortions in the SFS.
-[IDEA: A plot of $\hilopmi$ at a fixed r vs Tajima's D for all the models together. Could make several plots, varying $r$ and $i_c$. This might be more convincing than the current figure.]
 This is true across recombination rates and high/low cutoff minor allele counts.
 These results demonstrate that $\hilopmi$ is capable of discriminating between coalescent models even when there is recombination between sites.
+
+\Fig{fig:hilo_vs_tajD} shows the relative invariance of $\hilopmi$ to a time-varying coalescent rate.
+While population growth in a Kingman coalescent model can strongly distort the SFS, as measured by Tajima's D, it has very little effect on the $\hilopmi$ for sites $r \E{T_2} \sim 1$ apart.
+This holds for exponential as well as piecewise constant growth.
+In contrast, the beta coalescent induces large positive $\hilopmi$ for the same values of Tajima's D.
+This result is robust to the choice of cutoff minor allele count for binning.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/hilopmi_vs_tajimasD.pdf}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus normalized Tajima's D for simulations with recombination. All values are for $r \E{T_2} \sim 1$ and $n=100$. Orange points show Kingman coalescent simulations with population growth. Blue points show beta coalescent simulations. [Q: Should this be the bottom row of the previous figure?] \label{fig:hilo_vs_tajD}}
+\end{figure}
 
 There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not decay to zero at long distances in the beta coalescent.
 This is related to the results of \cite{EldonWakeley20??}, who showed that a model with ``jackpot'' reproductive events can generate infinite-range linkage disequilibrium.
@@ -476,7 +488,7 @@ Our results above show that $\fpmi$ and its coarse-grained analog, $\hilopmi$ ar
 This is true even when the population growth generates similar distortions in the SFS.
 We therefore propose the following model-checking procedure for demographic inference methods
 \begin{enumerate}[label=(\roman*), before=\unskip{: }]
-    \item Fit a demographic model to data using any relevant method.
+    \item Fit a demographic model to data.
     \item Simulate genealogies under the fitted model (using \texttt{msprime} or other coalescent simulator). Calculate the $\fpmi(d)$ and $\hilopmi(d;i_c)$ predicted by the model.
     \item Calculate $\fpmi(d)$ and $\hilopmi(d;i_c)$ from the data.
     \item Compare true to predicted statistics. Evaluate model fit.
@@ -524,7 +536,7 @@ However, we caution against concluding that sweeps are necessarily responsible f
 \caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note: there is a third possible multiple-merger topology, not shown.) \label{fig:trees}}
 \end{figure}
 
-We can get an intuitive understanding for the result above by considering a sample four chromosomes.
+We can get an intuitive understanding for these results by considering a sample four chromosomes.
 In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
 Furthermore, the total branch length is independent of the topology \cite{Wakeley2009}.
 As a result, there is a trade-off between the length of branches leading to singleton/tripleton mutations on one hand, and the branch length leading to doubletons on the other.
@@ -550,7 +562,7 @@ In the latter model, we vary both the fold-change in $N$ and the time of the cha
 Like Tajima's D, the singleton/doubleton ratio measures distortion the SFS relative to the constant-$N$ Kingman coalescent.
 (In fact, with $n=4$, this ratio captures \emph{all} of the distortion in the SFS.)
 As with the larger sample size (\fig{fig:fpmi_vs_tajimasd}), mulitple mergers generate larger distortions in $\fpmi$ than population growth does, accounting for the distortions in the SFS.
-Moreover, the two different models of growth collapse onto one another.
+Moreover, the results for two different models of growth coincide.
 This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f(\eta_1/\eta_2)$ for some function $f$.
 
 \begin{itemize}
