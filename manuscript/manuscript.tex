@@ -529,7 +529,9 @@ However, we caution against concluding that sweeps are necessarily responsible f
 
 \section*{Discussion}
 
-\subsection*{Samples of four chromosomes}
+We have shown that $\fpmi$ and its binned analog $\hilopmi$ are sensitive to multiple mergers, but relatively invariant under population growth in the Kingman coalescent.
+These properties make them well-suited for coalescent model checking.
+We've demonstrated a model-checking procedure on data from \textit{D. melanogaster}, which is believed to be strongly shaped by natural selection, and found evidence that population growth can not explain the positive associations between high and low frequency mutations.
 
 \begin{figure}
 \centering
@@ -537,7 +539,7 @@ However, we caution against concluding that sweeps are necessarily responsible f
 \caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note: there is a third possible multiple-merger topology, not shown.) \label{fig:trees}}
 \end{figure}
 
-We can get an intuitive understanding for these results by considering a sample four chromosomes.
+We can get an intuitive understanding for why $\fpmi$ distinguishes among coalescent models by considering a sample four chromosomes.
 In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
 Furthermore, the total branch length is independent of the topology \cite{Wakeley2009}.
 As a result, there is a trade-off between the length of branches leading to singleton/tripleton mutations on one hand, and the branch length leading to doubletons on the other.
@@ -566,24 +568,36 @@ As with the larger sample size (\fig{fig:fpmi_vs_tajimasd}), mulitple mergers ge
 Moreover, the results for two different models of growth coincide.
 This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f(\eta_1/\eta_2)$ for some function $f$.
 
-\begin{itemize}
-    \item Review results.
-    \item Availability of code: models for computing moments numerically, scripts for running simulations. Notebooks for data analysis.
-    \item We focus here on coalescent-based methods, but also relevant for diffusion methods (because they imply a coalescent model)
-    \item Mention methods to fit multiple mergers coalescent to data (computationally difficult). Not really what we're trying to do here. Our goal is that you can exploit this extra dimension of the data you already have to check your model and make sure you're not fitting a signal of selection, etc with a demographic model.
-    \item Could also develop a formal hypothesis testing procedure, using the bootstrap, etc.
-    \item Compare with: Single-locus tests that rely on building trees (Seger whale lice, Neher with viruses)
-    \item Compare with: Multi-locus tests that compare a particular region to genomic background. (What if the background isn't neutral/Kingman?)
-    \item But: we could extend our method to a local method that looks for variation in ``multiple-merger-ness''
-    \item Multiple-mergers coalescent and recombination: open area of research
-    \item $\fpmi(d)$ should be a standard posterior check for demographic models. Possibly incorporate into model fitting packages.
-    \item Interesting to compare across species.
-\end{itemize}
+We focus here on demographic inference methods that explicitly use the Kingman coalescent model for calculations.
+However, another popular class of methods are based on forward-time models, such as the Wright-Fisher model (e.g., \cite{GutenkunstEtAl2009}, \cite{dical}).
+We believe that $\fpmi$ is useful for model-checking with these methods as well.
+This is because forward-time neutral models each have an associated dual coalescent model \cite{etheridge}, which can be used to compute the expected $\fpmi$ as outlined in this paper.
+Furthermore, non-neutral models also generate predictions about the 2-SFS and thus $\fpmi$.
+In principle, any fitted model that allows calculation or simulation of the 2-SFS may be checked using $\fpmi$.
+However, the suitability of $\fpmi$ for discriminating among arbitrary families of models is unknown.
+
+In this paper, we have outlined a graphical model-checking procedure in the spirit of \cite{Anscombe} and \cite{GelmanBDA}.
+One could extend our work to implement a formal hypothesis-testing framework for rejecting the best-fit Kingman coalescent model according to some inference method.
+Numerical calculations would require higher moments of the branch-length distribution, which may be computationally intractable for large samples.
+On the other hand, it would be straightforward to develop a bootstrap-style procedure, using coalescent simulations to estimate the variance in test statistics under the fit model.
+In any case, we believe that it would be useful for simulation packages such as \texttt{msprime} and population genetics analysis libraries to include standard functions for computing the 2-SFS, $\fpmi$, and $\hilopmi$.
+
+Our coalescent simulations implement a particular version of the multiple mergers coalescent with recombination.
+However, the precise correspondence between this model and any particular forward-time process is unclear.
+In order to compare with our numerical calculations based on \cite{BirknerEtAl2013}, we use the beta coalescent for the distribution of marginal genealogies, but the explicit forward-time models that have been studied by others generate simultaneous multiple mergers.
+(See e.g., \cite{DurrettSchweinsberg2005} in a model with selective sweeps, but note that our forward-time simulations suggest that this distinction is not important to our main results.)
+Moreover, the long-range correlations observed in \fig{fig:hilo_vs_d} likely depend on an implicit choice regarding the scaling of recombination, coalescent, and multiple merger rates \autocite{EldonWakeley2006}.
+These issues are poorly understood, and more theoretical work is required to understand the interactions between multiple mergers and recombination.
+
+There are two interesting potential empirical applications of our work: assessing the evidence for variation in multiple mergers coalescence within genomes and between species.
+For example, one could compute the $\fpmi$ in different regions of a large genome and look for a relationship between the strength of non-Kingman coalescence and genomic properties such as the recombination rate and functional density.
+Alternatively, one could survey multiple species using a data set such as the diversity data compiled by \cite{Corbett-DetigEtAl2015}.
+Either would reveal new information about the suitability of population genetic models, and the forces that determine genetic diversity.
 
 \printbibliography
 
 \section*{Supplementary Methods}
-[IF NECESSARY]
+[MOVE STUFF HERE IF NECESSARY]
 
 \clearpage
 
@@ -656,6 +670,12 @@ TODO:
     - clean
     - comment
     - post on Github
+
+Left out of Discussion:
+\begin{itemize}
+    \item Mention methods to fit multiple mergers coalescent to data (computationally difficult). Not really what we're trying to do here. Our goal is that you can exploit this extra dimension of the data you already have to check your model and make sure you're not fitting a signal of selection, etc with a demographic model.
+    \item Compare with: Single-locus tests that rely on building trees (Seger whale lice, Neher with viruses)
+\end{itemize}
 
 Things that were done but not included in this ms:
 - Background selection (didn't run the right parameters to see the effect. Might be computationally challenging.)
