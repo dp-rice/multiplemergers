@@ -178,43 +178,42 @@ In the following, we demonstrate that this distinction in the 2-SFS between the 
     \item can form the basis of a model-checking procedure for demographic inference methods
 \end{enumerate*}.
 
-% To this end, we will make use of the fact that the 2-SFS may be interpreted as a joint probability distribution to define the following transformation.
 
 \section*{Methods}
 
 \subsection*{Frequency pointwise mutual information}
 
-[DEFINITION FIRST, THEN EXPLANATION]
-
-Given a coalescent model, the minor allele count at an arbitrary site is a random variable with probability mass function $p(i) = \E{\eta_i}$, where we define $\eta_0$ to be the fraction of monomorphic sites.
-Similarly, the minor allele counts at a pair of sites separated by $d$ bases is a pair of random variables with joint probability mass function $p_d(i,j) = \E{\eta_{ij}(d)}$.
-We are interested in quantifying the dependence between minor allele counts at a given pair of sites, particularly for $i\neq j$.
-
-A general measure of the dependence between a pair of random variables is the \textit{mutual information} \autocite{CoverThomas1991}.
-The mutual information between random variables $X$ and $Y$ is a functional of their joint probability mass function, $p(x,y)$, defined as
-\begin{align}
-    I[p(x,y)] = \sum_{x,y} p(x,y) \log \frac{p(x,y)}{p(x)p(y)},
-    \label{eq:mutual_information}
-\end{align}
-where, with slight abuse of notation, $p(x) = \sum_y p(x,y)$ and vice versa.
-Equivalently, the mutual information is the Kullback-Leibler divergence between the true joint distribution of $X$ and $Y$ and the joint distribution of two independent random variables with the same marginal distributions as $X$ and $Y$ \autocite{CoverThomas1991}.
-Thus, mutual information captures generic, possibly nonlinear, dependence between $X$ and $Y$.
-
-We would like to measure the association between alleles at particular frequencies, rather than the overall dependence between allele frequencies at nearby sites (which would be a measure of linkage disequilibrium).
-\Eq{eq:mutual_information} shows that $I[p(x,y)]$ is the expectation, relative to $p(x,y)$, of a quantity known as the \textit{pointwise mutual information}, where
-\begin{align}
-    \pmi(x,y) = \log \frac{p(x,y)}{p(x)p(y)} = \log \frac{p(x|y)}{p(x)} = \log \frac{p(y|x)}{p(y)}
-\end{align}
-\autocite{ChurchHanks1990}.
-Pointwise mutual information measures the change in the probability that $X=x$ given knowledge that $Y=y$.
-When $X$ and $Y$ are independent, $\pmi(x,y) = 0$ for all $x,y$.
-On the other hand, when $X$ and $Y$ are not independent, $\pmi(x,y) > 0$ implies that $p(x|y) > p(x)$, and conversely for $\pmi(x,y) < 0$.
-
-As we have shown above, the expected folded 2-SFS is a joint probability mass function over minor allele counts.
-We may thus define the \textit{frequency pointwise mutual information} as
+We are interested in quantifying the dependence between minor allele counts at a pair of sites, particularly for $i\neq j$.
+To do so, we define the \textit{frequency pointwise mutual information} as
 \begin{align}
     \fpmi(i,j;d) = \log \frac{\E{\eta_{i,j}(d)}}{\E{\eta_i} \E{\eta_j}}.
+    \label{eq:fpmi}
 \end{align}
+\Fig{fig:schematic} shows the steps to compute $\fpmi$ from a sample of sequences.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{figures/schematic.pdf}
+\caption{Summarizing population genetic data with frequency pointwise information. First, a sequence alignment is reduced to the minor allele frequencies and positions of segregating mutations. Then, for a given distance, $d$, the 2-SFS gives the number of pairs of sites with each combination of minor allele frequencies. Finally, $\fpmi$ is calculated from the 2-SFS according to \eq{eq:fpmi}.
+[OPTIONS: Could add (1) weighted fpmi, and/or (2) binned 2-SFS] \label{fig:schematic}}
+\end{figure}
+
+In information theory, the pointwise mutual information of a pair of random variables (PMI), $X$ and $Y$, is a transformation of the probability mass function, $p(x,y)$, given by
+\begin{align}
+    \pmi(x,y) = \log \frac{p(x,y)}{p(x)p(y)} = \log \frac{p(x|y)}{p(x)}
+    \label{eq:pmi}
+\end{align}
+where $p(x) = \sum_y p(x,y)$ and vice versa \autocite{ChurchHanks1990}.
+PMI measures the change in the probability that $X=x$ given knowledge that $Y=y$.
+When $X$ and $Y$ are independent, $\pmi(x,y) = 0$ for all $x,y$.
+On the other hand, when $X$ and $Y$ are not independent, $\pmi(x,y) > 0$ implies that $p(x|y) > p(x)$, and conversely for $\pmi(x,y) < 0$.
+(The expectation of PMI over the joint distribution of $X$ and $Y$ is known as the mutual information of $X$ and $Y$ \autocite{CoverThomas1991}.)
+
+In our setting, the 2-SFS may be interpreted as a joint probability mass function over allele frequencies.
+Given a coalescent model, the minor allele count at an arbitrary site is a random variable with probability mass function $p(i) = \E{\eta_i}$, where we define $\eta_0$ to be the fraction of monomorphic sites.
+Similarly, the minor allele counts at a pair of sites separated by $d$ bases is a pair of random variables with joint probability mass function $p_d(i,j) = \E{\eta_{ij}(d)}$.
+Comparing, \eq{eq:fpmi} with \eq{eq:pmi} shows that $\fpmi$ is the standard pointwise mutual information for pairs of allele frequencies.
+
 This transformation of the 2-SFS has several useful properties.
 First, because it is based on the minor allele frequencies, we may compute $\fpmi$ from data without knowing the ancestral allele.
 Moreover, the results of \cite{Fu1995} show that $\fpmi(i,j) < 0$ for $i\neq j$ for non-recombining sites under the time-homogeneous Kingman coalescent.
@@ -224,28 +223,43 @@ Population-size variation distorts the SFS by changing the distribution of waiti
 However, the time-inhomogeneous Kingman coalescent generates the same distribution of tree topologies as the time-homogeneous version.
 On the other hand, multiple mergers alter both the coalescent time distribution and the distribution of topologies.
 These two effects are convolved in the SFS, making it difficult to distinguish between population growth and multiple mergers.
-Our hope is that the 2-SFS contains additional information about the distribution of genealogies, once distortions in coalescent times are accounted for.
+Our hope is that the $\fpmi$ reflects additional information about the distribution of genealogies, once distortions in coalescent times are accounted for.
+That is, we expect $\fpmi$ to be sensitive to multiple mergers, but invariant under changes in the coalescent rate.
 
-For plotting purposes, we will also use a weighted version of the $\fpmi$:
-\begin{align}
-    \wfpmi(i,j:d) = \frac{\E{\eta_{ij}}}{\mu^2 \E{T_2}^2} \fpmi(i,j;d),
-\end{align}
-where $T_2$ is the coalescence time for a sample of size two.
-This weighting emphasizes the most common pairs of minor allele counts, while maintaining invariance to the mutation and pairwise coalescence rates.
+% A general measure of the dependence between a pair of random variables is the \textit{mutual information} \autocite{CoverThomas1991}.
+% The mutual information between random variables $X$ and $Y$ is a functional of their joint probability mass function, $p(x,y)$, defined as
+% \begin{align}
+%     I[p(x,y)] = \sum_{x,y} p(x,y) \log \frac{p(x,y)}{p(x)p(y)},
+%     \label{eq:mutual_information}
+% \end{align}
+% where $p(x) = \sum_y p(x,y)$ and vice versa.
+% Equivalently, the mutual information is the Kullback-Leibler divergence between the true joint distribution of $X$ and $Y$ and the joint distribution of two independent random variables with the same marginal distributions as $X$ and $Y$ \autocite{CoverThomas1991}.
+% Thus, mutual information captures generic, possibly nonlinear, dependence between $X$ and $Y$.
 
-\subsection*{Coarse-grained frequencies}
+% We would like to measure the association between alleles at particular frequencies, rather than the overall dependence between allele frequencies at nearby sites (which would be a measure of linkage disequilibrium).
+% \Eq{eq:mutual_information} shows that $I[p(x,y)]$ is the expectation, relative to $p(x,y)$, of a quantity known as the \textit{pointwise mutual information}, where
+% \begin{align}
+%     \pmi(x,y) = \log \frac{p(x,y)}{p(x)p(y)} = \log \frac{p(x|y)}{p(x)} = \log \frac{p(y|x)}{p(y)}
+% \end{align}
+% \autocite{ChurchHanks1990}.
+% Pointwise mutual information measures the change in the probability that $X=x$ given knowledge that $Y=y$.
+% When $X$ and $Y$ are independent, $\pmi(x,y) = 0$ for all $x,y$.
+% On the other hand, when $X$ and $Y$ are not independent, $\pmi(x,y) > 0$ implies that $p(x|y) > p(x)$, and conversely for $\pmi(x,y) < 0$.
+
+
+\subsection*{Binned allele frequencies}
 
 With finite data, estimates of the 2-SFS will be noisy.
 This is particularly true for $i,j\gg1$ because $\E{\eta_{ij}}$ decays like $(ij)^{-1}$ for the standard Kingman \autocite{Fu1995} and faster with growth or multiple mergers.
 We show in Results that a positive association between mutations with high minor allele counts and mutations with low minor allele counts is a signature of multiple mergers.
-This suggests a coarse-grained SFS and 2-SFS:
+This suggests a binned SFS and 2-SFS:
 \begin{align}
     \eta_{\text{lo}}(i_c) &= \sum_{i=1}^{i_c-1} \eta_i \\
     \eta_{\text{hi}}(i_c) &= \sum_{i=i_c}^{\floor{n/2}} \eta_i \\
     \eta_{\text{hi,lo}}(d; i_c) &= \sum_{i=1}^{i_c-1} \sum_{j=i_c}^{\floor{n/2}} \eta_{ij}(d),
 \end{align}
 where $i_c$ is an arbitrary cutoff between high and low minor allele frequency.
-Coarse-graining allows us to estimate the 2-SFS stably for large sample sizes, because we may adjust $i_c$ to ensure a large number of sites in both the high--minor allele count and low--minor allele count bins.
+Binning allows us to estimate the 2-SFS stably for large sample sizes, because we may adjust $i_c$ to ensure a large number of sites in both the high--minor allele count and low--minor allele count bins.
 
 We can also compute the pointwise mutual information in this coarse-grained distribution as
 \begin{align}
@@ -253,7 +267,18 @@ We can also compute the pointwise mutual information in this coarse-grained dist
                                 {\E{\eta_{\text{hi,lo}}(d; i_c)}}
                                 {\E{\eta_{\text{lo}}(i_c)}  \E{\eta_{\text{hi}}(i_c)}}.
 \end{align}
-One could similarly calculate five other pointwise mutual information statistics from the coarse-grained 2-SFS (e.g., the PMI between monomorphic sites and sites with high minor allele counts), but we will not use these statistics here.
+One could similarly calculate five other pointwise mutual information statistics from the binning 2-SFS (e.g., the PMI between monomorphic sites and sites with high minor allele counts), but we will not use these statistics here.
+Also, it is possible to define less drastic coarse-graining schemes that strike a balance between sampling noise and preserving more detailed information about allele frequencies.
+
+\subsection*{Weighted $\fpmi$}
+For plotting purposes, we will also use a weighted version of the $\fpmi$:
+\begin{align}
+    \wfpmi(i,j:d) = \frac{\E{\eta_{ij}}}{\mu^2 \E{T_2}^2} \fpmi(i,j;d),
+    \label{eq:wfpmi}
+\end{align}
+where $T_2$ is the coalescence time for a sample of size two.
+The numerator of the weighting factor in \eq{eq:wfpmi} serves to emphasize the most common pairs of minor allele counts.
+The denominator, which is proportional to the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant under changes in the overall mutation and coalescence rates.
 
 \subsection*{Computing branch-length moments}
 
@@ -262,18 +287,22 @@ For the Kingman coalescent with time-varying coalescent rate, we used equations~
 To calculate the second moments of the coalescent time distribution for exponentially growing populations, we used Gaussian quadrature.
 For the beta coalescent, we implemented the recursion described by \cite{BirknerEtAl2013}.
 
-Functions for compute the branch-length moments are available [GITHUB].
+Functions for computing the branch-length moments are available [GITHUB].
 The Kingman coalescent code currently can compute moments for exponentially growing and two-epoch piecewise constant models, but could be extended to allow for other models.
 The formulas of \cite{ZivkovicWiehe2008} exhibit numerical instability related to the instability of \cite{GriffithsTavare1994}.
 They are therefore only practical for sample sizes up to $n \approx 40$.
-The recursion of \cite{BirknerEtAl2013} is $\mathcal{O}(n^4)$ [CHECK THIS] and is also only practical for samples up to $n \approx 50$.
+The recursion of \cite{BirknerEtAl2013} is $\mathcal{O}(n^4)$ and is also only practical for samples up to $n \approx 50$.
 
 \subsection*{Coalescent simulations}
 
-Our beta coalescent simulation code is based on modifications to the \texttt{msprime} package made by Joe Zhu [link to github] to allow for multiple mergers.
+We ran coalescent simulations using a custom version of \texttt{msprime} \autocite{KelleherEtAl2014} capable of multiple mergers, based on modifications made by Joe Zhu [link to github].
 This code, together with \texttt{python} wrapper scripts and utility functions to run simulations and calculate the 2-SFS and $\fpmi$ from the \texttt{msprime} output is available [GITHUB].
 
-[Possibly move some of the description here]
+For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
+We chose values of $r$ so that the combined parameter $r\E{T_2}$ varied over several orders of magnitude, where $\E{T_2}$ was measured from the simulation output.
+For each locus, we measured $\{\tau_i : i = 1,\ldots,n-1\}$ in the two genealogies at each end of the loci.
+We then calculated the expectations $\{\E{\tau_i\}}$ and $\{\E{\tau_{ij}}\}$ by averaging over independent loci.
+These expectations allow us to calculate all of the 2-SFS statistics defined above.
 
 \subsection*{Forward-time simulations of selective sweeps}
 
@@ -300,10 +329,10 @@ We also downloaded the Nov. 3, 2016 spreadsheet of inversions available at the l
 For each chromosome arm, we excluded any samples with an inversion in that arm and then down-sampled to $n=100$ by taking the first 100 remaining samples in alphanumeric order by sample name.
 (As a result, the data for each chromosome arm is from a slightly different subset of the individuals.)
 
-We calculated the average pairwise diversity, $\pi$, as a function of position for each autosomal chromosome arm (\fig{fig:dpgp_pi}).
+We calculated the average pairwise diversity, $\Pi$, as a function of position for each autosomal chromosome arm (\fig{fig:dpgp_pi}).
 Pairwise diversity is high in the middle of each chromosome arm and lower near the centromeres and telomeres.
 Our modeling---and coalescent-based demographic inference methods in general---assumes that the distribution of gene genealogies is homogeneous along the chromosome.
-Therefore, we selected a 13-16~MB ``central'' region of each arm with relatively homogeneous $\pi$ for further analysis.
+Therefore, we selected a 13-16~MB ``central'' region of each arm with relatively homogeneous $\Pi$ for further analysis.
 The boundaries of these central regions are given in Table~\ref{tab:central_regions}.
 
 In order to ensure that the segregating mutations reflect true genetic diversity and not variation in calling errors, we excluded sites where fewer than 90 of the 100 samples have genotype calls.
@@ -329,8 +358,8 @@ In addition to the average SFS used to fit the model, we computed the average 2-
 Because we are using four-fold degenerate sites, we only computed the 2-SFS for distances that are multiples of 3.
 For comparison between data and simulations, we scale the distances in basepairs by a critical distance $d_c = (r\E{T_2})^{-1}$.
 We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair per generation \autocite{ComeronEtAl2012}.
-We estimated $\E{T_2}$ by $\pi / 2 \mu$.
-For $\pi$, we used the average pairwise diversity at fourfold degenerate sites in the central region of each chromosome arm.
+We estimated $\E{T_2}$ by $\Pi / 2 \mu$.
+For $\Pi$, we used the average pairwise diversity at fourfold degenerate sites in the central region of each chromosome arm.
 For $\mu$, we used a genome-wide mutation rate of $3 \times 10^{-9}$ per basepair per generation \autocite{KeightlyEtAl2014}.
 These estimates are not precise, but only serve to scale genetic distances to the right order of magnitude.
 
@@ -338,31 +367,29 @@ A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} not
 
 \section*{Results \label{sec:results}}
 
-\subsection*{Population growth vs. the beta coalescent in non-recombining loci}
+\subsection*{Population growth versus the beta coalescent in non-recombining loci}
 
 In this section, we compare the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
-We wrote a \texttt{python} package to compute the SFS, 2-SFS, and $\fpmi$ numerically.
-This package uses the results of \cite{Fu1995} for the time-homogeneous Kingman coalescent, \cite{ZivkovicWiehe2008} for the time-inhomogeneous Kingman coalescent, and \cite{BirknerEtAl2013} for the beta coalescent.
-(See Methods for details.)
+We are interested in whether $\fpmi$ can distinguish among coalescent models that produce similar distortions in the SFS.
+To this end, we compute a version of Tajima's D \autocite{Tajima1983} normalized to be invariant under changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson19??}.
+Negative values of $D$ indicate an overabundance of low-frequency mutations relative to the time-homogeneous Kingman expectation.
+All results are computed numerically using the results of \cite{Fu1995}, \cite{ZivkovicWiehe2008}, and \cite{BirknerEtAl2013} (see Methods).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/figure1.pdf}
+\includegraphics[width=0.5\textwidth]{figures/wfpmi_growth_beta.pdf}
 \caption{Weighted frequency pointwise mutual information for three coalescent models: the time-homogeneous Kingman coalescent, the Kingman coalescent with exponential growth ($g=4$), and the beta coalescent ($\alpha=1.45$). For all models $n=39$. Growth and $\alpha$ parameters were chosen to generate average SFS with similar Tajima's D. The diagonal $i=j$ is masked. \label{fig:nonrecombining_pmi}}
 \end{figure}
 
 \Fig{fig:nonrecombining_pmi} shows the $\wfpmi$ for constant-$N$ Kingman coalescent; the Kingman coalescent with exponential growth, $N(t)=N_0 \exp(-g \frac{t}{N_0})$; and a beta coalescent intermediate between the Kingman and Bolthausen-Sznitman coalescents.
-We find that while exponential growth with $g=4$ has a substantial effect on the SFS (Tajima's D = $-0.39 \pi$, where $\pi$ is the average pairwise diversity), it does not qualitatively change the $\fpmi$.
+We find that while exponential growth with $g=4$ has a substantial effect on the SFS ($D = -0.39$), it does not qualitatively change the $\fpmi$.
 In particular, $\fpmi_{i,j} < 0$ for all $i \neq j$, just as in the constant-$N$ Kingman coalescent.
 
-On the other hand, a beta coalescent that generates similar distortions in the SFS ($\alpha=1.45$, Tajima's D = $-0.42 \pi$) also generates positive $\fpmi$.
+On the other hand, a beta coalescent that generates similar distortions in the SFS ($\alpha=1.45$, $D = -0.42$) also generates positive $\fpmi$.
 The effect of multiple mergers is strongest on $\fpmi$ between high and low minor allele counts.
 This justifies coarse-graining the SFS and 2-SFS into high-- and low--minor allele count bins as defined above.
 
 Accordingly, we computed the coarse-grained $\hilopmi$ between singletons and non-singletons ($i_c = 1$) for a range of $g$ and $\alpha$.
-For the same parameters, we also calculated a normalized Tajima's D statistic:
-$(\hat{\theta}_W - \pi) / \pi$, where $\hat{\theta}_W$ is Watterson's estimator of the coalescent scaled mutation rate \autocite{Watterson19??}.
-The latter is a measure of the distortions in the SFS induced by population growth or multiple mergers and equals zero for the constant-$N$ Kingman coalescent.
 \Fig{fig:fpmi_vs_tajimasd} shows that as the population growth rate increases, distorting the SFS, $\hilopmi$ increases relative to the constant-$N$ Kingman, but plateaus at a negative value.
 On the other hand, beta coalescents that generate similar distortions in the SFS, generate larger changes in $\hilopmi$, including positive values.
 Thus, the 2-SFS in general, and $\hilopmi$ in particular, are capable of capturing the effects of multiple mergers beyond the distortions in branch lengths.
@@ -373,43 +400,6 @@ Thus, the 2-SFS in general, and $\hilopmi$ in particular, are capable of capturi
 \caption{Pointwise mutual information between singletons and non-singletons for Kingman coalescents with exponential growth and beta coalescents. The exponential growth rate, $g$, ranges from 0.25 to 8.0 in coalescent time units. The beta coalescent parameter, $\alpha$, ranges from 1.75 (nearly Kingman) to 1.25 (nearly Bolthausen-Sznitman). \label{fig:fpmi_vs_tajimasd}}
 \end{figure}
 
-\subsection*{Samples of four chromosomes}
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{figures/trees.png}
-\caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note: there is a third possible multiple-merger topology, not shown.) \label{fig:trees}}
-\end{figure}
-
-We can get an intuitive understanding for the result above by considering a sample four chromosomes.
-In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
-Furthermore, the total branch length is independent of the topology \cite{Wakeley2009}.
-As a result, there is a trade-off between the length of branches leading to singleton/tripleton mutations on one hand, and the branch length leading to doubletons on the other.
-Genealogies with topology (A) will have more opportunities for the former and loci with topology (B) will have more opportunities for the latter.
-Conditional on observing a doubleton at a site, it is thus more likely that the genealogy has topology (B) and so the expected number of singletons at sites with the same genealogy is lower than average.
-In terms of the 2-SFS, we have $\E{\eta_{12}} < \E{\eta_{1}} \E{\eta_{2}}$.
-
-On the other hand, multiple mergers induce correlations between the tree topology and the total branch length.
-For example, topology (C) has less opportunity for singletons \emph{and} less opportunity for doubletons than (A) or (B), even though the expected proportion of singletons is higher.
-Thus, observing \emph{any mutation at all} makes topology (C) less likely and the expected number of other mutations at all frequencies higher.
-If multiple-mergers events are frequent enough, this effect may dominate the tradeoff between (A) and (B) so that $\E{\eta_{12}} > \E{\eta_{1}} \E{\eta_{2}}$.
-
-\begin{figure}
-\centering
-\includegraphics[width=0.8\textwidth]{figures/figure3.pdf}
-\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^{-4}$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
-\end{figure}
-
-As argued above, $\E{\eta_{12}}$ is also distorted by changes in the coalescent time distribution induced by population growth.
-\Fig{fig:sdpmi_vs_sdratio} demonstrates that $\fpmi$ accounts for this fact by normalizing by the SFS.
-\Fig{fig:sdpmi_vs_sdratio} plots $\fpmi_{12}$ against the ratio of singletons to doubletons $\eta_1 / \eta_2$ for the beta coalescent and two models of population growth: exponential growth and a piecewise-constant model with two epochs.
-In the latter model, we vary both the fold-change in $N$ and the time of the change.
-Like Tajima's D in the previous section, the singleton/doubleton ratio measures distortion the SFS relative to the constant-$N$ Kingman coalescent.
-(In fact, with $n=4$, this ratio captures \emph{all} of the distortion in the SFS.)
-As with the larger sample size (\fig{fig:fpmi_vs_tajimasd}), mulitple mergers generate larger distortions in $\fpmi$ than population growth does, accounting for the distortions in the SFS.
-Moreover, the two different models of growth collapse onto one another.
-This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f(\eta_1/\eta_2)$ for some function $f$.
-
 \subsection*{Pointwise mutual information between recombining sites}
 
 The previous sections have shown that $\fpmi$ between pairs of non-recombining sites can discriminate between the Kingman coalescent with population growth and the beta coalescent.
@@ -418,16 +408,10 @@ In fact, for large non-recombining loci, it is sometimes possible to reconstruct
 The advantage of the $\fpmi$ approach is that it can be computed on a genomic scale, as with the SFS.
 Therefore, it is important to assess the robustness of our approach to recombination between sites.
 
-To measure the relationship between $\fpmi$ and recombination, we ran coalescent simulations using a version of the program \texttt{msprime} \cite{KehellerEtAl201?} modified to allow for multiple mergers.
-In particular, we simulated a model where coalescent events are drawn from the distribution specified by the beta coalescent, as in our numerical calculations above.
+To measure the relationship between $\fpmi$ and recombination, we ran coalescent simulations using a version of the program \texttt{msprime} \cite{KehellerEtAl201?} modified to allow for multiple mergers (See Methods).
+In particular, we simulated a model where the sizes of coalescent events are drawn from the distribution specified by the beta coalescent, as in our numerical calculations above.
 In this model, marginal genealogies will follow the beta coalescent distribution, and the average SFS will be given by the formula in \cite{BirknerEtAl2013}.
 We also simulated data from two models of population growth: exponential growth and a two-epoch piecewise-constant model.
-
-For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
-We chose values of $r$ so that the combined parameter $r\E{T_2}$ varied over several orders of magnitude, where $\E{T_2}$ was measured from the simulation output.
-For each locus, we measured $\{\tau_i : i = 1,\ldots,n-1\}$ in the two genealogies at each end of the loci.
-We then calculated the expectations $\{\E{\tau_i\}}$ and $\{\E{\tau_ij}\}$ by averaging over independent loci.
-These expectations allow us to calculate all of the 2-SFS statistics defined above.
 
 \begin{figure}
 \centering
@@ -445,7 +429,7 @@ On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/figure5.pdf}
-\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. \label{fig:hilo_vs_d}}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. [TODO: SPLIT SWEEPS PANELS OFF INTO THEIR OWN FIGURE.]\label{fig:hilo_vs_d}}
 \end{figure}
 
 \Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d=r\E{T_2}$ and three different choices of $i_c$.
@@ -520,7 +504,7 @@ We then simulated under our fitted model using \texttt{msprime} and computed the
 \end{figure}
 
 The first row of \fig{fig:dpgp3} shows that the expected SFS under the fit demographic models agree with the observed SFS, demonstrating that a time-varying $N(t)$ can explain this aspect of the data well.
-In contrast, the second row shows the expected and observed weighted $\fpmi$ for averaged over distances less than $15 d_c$ apart, where $d_c = 2/ (\pi \mu)$ is the distance scale corresponding to $r\E{T_2} = 1$.
+In contrast, the second row shows the expected and observed weighted $\fpmi$ for averaged over distances less than $15 d_c$ apart, where $d_c = 2/ (\Pi \mu)$ is the distance scale corresponding to $r\E{T_2} = 1$.
 Here, the data shows strong positive associations between nearby alleles at different frequencies, while the model of population growth predicts weak negative associations except just off of the diagonal.
 This pattern extends across a range of genomic distances, $d/d_c \in (10^{-1}, 10^2)$ (\fig{fig:dpgp3}, third row).
 As a result, we may conclude that the data is not well explained by the Kingman coalescent with population growth.
@@ -531,6 +515,44 @@ However, we caution against concluding that sweeps are necessarily responsible f
 
 
 \section*{Discussion}
+
+\subsection*{Samples of four chromosomes}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/trees.png}
+\caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note: there is a third possible multiple-merger topology, not shown.) \label{fig:trees}}
+\end{figure}
+
+We can get an intuitive understanding for the result above by considering a sample four chromosomes.
+In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
+Furthermore, the total branch length is independent of the topology \cite{Wakeley2009}.
+As a result, there is a trade-off between the length of branches leading to singleton/tripleton mutations on one hand, and the branch length leading to doubletons on the other.
+Genealogies with topology (A) will have more opportunities for the former and loci with topology (B) will have more opportunities for the latter.
+Conditional on observing a doubleton at a site, it is thus more likely that the genealogy has topology (B) and so the expected number of singletons at sites with the same genealogy is lower than average.
+In terms of the 2-SFS, we have $\E{\eta_{12}} < \E{\eta_{1}} \E{\eta_{2}}$.
+
+On the other hand, multiple mergers induce correlations between the tree topology and the total branch length.
+For example, topology (C) has less opportunity for singletons \emph{and} less opportunity for doubletons than (A) or (B), even though the expected proportion of singletons is higher.
+Thus, observing \emph{any mutation at all} makes topology (C) less likely and the expected number of other mutations at all frequencies higher.
+If multiple-mergers events are frequent enough, this effect may dominate the tradeoff between (A) and (B) so that $\E{\eta_{12}} > \E{\eta_{1}} \E{\eta_{2}}$.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figures/figure3.pdf}
+\caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^{-4}$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
+\end{figure}
+
+As argued above, $\E{\eta_{12}}$ is also distorted by changes in the coalescent time distribution induced by population growth.
+\Fig{fig:sdpmi_vs_sdratio} demonstrates that $\fpmi$ accounts for this fact by normalizing by the SFS.
+\Fig{fig:sdpmi_vs_sdratio} plots $\fpmi_{12}$ against the ratio of singletons to doubletons $\eta_1 / \eta_2$ for the beta coalescent and two models of population growth: exponential growth and a piecewise-constant model with two epochs.
+In the latter model, we vary both the fold-change in $N$ and the time of the change.
+Like Tajima's D, the singleton/doubleton ratio measures distortion the SFS relative to the constant-$N$ Kingman coalescent.
+(In fact, with $n=4$, this ratio captures \emph{all} of the distortion in the SFS.)
+As with the larger sample size (\fig{fig:fpmi_vs_tajimasd}), mulitple mergers generate larger distortions in $\fpmi$ than population growth does, accounting for the distortions in the SFS.
+Moreover, the two different models of growth collapse onto one another.
+This suggests that for the Kingman coalescent with growth, $\fpmi_{12} \approx f(\eta_1/\eta_2)$ for some function $f$.
+
 \begin{itemize}
     \item Review results.
     \item Availability of code: models for computing moments numerically, scripts for running simulations. Notebooks for data analysis.
@@ -557,7 +579,7 @@ However, we caution against concluding that sweeps are necessarily responsible f
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/pi_vs_position.pdf}
-\caption{Average pairwise diversity, $\pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
+\caption{Average pairwise diversity, $\Pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
 \label{fig:dpgp_pi}}
 \end{figure}
 
