@@ -5,7 +5,15 @@
 \usepackage{url}
 % Allow inline lists
 \usepackage[inline]{enumitem}
-\usepackage[backend=biber, style=authoryear, autocite=inline, isbn=false, doi=false, url=false, eprint=false]{biblatex}
+\usepackage[
+    backend=biber,
+    citestyle=authoryear,
+    style=authoryear,
+    autocite=inline,
+    isbn=false, doi=false, url=false, eprint=false,
+    uniquename=false,
+    maxcitenames=2
+]{biblatex}
 % Fix biblatex behavior that writes "In: " before journal name.
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{\printtext{\bibstring{in}\intitlepunct}}}
@@ -27,7 +35,7 @@
 \DeclareMathOperator{\hilopmi}{hilopmi}
 
 
-\bibliography{references}
+\addbibresource{references.bib}
 
 \title{Distinguishing among coalescent models using two-site allele frequency spectra}
 \author{Daniel P. Rice}
@@ -37,28 +45,7 @@
 \maketitle
 
 \abstract{[NOTE: OLD]
-The genetic diversity of a population reflects its demographic and
-evolutionary history. Methods for inferring this history typically
-assume that the ancestry of a sample can be modeled by the Kingman
-coalescent process. A defining feature of the Kingman coalescent is
-that it generates genealogies that are binary trees: no more than two
-ancestral lineages may coalesce at the same time. However, this
-assumption breaks down under several scenarios. For example, pervasive
-natural selection, rapid spatial range expansion, and extreme
-variation in offspring number can all generate genealogies with
-``multiple-merger'' events in which more than two lineages coalesce
-instantaneously. Therefore, detecting multiple mergers is important
-both for understanding which forces have shaped the diversity of a
-population and for avoiding fitting misspecified models to data.
-Current methods to detect multiple mergers rely on the average site
-frequency spectrum (SFS). However, the signatures of multiple
-mergers in the average SFS are also consistent with a Kingman
-coalescent process with a time-varying population size. Here, I
-present a new method for detecting multiple mergers based on
-the mutual information of the joint allele frequency spectrum at pairs of linked sites. Unlike the average SFS,
-the mutual information depends mostly on the topologies of genealogies
-rather than their branch lengths and is therefore robust to most
-demographic effects.}
+The genetic diversity of a population reflects its demographic and evolutionary history. Methods for inferring this history typically assume that the ancestry of a sample can be modeled by the Kingman coalescent process. A defining feature of the Kingman coalescent is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time. However, this assumption breaks down under several scenarios. For example, pervasive natural selection and extreme variation in offspring number can both generate genealogies with ``multiple-merger'' events in which more than two lineages coalesce instantaneously.  Therefore, detecting multiple mergers is important both for understanding which forces have shaped the diversity of a population and for avoiding fitting misspecified models to data. Current methods to detect multiple mergers rely on the site frequency spectrum (SFS). However, the signatures of multiple mergers in the SFS are also consistent with a Kingman coalescent process with a time-varying population size. Here, we present a new method for detecting multiple mergers based on the pointwise mutual information of the two-site frequency spectrum for pairs of linked sites. Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than their branch lengths and is therefore insensitive to population size change.}
 
 \section*{Introduction}
 The genetic diversity of a population reflects its demographic and evolutionary history.
@@ -126,7 +113,7 @@ The primary signature of multiple mergers in the SFS is an overabundance of low-
 The non-mononotic SFS identified by \cite{RodelspergerEtAl2014} is a more robust signature of multiple mergers, but detecting it in data requires knowledge of the ancestral allele at each site.
 High-frequency mutations are typically much rarer than low-frequency mutations, so misidentifying even a small fraction of ancestral alleles can generate a non-monotonic SFS at high frequencies.
 
-Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtal2018})---are useful for distinguishing between the Kingman coalescent with population growth and multiple merger coalescents.
+Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtAl2018})---are useful for distinguishing between the Kingman coalescent with population growth and multiple merger coalescents.
 In particular, we demonstrate that a transformation of the 2-SFS that we refer to as \emph{frequency pointwise mutual information} (fpmi) is sensitive to multiple mergers but relatively invariant under time-varying coalescent rates.
 We show that this is true for both perfectly linked sites and sites separated by a moderate genetic distance.
 These statistics may be calculated efficiently from genomic single nucleotide polymorphism data.
@@ -322,7 +309,7 @@ For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and comp
 
 \subsection*{Analysis of \textit{D. melanogaster} data}
 
-We analyzed sequence data from the DPGP3 data set, which consists of haploid consensus sequences from $\sim 200$ flies, obtained via the haploid embryo method of \cite{LangleyEtal2011}.
+We analyzed sequence data from the DPGP3 data set, which consists of haploid consensus sequences from $\sim 200$ flies, obtained via the haploid embryo method of \cite{LangleyEtAl2011}.
 The SNP calls underlying these sequences have been subjected to a variety of quality filters described in \cite{LackEtAl2015}.
 We obtained the DPGP3 consensus sequence files version 1.1 from \url{www.johnpool.net/genomes.html}.
 These files contain the sequence alignments of all flies in the sample on all chromosome arms.
@@ -372,7 +359,7 @@ A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} not
 
 We compared the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
 We are interested in whether $\fpmi$ can distinguish among coalescent models that produce similar distortions in the SFS.
-To this end, we computed a version of Tajima's D \autocite{Tajima1983} normalized to be invariant under changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson19??}.
+To this end, we computed a version of Tajima's D \autocite{Tajima1989} normalized to be invariant under changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson19??}.
 Negative values of $D$ indicate an overabundance of low-frequency mutations relative to the time-homogeneous Kingman expectation.
 All results are computed numerically using the results of \cite{Fu1995}, \cite{ZivkovicWiehe2008}, and \cite{BirknerEtAl2013} (see Methods).
 
@@ -505,7 +492,7 @@ Thus, this data is a good candidate for demonstrating the utility of $\fpmi$ for
 
 After filtering for coverage, removing chromosome arms with known inversions, downsampling to $n=100$ samples per autosomal chromosome arm, and identifying 4-fold degenerate sites, we selected the central region of each chromosome that have consistent high diversity (Methods).
 Because the average pairwise diversity varies between arms---possibly reflecting selection or different sets of segregating inversions---we performed all subsequent calculations on each arm independently.
-We fit a demographic model to the site frequency spectra of these central regions using \texttt{fastNeutrino} \cite{BhaskarEtal2015}.
+We fit a demographic model to the site frequency spectra of these central regions using \texttt{fastNeutrino} \cite{BhaskarEtAl2015}.
 We fit a 3-epoch piecewise-constant model, with four free parameters: two changepoints and two population size ratios.
 We report our fitted parameters in Table~\ref{tab:DPGP_params}.
 We then simulated under our fitted model using \texttt{msprime} and computed the expected and observed SFS, $\fpmi$, and $\hilopmi$ (\fig{fig:dpgp3}, See methods for details.).
