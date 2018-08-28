@@ -134,12 +134,9 @@ The non-mononotic SFS identified by \cite{RodelspergerEtAl2014} is a more robust
 High-frequency mutations are typically much rarer than low-frequency mutations, so misidentifying even a small fraction of ancestral alleles can generate a non-monotonic SFS at high frequencies.
 
 Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtAl2018})---are useful for distinguishing between the Kingman coalescent with population growth and multiple merger coalescents.
-In particular, we demonstrate that a transformation of the 2-SFS that we refer to as \emph{frequency pointwise mutual information} (fPMI) is sensitive to multiple mergers but relatively invariant to time-varying coalescent rates.
-We show that this is true for both perfectly linked sites and sites separated by a moderate genetic distance.
 These statistics may be calculated efficiently from genomic single nucleotide variant data.
 Furthermore, they do not require phasing, recombination maps, or ancestral allele identification and are informative even with small sample sizes.
 Together, these properties make the 2-SFS useful for demographic model-checking in a wide range of species.
-We demonstrate this model-checking procedure on genomic diversity data from \textit{Drosophila melanogaster} \autocite{LackEtAl2015}.
 
 Following the notation of \cite{Fu1995}, the site frequency spectrum of a sample of $n$ haploid genomes is $\left\{ \xi_i : 1 \leq i < n \right\}$, where $\xi_i$ is the fraction of sites containing a mutation with derived allele count $i$ in the sample.
 In many cases, the ancestral allele is unknown and so the allele in $i$ samples and the complementary allele in $n-i$ samples are indistinguishable.
@@ -176,14 +173,16 @@ As a result, they were mostly interested in the diagonal terms of the SFS covari
 However, Figures 5 and 6 of \cite{BirknerEtAl2013} show positive correlations between $\xi_i$ and $\xi_j$ for $j \not\in \{i, n-i\}$.
 Thus, unlike the standard Kingman coalescent, the beta coalescent can generate positive associations between mutations with different minor allele counts.
 
-In the following, we demonstrate that this distinction in the 2-SFS between the multiple merger and Kingman coalescents
+In the following, we demonstrate that the positive associations between mutations at different frequencies distinguish the multiple-merger from the Kingman coalescent and that this distinction
 \begin{enumerate*}[label=(\roman*), before=\unskip{: }, itemjoin={{; }}, itemjoin*={{, and }}]
     \item applies to Kingman coalescents with time-varying coalescent rates
     \item is robust to recombination between the sites
     \item is also a feature of forward-time models with selection
     \item can form the basis of a model-checking procedure for demographic inference methods
 \end{enumerate*}.
-
+To do so, we introduce a transformation of the 2-SFS that we call frequency pointwise mutual information ($\fpmi$).
+We use a combination of numerical calculations and stochastic simulations to explore the properties of this statistic under different coalescent models.
+Finally, we demonstrate the use of $\fpmi$ in a coalescent model-checking procedure on genomic diversity data from \textit{Drosophila melanogaster} \autocite{LackEtAl2015}.
 
 \section*{Methods}
 
