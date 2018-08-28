@@ -55,8 +55,17 @@
 \begin{document}
 \maketitle
 
-\abstract{[NOTE: OLD]
-The genetic diversity of a population reflects its demographic and evolutionary history. Methods for inferring this history typically assume that the ancestry of a sample can be modeled by the Kingman coalescent process. A defining feature of the Kingman coalescent is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time. However, this assumption breaks down under several scenarios. For example, pervasive natural selection and extreme variation in offspring number can both generate genealogies with ``multiple-merger'' events in which more than two lineages coalesce instantaneously.  Therefore, detecting multiple mergers is important both for understanding which forces have shaped the diversity of a population and for avoiding fitting misspecified models to data. Current methods to detect multiple mergers rely on the site frequency spectrum (SFS). However, the signatures of multiple mergers in the SFS are also consistent with a Kingman coalescent process with a time-varying population size. Here, we present a new method for detecting multiple mergers based on the pointwise mutual information of the two-site frequency spectrum for pairs of linked sites. Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than their branch lengths and is therefore insensitive to population size change.}
+\abstract{
+Population genetics methods for demographic inference typically assume that the ancestry of a sample can be modeled by the Kingman coalescent process.
+A defining feature of the Kingman coalescent is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time.
+However, this assumption breaks down under several scenarios.
+For example, pervasive natural selection and extreme variation in offspring number can both generate genealogies with ``multiple-merger'' events in which more than two lineages coalesce instantaneously.
+Therefore, detecting multiple mergers is important both for understanding which forces have shaped the diversity of a population and for avoiding fitting misspecified models to data.
+Current methods to detect multiple mergers in genomic data rely on the site frequency spectrum (SFS).
+However, the signatures of multiple mergers in the SFS are also consistent with a Kingman coalescent process with a time-varying population size.
+Here, we present a new method for detecting multiple mergers based on the pointwise mutual information of the two-site frequency spectrum for pairs of linked sites.
+Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than their branch lengths and is therefore insensitive to population size change.
+This statistic is global in the sense that it can detect when the genome-wide genetic diversity is inconsistent with the Kingman coalescent, rather than detecting outlier regions, as in selection scan methods.}
 
 \section*{Introduction}
 The genetic diversity of a population reflects its demographic and evolutionary history.
@@ -227,8 +236,8 @@ Furthermore, the same normalization renders $\fpmi$ insensitive to ascertainment
 Variant detection methods typically compare sampled sequences to a reference sequence and ``call'' a variant site when there is sufficient evidence that at least one sample differs from the reference at that site.
 As a result, the ascertainment probability, $p_i$, of a mutation is an increasing function of its true allele count $i$.
 This effect distorts the expected ascertained SFS ($\E{\eta_i}_{\text{asc}} = \mu \E{\tau_i} p_i$) toward high-frequency mutations.
-However, provided that variant detection at each site is approximately independent, the primary effect of ascertainment bias in \eq{eq:fpmi} is to multiply the numerator and denominator by a common factor of $p_i p_j$, which cancel.
-Thus, $\fpmi$ is less sensitive than the raw SFS and 2-SFS to ascertainment effects.
+However, provided that variant detection at each site is approximately independent, the primary effect of ascertainment bias in \eq{eq:fpmi} is to multiply the numerator and denominator by a common factor of $p_i p_j$.
+Because these factors cancel, $\fpmi$ is less sensitive than the raw SFS and 2-SFS to ascertainment effects.
 % A general measure of the dependence between a pair of random variables is the \textit{mutual information} \autocite{CoverThomas1991}.
 % The mutual information between random variables $X$ and $Y$ is a functional of their joint probability mass function, $p(x,y)$, defined as
 % \begin{align}
@@ -298,7 +307,7 @@ The recursion of \cite{BirknerEtAl2013} is $\mathcal{O}(n^4)$ and is also only p
 
 \subsection*{Coalescent simulations}
 
-We ran coalescent simulations using a custom version of \texttt{msprime} \autocite{KelleherEtAl2014} capable of multiple mergers, based on modifications made by Joe Zhu [link to github].
+We ran coalescent simulations using a custom version of \texttt{msprime} \autocite{KelleherEtAl2014} capable of multiple mergers, based on modifications made by Joe Zhu [GITHUB].
 This code, together with \texttt{python} wrapper scripts and utility functions to run simulations and calculate the 2-SFS and $\fpmi$ from the \texttt{msprime} output is available [GITHUB].
 
 For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
