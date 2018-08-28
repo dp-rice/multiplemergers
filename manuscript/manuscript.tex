@@ -3,6 +3,8 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{url}
+% Author affiliations
+\usepackage{authblk}
 % Allow inline lists
 \usepackage[inline]{enumitem}
 \usepackage[
@@ -14,6 +16,10 @@
     uniquename=false,
     maxcitenames=2
 ]{biblatex}
+
+% Don't print month and day in bibliography
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryBibitem{\clearfield{day}}
 % Fix biblatex behavior that writes "In: " before journal name.
 \renewbibmacro{in:}{%
   \ifentrytype{article}{}{\printtext{\bibstring{in}\intitlepunct}}}
@@ -37,8 +43,13 @@
 
 \addbibresource{references.bib}
 
-\title{Distinguishing among coalescent models using two-site allele frequency spectra}
-\author{Daniel P. Rice}
+\title{Distinguishing multiple-merger from Kingman coalescence using two-site frequency spectra}
+\author[1]{Daniel P. Rice}
+\author[1,*]{John Novembre}
+\author[2,*]{Michael M. Desai}
+\affil[1]{Department of Human Genetics, University of Chicago, Chicago, IL}
+\affil[2]{Department of Organismic and Evolutionary Biology, Harvard University, Cambridge, MA}
+\affil[*]{These authors contributed equally to this work.}
 \date{\today}
 
 \begin{document}
@@ -114,7 +125,7 @@ The non-mononotic SFS identified by \cite{RodelspergerEtAl2014} is a more robust
 High-frequency mutations are typically much rarer than low-frequency mutations, so misidentifying even a small fraction of ancestral alleles can generate a non-monotonic SFS at high frequencies.
 
 Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtAl2018})---are useful for distinguishing between the Kingman coalescent with population growth and multiple merger coalescents.
-In particular, we demonstrate that a transformation of the 2-SFS that we refer to as \emph{frequency pointwise mutual information} (fpmi) is sensitive to multiple mergers but relatively invariant to time-varying coalescent rates.
+In particular, we demonstrate that a transformation of the 2-SFS that we refer to as \emph{frequency pointwise mutual information} (fPMI) is sensitive to multiple mergers but relatively invariant to time-varying coalescent rates.
 We show that this is true for both perfectly linked sites and sites separated by a moderate genetic distance.
 These statistics may be calculated efficiently from genomic single nucleotide variant data.
 Furthermore, they do not require phasing, recombination maps, or ancestral allele identification and are informative even with small sample sizes.
@@ -181,7 +192,7 @@ To do so, we define the \textit{frequency pointwise mutual information} as
 \centering
 \includegraphics[width=0.5\textwidth]{figures/schematic.pdf}
 \caption{Summarizing population genetic data with frequency pointwise information. First, a sequence alignment is reduced to the minor allele frequencies and positions of segregating mutations. Then, for a given distance, $d$, the 2-SFS gives the number of pairs of sites with each combination of minor allele frequencies. Finally, $\fpmi$ is calculated from the 2-SFS according to \eq{eq:fpmi}.
-[OPTIONS: Could add (1) weighted fpmi, and/or (2) binned 2-SFS] \label{fig:schematic}}
+[OPTIONS: Could add (1) weighted fPMI, and/or (2) binned 2-SFS] \label{fig:schematic}}
 \end{figure}
 
 In information theory, the pointwise mutual information (PMI) of a pair of random variables, $X$ and $Y$, is a transformation of the probability mass function, $p(x,y)$, given by
@@ -212,6 +223,12 @@ These two effects are convolved in the SFS, making it difficult to distinguish b
 Our hope is that the $\fpmi$ reflects additional information about the distribution of genealogies, once distortions in coalescent times are accounted for.
 That is, we expect $\fpmi$ to be sensitive to multiple mergers, but invariant under changes in the coalescent rate.
 
+Furthermore, the same normalization renders $\fpmi$ insensitive to ascertainment bias.
+Variant detection methods typically compare sampled sequences to a reference sequence and ``call'' a variant site when there is sufficient evidence that at least one sample differs from the reference at that site.
+As a result, the ascertainment probability, $p_i$, of a mutation is an increasing function of its true allele count $i$.
+This effect distorts the expected ascertained SFS ($\E{\eta_i}_{\text{asc}} = \mu \E{\tau_i} p_i$) toward high-frequency mutations.
+However, provided that variant detection at each site is approximately independent, the primary effect of ascertainment bias in \eq{eq:fpmi} is to multiply the numerator and denominator by a common factor of $p_i p_j$, which cancel.
+Thus, $\fpmi$ is less sensitive than the raw SFS and 2-SFS to ascertainment effects.
 % A general measure of the dependence between a pair of random variables is the \textit{mutual information} \autocite{CoverThomas1991}.
 % The mutual information between random variables $X$ and $Y$ is a functional of their joint probability mass function, $p(x,y)$, defined as
 % \begin{align}
