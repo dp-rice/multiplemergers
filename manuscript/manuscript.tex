@@ -309,8 +309,9 @@ The recursion of \cite{BirknerEtAl2013} is $\mathcal{O}(n^4)$ and is also only p
 We ran coalescent simulations using a custom version of \texttt{msprime} \autocite{KelleherEtAl2014} capable of multiple mergers, based on modifications made by Joe Zhu [GITHUB].
 This code, together with \texttt{python} wrapper scripts and utility functions to run simulations and calculate the 2-SFS and $\fpmi$ from the \texttt{msprime} output is available [GITHUB].
 
-For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with total recombination rate, $r$ (See SI for parameter combinations).
-We chose values of $r$ so that the realized values of $r\E{T_2}$ varied over several orders of magnitude, where $\E{T_2}$ was measured from the simulation output.
+For each coalescent model, we simulated at least $10^4$ independent infinite-sites loci, each with length $d$ and per basepair recombination rate $r$ resulting in a per locus total recombination rate $d r$.
+(See SI for parameter combinations.)
+We chose values of $d r$ so that the realized values of $d r \E{T_2}$ varied over several orders of magnitude.
 For each locus, we measured $\{\tau_i : i = 1,\ldots,n-1\}$ in the two genealogies at each end of the loci.
 We then calculated the expectations $\{\E{\tau_i}\}$ and $\{\E{\tau_{ij}}\}$ by averaging over independent loci.
 These expectations allow us to calculate all of the 2-SFS statistics defined above.
@@ -431,10 +432,10 @@ We also simulated data from two models of population growth: exponential growth 
 
 \Fig{fig:wfpmi_recombination} shows the weighted $\fpmi$ for three genetic distances in a constant-$N$ Kingman coalescent, a Kingman coalescent with exponential growth, and a beta coalescent.
 As in the non-recombining case, the constant-$N$ and exponential-growth Kingman models have similar $\fpmi$.
-In both models, $\fpmi > 0$ for $i\approx j$ for $r\E{T_2} \sim 1$.
+In both models, $\fpmi > 0$ for $i\approx j$ for $d r \E{T_2} \sim 1$.
 This is presumably because trees at nearby sites contain clades with similar numbers of leaves.
 These positive correlations do not extend to $i \gg j$, which is the signal of multiple mergers in our binned $\hilopmi$.
-On the other hand, the positive $\fpmi$ in the beta coalescent persists for $r\E{T_2} > 1$.
+On the other hand, the positive $\fpmi$ in the beta coalescent persists for $d r \E{T_2} > 1$.
 Thus, the signal of multiple mergers in $\fpmi$ is robust to recombination.
 
 \begin{figure}
@@ -443,11 +444,11 @@ Thus, the signal of multiple mergers in $\fpmi$ is robust to recombination.
 \caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. [TODO: SPLIT SWEEPS PANELS OFF INTO THEIR OWN FIGURE.]\label{fig:hilo_vs_d}}
 \end{figure}
 
-\Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d=r\E{T_2}$ and three different choices of $i_c$.
+\Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d r \E{T_2}$ and three different choices of $i_c$.
 Each curve represents a particular parameter combination and coalescent model and is colored by the distortion in the average SFS, which is independent of the recombination rate.
 At low recombination rates, $\hilopmi$ may be greater in growing populations than in constant-$N$ populations (dotted lines), but is always less than zero, consistent with the results for non-recombining sites.
-When $r\E{T_2}\geq 1$, $\hilopmi$ may be slightly positive for large $i_c$, but is smaller in growing populations than in the constant-$N$ Kingman model.
-In all Kingman models, $\hilopmi$ decays to zero for $r\E{T_2}\gg 1$.
+When $d r \E{T_2}\geq 1$, $\hilopmi$ may be slightly positive for large $i_c$, but is smaller in growing populations than in the constant-$N$ Kingman model.
+In all Kingman models, $\hilopmi$ decays to zero for $d r \E{T_2}\gg 1$.
 
 In contrast, the beta coalescent generates $\hilopmi$ that is consistently greater than the constant-$N$ Kingman.
 As with non-recombining sites, the $\hilopmi$ is also greater in the beta coalescent model then in models of population growth than generate similar distortions in the SFS.
@@ -455,7 +456,7 @@ This is true across recombination rates and high/low cutoff minor allele counts.
 These results demonstrate that $\hilopmi$ is capable of discriminating between coalescent models even when there is recombination between sites.
 
 \Fig{fig:hilo_vs_tajD} shows the relative invariance of $\hilopmi$ to a time-varying coalescent rate.
-While population growth in a Kingman coalescent model can strongly distort the SFS, as measured by Tajima's D, it has very little effect on the $\hilopmi$ for sites $r \E{T_2} \sim 1$ apart.
+While population growth in a Kingman coalescent model can strongly distort the SFS, as measured by Tajima's D, it has very little effect on the $\hilopmi$ for sites $d r \E{T_2} \sim 1$ apart.
 This holds for exponential as well as piecewise constant growth.
 In contrast, the beta coalescent induces large positive $\hilopmi$ for the same values of Tajima's D.
 The figure also showes that this result is robust to the choice of cutoff minor allele count for binning.
@@ -463,7 +464,7 @@ The figure also showes that this result is robust to the choice of cutoff minor 
 \begin{figure}
 \centering
 \includegraphics[width=0.8\textwidth]{figures/hilopmi_vs_tajimasD_recombination.pdf}
-\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus normalized Tajima's D for simulations with recombination. All values are for $r \E{T_2} \sim 1$ and $n=100$. Orange points show Kingman coalescent simulations with population growth. Blue points show beta coalescent simulations. [Q: Should this be the bottom row of the previous figure?] \label{fig:hilo_vs_tajD}}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus normalized Tajima's D for simulations with recombination. All values are for $d r \E{T_2} \sim 1$ and $n=100$. Orange points show Kingman coalescent simulations with population growth. Blue points show beta coalescent simulations. [Q: Should this be the bottom row of the previous figure?] \label{fig:hilo_vs_tajD}}
 \end{figure}
 
 There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not decay to zero at long distances in the beta coalescent.
@@ -524,7 +525,7 @@ We then simulated under our fitted model using \texttt{msprime} and computed the
 \end{figure}
 
 The first row of \fig{fig:dpgp3} shows that the expected SFS under the fit demographic models agree with the observed SFS, demonstrating that a time-varying $N(t)$ can explain this aspect of the data well.
-In contrast, the second row shows the expected and observed weighted $\fpmi$ for averaged over distances less than $15 d_c$ apart, where $d_c = 2/ (\Pi \mu)$ is the distance scale corresponding to $r\E{T_2} = 1$.
+In contrast, the second row shows the expected and observed weighted $\fpmi$ for averaged over distances less than $15 d_c$ apart, where $d_c = 2/ (\Pi \mu)$ is the distance scale corresponding to $d_c r \E{T_2} = 1$.
 Here, the data shows strong positive associations between nearby alleles at different frequencies, while the model of population growth predicts weak negative associations except just off of the diagonal.
 This pattern extends across a range of genomic distances, $d/d_c \in (10^{-1}, 10^2)$ (\fig{fig:dpgp3}, third row).
 As a result, we may conclude that the data is not well explained by the Kingman coalescent with population growth.
