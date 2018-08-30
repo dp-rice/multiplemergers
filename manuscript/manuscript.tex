@@ -56,15 +56,15 @@
 \maketitle
 
 \abstract{
-Population genetics methods for demographic inference typically assume that the ancestry of a sample can be modeled by the Kingman coalescent process.
-A defining feature of the Kingman coalescent is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time.
+Demographic inference methods in population genetics typically assume that the ancestry of a sample can be modeled by the Kingman coalescent.
+A defining feature of this stochstic process is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time.
 However, this assumption breaks down under several scenarios.
 For example, pervasive natural selection and extreme variation in offspring number can both generate genealogies with ``multiple-merger'' events in which more than two lineages coalesce instantaneously.
 Therefore, detecting multiple mergers is important both for understanding which forces have shaped the diversity of a population and for avoiding fitting misspecified models to data.
 Current methods to detect multiple mergers in genomic data rely on the site frequency spectrum (SFS).
-However, the signatures of multiple mergers in the SFS are also consistent with a Kingman coalescent process with a time-varying population size.
+However, the signatures of multiple mergers in the SFS are also consistent with a Kingman coalescent with a time-varying population size.
 Here, we present a new method for detecting multiple mergers based on the pointwise mutual information of the two-site frequency spectrum for pairs of linked sites.
-Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than their branch lengths and is therefore insensitive to population size change.
+Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than their branch lengths and is therefore insensitive to population -ize change.
 This statistic is global in the sense that it can detect when the genome-wide genetic diversity is inconsistent with the Kingman coalescent, rather than detecting outlier regions, as in selection scan methods.}
 
 \section*{Introduction}
@@ -198,9 +198,9 @@ To do so, we define the \textit{frequency pointwise mutual information} as
 
 \begin{figure}
 \centering
-\includegraphics[width=0.5\textwidth]{figures/schematic.pdf}
+\includegraphics[scale=1]{figures/schematic.pdf}
 \caption{Summarizing population genetic data with frequency pointwise information. First, a sequence alignment is reduced to the minor allele frequencies and positions of segregating mutations. Then, for a given distance, $d$, the 2-SFS gives the number of pairs of sites with each combination of minor allele frequencies. Finally, $\fpmi$ is calculated from the 2-SFS according to \eq{eq:fpmi}.
-[OPTIONS: Could add (1) weighted fPMI, and/or (2) binned 2-SFS] \label{fig:schematic}}
+ \label{fig:schematic}}
 \end{figure}
 
 In information theory, the pointwise mutual information (PMI) of a pair of random variables, $X$ and $Y$, is a transformation of the probability mass function, $p(x,y)$, given by
@@ -229,7 +229,7 @@ However, the time-inhomogeneous Kingman coalescent generates the same distributi
 On the other hand, multiple mergers alter both the coalescent time distribution and the distribution of topologies.
 These two effects are convolved in the SFS, making it difficult to distinguish between population growth and multiple mergers.
 Our hope is that the $\fpmi$ reflects additional information about the distribution of genealogies, once distortions in coalescent times are accounted for.
-That is, we expect $\fpmi$ to be sensitive to multiple mergers, but invariant under changes in the coalescent rate.
+That is, we expect $\fpmi$ to be sensitive to multiple mergers, but invariant to changes in the coalescent rate.
 
 Furthermore, the same normalization renders $\fpmi$ insensitive to ascertainment bias.
 Variant detection methods typically compare sampled sequences to a reference sequence and ``call'' a variant site when there is sufficient evidence that at least one sample differs from the reference at that site.
@@ -290,7 +290,7 @@ For plotting purposes, we will also use a weighted version of the $\fpmi$:
 \end{align}
 where $T_2$ is the coalescence time for a sample of size two.
 The numerator of the weighting factor in \eq{eq:wfpmi} serves to emphasize the most common pairs of minor allele counts.
-The denominator, which is proportional to the square of the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant under changes in the overall mutation and coalescence rates.
+The denominator, which is proportional to the square of the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant to changes in the overall mutation and coalescence rates.
 
 \subsection*{Computing branch-length moments}
 
@@ -383,13 +383,13 @@ A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} not
 
 We compared the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
 We are interested in whether $\fpmi$ can distinguish beta from Kingman coalescent models that produce similar distortions in the SFS.
-To this end, we computed a version of Tajima's D \autocite{Tajima1989} normalized to be invariant under changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson1975}.
+To this end, we computed a version of Tajima's D \autocite{Tajima1989} normalized to be invariant to changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson1975}.
 Negative values of $D$ indicate an overabundance of low-frequency mutations relative to the time-homogeneous Kingman expectation.
 All results are computed numerically using the results of \cite{Fu1995}, \cite{ZivkovicWiehe2008}, and \cite{BirknerEtAl2013} (see Methods).
 
 \begin{figure}
 \centering
-\includegraphics[width=0.5\textwidth]{figures/wfpmi_no_recombination.pdf}
+\includegraphics[scale=1]{figures/wfpmi_no_recombination.pdf}
 \caption{Weighted frequency pointwise mutual information for three coalescent models: the time-homogeneous Kingman coalescent, the Kingman coalescent with exponential growth ($g=4$), and the beta coalescent ($\alpha=1.45$). For all models $n=39$. Growth and $\alpha$ parameters were chosen to generate average SFS with similar Tajima's D. The diagonal $i=j$ is masked. \label{fig:nonrecombining_pmi}}
 \end{figure}
 
@@ -408,7 +408,7 @@ Thus, the 2-SFS in general, and $\hilopmi$ in particular, are capable of capturi
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/hilopmi_vs_tajimasD_no_recombination.pdf}
+\includegraphics[scale=1]{figures/hilopmi_vs_tajimasD_no_recombination.pdf}
 \caption{Pointwise mutual information between singletons and non-singletons for Kingman coalescents with exponential growth and beta coalescents. The exponential growth rate, $g$, ranges from 0.25 to 8.0 in coalescent time units. The beta coalescent parameter, $\alpha$, ranges from 1.75 (nearly Kingman) to 1.25 (nearly Bolthausen-Sznitman). \label{fig:fpmi_vs_tajimasd}}
 \end{figure}
 
@@ -419,14 +419,14 @@ However, most demographic inference is performed on regions of the genome with n
 The advantage of the $\fpmi$ approach is that it can be computed on a genomic scale, as with the SFS.
 Therefore, it is important to assess the robustness of our approach to recombination between sites.
 
-To measure the relationship between $\fpmi$ and recombination, we ran coalescent simulations using a version of the program \texttt{msprime} \cite{KehellerEtAl201?} modified to allow for multiple mergers (See Methods).
+To measure the relationship between $\fpmi$ and recombination, we ran coalescent simulations using a version of the program \texttt{msprime} \cite{KelleherEtAl2016} modified to allow for multiple mergers (See Methods).
 In particular, we simulated a model where the sizes of coalescent events are drawn from the distribution specified by the beta coalescent, as in our numerical calculations above.
 In this model, marginal genealogies will follow the beta coalescent distribution, and the average SFS will be given by the formula in \cite{BirknerEtAl2013}.
 We also simulated data from two models of population growth: exponential growth and a two-epoch piecewise-constant model.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/wfpmi_with_recombination.pdf}
+\includegraphics[scale=1]{figures/wfpmi_with_recombination.pdf}
 \caption{Weighted frequency pointwise information for three recombination rates with sample size $n=100$. As in \Fig{fig:nonrecombining_pmi}, the diagonal elements are masked, and the growth and multiple-merger parameters were chosen to generate average SFS with similar Tajima's D. \label{fig:wfpmi_recombination}}
 \end{figure}
 
@@ -440,8 +440,8 @@ Thus, the signal of multiple mergers in $\fpmi$ is robust to recombination.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/figure5.pdf}
-\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. [TODO: SPLIT SWEEPS PANELS OFF INTO THEIR OWN FIGURE.]\label{fig:hilo_vs_d}}
+\includegraphics[scale=1]{figures/hilopmi_vs_distance.pdf}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. \label{fig:hilo_vs_d}}
 \end{figure}
 
 \Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d r \E{T_2}$ and three different choices of $i_c$.
@@ -463,8 +463,8 @@ The figure also showes that this result is robust to the choice of cutoff minor 
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/hilopmi_vs_tajimasD_recombination.pdf}
-\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus normalized Tajima's D for simulations with recombination. All values are for $d r \E{T_2} \sim 1$ and $n=100$. Orange points show Kingman coalescent simulations with population growth. Blue points show beta coalescent simulations. [Q: Should this be the bottom row of the previous figure?] \label{fig:hilo_vs_tajD}}
+\includegraphics[scale=1]{figures/hilopmi_vs_tajimasD_recombination.pdf}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus normalized Tajima's D for simulations with recombination. All values are for $d r \E{T_2} \sim 1$ and $n=100$. Orange points show Kingman coalescent simulations with population growth. Blue points show beta coalescent simulations. \label{fig:hilo_vs_tajD}}
 \end{figure}
 
 There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not decay to zero at long distances in the beta coalescent.
@@ -520,8 +520,8 @@ We then simulated under our fitted model using \texttt{msprime} and computed the
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/figure6.pdf}
-\caption{DPGP3 data and coalescent model predictions. First row: observed (blue) and expected (orange) site frequency spectrum compared to constant-$N$ Kingman coalescent (dotted lines). Second row: Expected (upper triangle) and observed (lower triangle) weighted $\fpmi$ averaged over all pairs of sites less than $15 d_c$ apart. Third row: Observed (blue) and expected (orange) $\hilopmi$ versus genetic distance. Cutoff minor allele count, $i_c, = 5$. Solid blue curves show cubic spline fit. Dotted lines show the expectation under the constant-$N$ Kingman coalescent. [Middle row needs colorbar] \label{fig:dpgp3}}
+\includegraphics[scale=1]{figures/dpgp3_analysis.pdf}
+\caption{DPGP3 data and coalescent model predictions. First row: observed (blue) and expected (orange) site frequency spectrum compared to constant-$N$ Kingman coalescent (dotted lines). Second row: Expected (upper triangle) and observed (lower triangle) weighted $\fpmi$ averaged over all pairs of sites less than $15 d_c$ apart. Third row: Observed (blue) and expected (orange) $\hilopmi$ versus genetic distance. Cutoff minor allele count, $i_c, = 5$. Solid blue curves show cubic spline fit. Dotted lines show the expectation under the constant-$N$ Kingman coalescent. \label{fig:dpgp3}}
 \end{figure}
 
 The first row of \fig{fig:dpgp3} shows that the expected SFS under the fit demographic models agree with the observed SFS, demonstrating that a time-varying $N(t)$ can explain this aspect of the data well.
@@ -537,13 +537,13 @@ However, we caution against concluding that sweeps are necessarily responsible f
 
 \section*{Discussion}
 
-We have shown that $\fpmi$ and its binned analog $\hilopmi$ are sensitive to multiple mergers, but relatively invariant under population growth in the Kingman coalescent.
+We have shown that $\fpmi$ and its binned analog $\hilopmi$ are sensitive to multiple mergers, but relatively invariant to population growth in the Kingman coalescent.
 These properties make them well-suited for coalescent model checking.
 We have demonstrated a model-checking procedure on data from \textit{D. melanogaster}, which is believed to be strongly shaped by natural selection, and found evidence that population growth can not explain the positive associations between high and low frequency mutations.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/trees.png}
+\includegraphics[width=3.5in]{figures/trees.png}
 \caption{Genealogies with a sample size of $n=4$. Opportunities for singleton/tripleton mutations are in orange. Opportunities for doubletons are in blue. (Note: there is a third possible multiple-merger topology, not shown.) \label{fig:trees}}
 \end{figure}
 
@@ -562,7 +562,7 @@ If multiple-mergers events are frequent enough, this effect may dominate the tra
 
 \begin{figure}
 \centering
-\includegraphics[width=0.8\textwidth]{figures/singleton-doubleton.pdf}
+\includegraphics[scale=1]{figures/singleton-doubleton.pdf}
 \caption{Distortions in $\fpmi$ vs. distortions in the SFS for $n=4$. Parameters for beta coalescents and exponential growth are as in \fig{fig:fpmi_vs_tajimasd}. For the piecewise-constant--$N$ model, the fold-change in $N$ varies from 2 to $2^4$ and the time of this change varies from $2^{-4}$ to 2 in coalescent time units. \label{fig:sdpmi_vs_sdratio}}
 \end{figure}
 
@@ -609,14 +609,14 @@ Either would reveal new information about the suitability of population genetic 
 
 \section*{Supplementary Figures and Tables}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/pi_vs_position.pdf}
+\includegraphics[scale=1]{figures/pi_vs_position.pdf}
 \caption{Average pairwise diversity, $\Pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
 \label{fig:dpgp_pi}}
 \end{figure}
 
-\begin{table}[h!]
+\begin{table}[ht!]
   \begin{center}
     \caption{Boundaries of the homogeneous central regions of chromosomes (shown in \ref{fig:dpgp_pi}).}
     \label{tab:central_regions}
