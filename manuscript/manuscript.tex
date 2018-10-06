@@ -71,8 +71,8 @@ This statistic is global in the sense that it can detect when the genome-wide ge
 The genetic diversity of a population reflects its demographic and evolutionary history.
 Learning about this history from contemporary genetic data is the domain of modern population genetics (see~\cite{Hahn2018a}).
 The fundamental tools of the trade are simplified mathematical models, which connect unobserved quantities such as the population size to observable features of genetic data.
-However, populations are complicated and, moreover, varied in their complications.
-No simple model can capture the processes governing every species' evolution, and fitting a misspecified model will generate misleading inferences.
+However, populations are complicated and, moreover, vary in their complications.
+A simple model cannot capture the processes governing every species' evolution, and fitting a misspecified model will generate misleading inferences.
 It is therefore crucial to understand the limits of our models and to be able to assess when a model is appropriate for a particular data set.
 
 One of the most widely used models is the Kingman coalescent~\autocite{Kingman1982, Kingman1982a, Hudson1983, Tajima1983}.
@@ -288,7 +288,7 @@ For plotting purposes, we will also use a weighted version of the $\fpmi$:
 \end{align}
 where $T_2$ is the coalescence time for a sample of size two.
 The numerator of the weighting factor in \eq{eq:wfpmi} serves to emphasize the most common pairs of minor allele counts.
-The denominator, which is proportional to the square of the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant to changes in the overall mutation and coalescence rates.
+The denominator, which is proportional to the square of the expected pairwise diversity, $\Pi$, ensures that $\wfpmi$ is invariant to changes in the mutation rate and average pairwise coalescence time.
 
 \subsection*{Computing branch-length moments}
 
@@ -296,7 +296,7 @@ We implemented numerical computations of the moments of the branch lengths $\E{\
 For the Kingman coalescent with time-varying coalescent rate, we used equations~(1)-(12) of \cite{ZivkovicWiehe2008}.
 For the beta coalescent, we implemented the recursion described by \cite{BirknerEtAl2013}.
 
-Functions for computing the branch-length moments are implimented in \texttt{python} using the numerical package \texttt{numpy} \autocite{numpy} and available [GITHUB].
+Functions for computing the branch-length moments are implimented in \texttt{python} using the numerical package \texttt{numpy} and available [GITHUB].
 The Kingman coalescent code currently can compute moments for exponentially growing and two-epoch piecewise constant models, but could be extended to allow for other models.
 The formulas of \cite{ZivkovicWiehe2008} exhibit numerical instability related to the instability of \cite{GriffithsTavare1994}.
 They are therefore only practical for sample sizes up to $n \approx 40$.
@@ -381,7 +381,7 @@ A \texttt{snakemake} pipeline, \texttt{python} scripts, and \texttt{jupyter} not
 
 We compared the $\fpmi$ of the Kingman coalescent with and without population growth to the $\fpmi$ of the beta coalescent, for pairs of sites without recombination.
 We are interested in whether $\fpmi$ can distinguish beta from Kingman coalescent models that produce similar distortions in the SFS.
-To this end, we computed a version of Tajima's D \autocite{Tajima1989} normalized to be invariant to changes in the mean coalescent rate: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson1975}.
+To this end, we computed a version of Tajima's D \autocite{Tajima1989} normalized to be invariant to changes in the average pairwise coalescence time: $D = (\Pi - \hat{\theta}_W) / \Pi$, where $\hat{\theta}_W$ is Watterson's theta, a linear function of the SFS \autocite{Watterson1975}.
 Negative values of $D$ indicate an overabundance of low-frequency mutations relative to the time-homogeneous Kingman expectation.
 All results are computed numerically using the results of \cite{Fu1995}, \cite{ZivkovicWiehe2008}, and \cite{BirknerEtAl2013} (see Methods).
 
@@ -439,7 +439,7 @@ Thus, the signal of multiple mergers in $\fpmi$ is robust to recombination.
 \begin{figure}
 \centering
 \includegraphics[scale=1]{figures/hilopmi_vs_distance.pdf}
-\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ ranges from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. \label{fig:hilo_vs_d}}
+\caption{Pointwise mutual information between high-- and low--minor allele count mutations ($\hilopmi$) versus genetic distance. Each curve represents a different combination of coalescent parameters. The first three rows show coalescent simulations in \texttt{msprime}. Exponential growth rate $g$ varies logarithmically from 0.01 to 8.0 in coalescent time units. Piecewise constant change-points, range from 0.01 to 1 in coalescent time units, and the ratio of ancestral to modern population size ranges from 0.01 to 0.2. The fourth row shows forward-time \texttt{SLiM} simulations with selective sweeps at linked sites (beneficial mutation fraction $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$, see Methods). Lines are colored by the distortion in the SFS, as measured by Tajima's D. \label{fig:hilo_vs_d}}
 \end{figure}
 
 \Fig{fig:hilo_vs_d} shows $\hilopmi(d,i_c)$ in both models of growth and the beta coalescent, for a range of $d\,r \E{T_2}$ and three different choices of $i_c$.
@@ -449,15 +449,19 @@ When $d\,r \E{T_2}\geq 1$, $\hilopmi$ may be slightly positive for large $i_c$, 
 In all Kingman models, $\hilopmi$ decays to zero for $d\,r \E{T_2}\gg 1$.
 
 In contrast, the beta coalescent generates $\hilopmi$ that is consistently greater than the constant-$N$ Kingman.
-As with non-recombining sites, the $\hilopmi$ is also greater in the beta coalescent model then in models of population growth than generate similar distortions in the SFS.
+As with non-recombining sites, the $\hilopmi$ is also greater in the beta coalescent model than in models of population growth than generate similar distortions in the SFS.
 This is true across recombination rates and high/low cutoff minor allele counts.
-These results demonstrate that $\hilopmi$ is capable of discriminating between coalescent models even when there is recombination between sites.
 
-\Fig{fig:hilo_vs_tajD} shows the relative invariance of $\hilopmi$ to a time-varying coalescent rate.
+These results demonstrate that $\hilopmi$ is capable of discriminating between coalescent models even when there is recombination between sites.
+In particular, population growth has very little effect on $\hilopmi$, especially for $d\,r \E{T_2} \gtrsim 1$, while multiple mergers increase $\hilopmi$ across the range of $d\,r \E{T_2}$.
+\Fig{fig:hilo_vs_d} also suggests that the most informative genomic distance for distinguishing multiple mergers from population growth is $d\,r \E{T_2} \sim 1$.
+In a later section, we will demonstrate how to use these results to implement a graphical model checking procedure based on plotting $\hilopmi$ as a function of genomic distance.
+
+\Fig{fig:hilo_vs_tajD} highlights the relative invariance of $\hilopmi$ at intermediate genomic distances to population growth.
 While population growth in a Kingman coalescent model can strongly distort the SFS, as measured by Tajima's D, it has very little effect on the $\hilopmi$ for sites $d\,r \E{T_2} \sim 1$ apart.
 This holds for exponential as well as piecewise constant growth.
 In contrast, the beta coalescent induces large positive $\hilopmi$ for the same values of Tajima's D.
-The figure also showes that this result is robust to the choice of cutoff minor allele count for binning.
+The figure also shows that this result is robust to the choice of cutoff minor allele count for binning.
 
 \begin{figure}
 \centering
@@ -487,7 +491,7 @@ The bottom row of \fig{fig:hilo_vs_d} shows the results of these simulations.
 For intermediate genetic distances, $d\,r \E{T_2} \sim 1$, the effects of linked sweeps are qualitatively similar to the effects of the beta coalescent.
 That is, when sweeps are sufficiently frequent to distort the SFS, as measured by Tajima's D, they also increase $\hilopmi$.
 The primary difference between the forward-time sweeps and beta coalescent simulations, is that the distortions caused by sweeps decay to zero for $d\,r \E{T_2} \gg 1$.
-This is reasonable because the effect of a particular sweep on genealogies should be localized around the beneficial mutation.
+This decay is reasonable because the effect of a single selective sweep on the genealogy is localized around the position of beneficial mutation.
 
 \subsection*{Application to \textit{Drosophila melanogaster}: Coalescent model checking}
 
@@ -547,7 +551,7 @@ We have demonstrated a model-checking procedure on data from \textit{D. melanoga
 
 We can get an intuitive understanding for why $\fpmi$ distinguishes among coalescent models by considering a sample of four chromosomes.
 In the Kingman coalescent, there are only two possible tree topologies (\Fig{fig:trees}).
-Furthermore, the total branch length is independent of the topology \cite{Wakeley2009}.
+Furthermore, the total branch length is independent of the topology \autocite{Wakeley2009}.
 As a result, there is a trade-off between the length of branches leading to singleton/tripleton mutations on one hand, and the branch length leading to doubletons on the other.
 Genealogies with topology (A) will have more opportunities for the former and loci with topology (B) will have more opportunities for the latter.
 Conditional on observing a doubleton at a site, it is thus more likely that the genealogy has topology (B) and so the expected number of singletons at sites with the same genealogy is lower than average.
@@ -571,13 +575,12 @@ In the latter model, we vary both the fold-change in $N$ and the time of the cha
 Like Tajima's D, the singleton/doubleton ratio measures distortion the SFS relative to the constant-$N$ Kingman coalescent.
 (In fact, with $n=4$, this ratio captures \emph{all} of the distortion in the SFS.)
 As with the larger sample size (\fig{fig:fpmi_vs_tajimasd}), mulitple mergers generate larger distortions in $\fpmi$ than population growth does, accounting for the distortions in the SFS.
-Moreover, the results for two different models of growth coincide.
-This suggests that for the Kingman coalescent with growth, $\fpmi(1,2) \approx f(\eta_1/\eta_2)$ for some function $f$.
+Moreover, the results for two different models of growth coincide, suggesting that the functional form of the population growth does not strongly influence $\fpmi$.
 
 We focus here on demographic inference methods that explicitly use the Kingman coalescent model for calculations.
 However, another popular class of methods are based on forward-time models, such as the Wright-Fisher model (e.g., \cite{GutenkunstEtAl2009}, \cite{SheehanEtAl2013}).
 We believe that $\fpmi$ is useful for model-checking with these methods as well.
-This is because forward-time neutral models each have an associated dual coalescent model \cite{Etheridge2011e}, which can be used to compute the expected $\fpmi$ as outlined in this paper.
+This is because forward-time neutral models each have an associated dual coalescent model \autocite{Etheridge2011e}, which can be used to compute the expected $\fpmi$ as outlined in this paper.
 Furthermore, non-neutral models also generate predictions about the 2-SFS and thus $\fpmi$.
 In principle, any fitted model that allows calculation or simulation of the 2-SFS may be checked using $\fpmi$.
 However, the suitability of $\fpmi$ for discriminating among arbitrary families of models is unknown.
