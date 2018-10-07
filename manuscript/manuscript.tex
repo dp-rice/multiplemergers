@@ -73,7 +73,7 @@ Learning about this history from contemporary genetic data is the domain of mode
 The fundamental tools of the trade are simplified mathematical models, which connect unobserved quantities such as the population size to observable features of genetic data.
 However, populations are complicated and, moreover, vary in their complications.
 A simple model cannot capture the processes governing every species' evolution, and will generate misleading inferences if misspecified.
-It is therefore crucial to understand the limits of our models and to assess when a model is appropriate for a particular data set.
+It is therefore crucial to understand the limits of population genetics models and to assess when a model is appropriate for a particular data set.
 
 One of the most widely used models is the Kingman coalescent~\autocite{Kingman1982, Kingman1982a, Hudson1983, Tajima1983}.
 The Kingman coalescent is a stochastic process that generates gene genealogies: trees representing the patterns of shared ancestry of sampled individuals.
@@ -180,7 +180,7 @@ In the following, we demonstrate that the positive associations between mutation
 \end{enumerate*}.
 To demonstrate these four properties, we introduce a transformation of the 2-SFS that we call frequency pointwise mutual information ($\fpmi$).
 We use a combination of numerical calculations and stochastic simulations to explore the properties of this statistic under different coalescent models.
-Finally, we demonstrate the use of $\fpmi$ in a coalescent model-checking procedure on genomic diversity data from \textit{Drosophila melanogaster} \autocite{LackEtAl2015}.
+Finally, we demonstrate the use of $\fpmi$ in a graphical model-checking procedure on genomic diversity data from \textit{Drosophila melanogaster} \autocite{LackEtAl2015}.
 
 \section*{Methods}
 
@@ -227,8 +227,8 @@ Thus, $\fpmi$ primarily reflects the distribution of topologies, which distingui
 
 Furthermore, the same normalization renders $\fpmi$ insensitive to ascertainment bias.
 Variant detection methods typically compare sampled sequences to a reference sequence and ``call'' a variant site when there is sufficient evidence that at least one sample differs from the reference at that site.
-As a result, the ascertainment probability, $p_i$, of a mutation is an increasing function of its true allele count $i$, skewing the expected ascertained SFS ($\E{\eta_i}_{\text{asc}} = \mu \E{\tau_i} p_i$) toward high-frequency mutations.
-However, provided that variant detection at each site is approximately independent, the primary effect of ascertainment bias in \eq{eq:fpmi} is to multiply the numerator and denominator by a common factor of $p_i p_j$.
+As a result, the ascertainment probability, $q_i$, of a mutation is an increasing function of its true allele count $i$, skewing the expected ascertained SFS ($\E{\eta_i}_{\text{asc}} = \mu \E{\tau_i} q_i$) toward high-frequency mutations.
+However, provided that variant detection at each site is approximately independent, the primary effect of ascertainment bias in \eq{eq:fpmi} is to multiply the numerator and denominator by a common factor of $q_i q_j$.
 Because these factors cancel, $\fpmi$ is less sensitive than the raw SFS and 2-SFS to ascertainment effects.
 % A general measure of the dependence between a pair of random variables is the \textit{mutual information} \autocite{CoverThomas1991}.
 % The mutual information between random variables $X$ and $Y$ is a functional of their joint probability mass function, $p(x,y)$, defined as
@@ -338,7 +338,7 @@ We calculated the average pairwise diversity, $\Pi$, as a function of position f
 Pairwise diversity is high in the middle of each chromosome arm and lower near the centromeres and telomeres.
 Our modeling---and coalescent-based demographic inference in general---assumes that the distribution of gene genealogies is homogeneous along the chromosome.
 Therefore, we selected a 13-16~MB ``central'' region of each arm with relatively homogeneous values of $\Pi$ for further analysis.
-The boundaries of these central regions are given in Table~\ref{tab:central_regions}.
+The boundary positions of these central regions are given in Table~\ref{tab:central_regions}.
 
 In order to ensure that the segregating mutations reflect true genetic diversity and not variation in calling errors, we excluded sites with fewer than 90 of the 100 genotypes called.
 This leaves over 90\% of all sites and without substantially altering the fraction of polymorphic sites (Table~\ref{tab:called_sites}).
@@ -359,7 +359,7 @@ For all four chromosomes, \texttt{fastNeutrino} inferred similar population grow
 Fitted parameters are presented in Table~\ref{tab:DPGP_params}.
 We simulated the SFS and 2-SFS under the fitted parameters using \texttt{msprime}.
 
-In addition to the average SFS used to fit the model, we computed the average 2-SFS for pairs of sites at distances distances between 3~bp and 5~Kb.
+In addition to the average SFS used to fit the model, we computed the average 2-SFS for pairs of sites at distances between 3~bp and 5~Kb.
 Because we are using fourfold degenerate sites, we only computed the 2-SFS for distances that are multiples of three.
 For comparison between data and simulations, we scale the distances in basepairs by a critical distance $d_c = (r\E{T_2})^{-1}$.
 We used a genome-wide recombination rate of $r = 2 \times 10^{-8}$ per basepair per generation \autocite{ComeronEtAl2012}.
