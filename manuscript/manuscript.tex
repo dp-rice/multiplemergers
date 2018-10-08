@@ -57,14 +57,14 @@
 
 \abstract{
 Demographic inference methods in population genetics typically assume that the ancestry of a sample can be modeled by the Kingman coalescent.
-A defining feature of this stochstic process is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time.
+A defining feature of this stochastic process is that it generates genealogies that are binary trees: no more than two ancestral lineages may coalesce at the same time.
 However, this assumption breaks down under several scenarios.
 For example, pervasive natural selection and extreme variation in offspring number can both generate genealogies with ``multiple-merger'' events in which more than two lineages coalesce instantaneously.
 Therefore, detecting multiple mergers is important both for understanding which forces have shaped the diversity of a population and for avoiding fitting misspecified models to data.
 Current methods to detect multiple mergers in genomic data rely on the site frequency spectrum (SFS).
 However, the signatures of multiple mergers in the SFS are also consistent with a Kingman coalescent with a time-varying population size.
 Here, we present a new method for detecting multiple mergers based on the pointwise mutual information of the two-site frequency spectrum for pairs of linked sites.
-Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than their branch lengths and is therefore insensitive to population -ize change.
+Unlike the SFS, the pointwise mutual information depends mostly on the topologies of genealogies rather than on their branch lengths and is therefore largely insensitive to population size change.
 This statistic is global in the sense that it can detect when the genome-wide genetic diversity is inconsistent with the Kingman coalescent, rather than detecting outlier regions, as in selection scan methods.}
 
 \section*{Introduction}
@@ -72,7 +72,7 @@ The genetic diversity of a population reflects its demographic and evolutionary 
 Learning about this history from contemporary genetic data is the domain of modern population genetics (see~\cite{Hahn2018a}).
 The fundamental tools of the trade are simplified mathematical models, which connect unobserved quantities such as the population size to observable features of genetic data.
 However, populations are complicated and, moreover, vary in their complications.
-A simple model cannot capture the processes governing every species' evolution, and will generate misleading inferences if misspecified.
+No simple model can capture the processes governing every species' evolution, and a misspecified model will generate misleading inferences.
 It is therefore crucial to understand the limits of population genetics models and to assess when a model is appropriate for a particular data set.
 
 One of the most widely used models is the Kingman coalescent~\autocite{Kingman1982, Kingman1982a, Hudson1983, Tajima1983}.
@@ -129,8 +129,8 @@ To this end, \cite{BirknerEtAl2013, BlathEtAl2016} and \cite{SpenceEtAl2016} der
 
 However, existing methods are limited in their ability to distinguish multiple mergers from general models of population-size change.
 The primary signature of multiple mergers in the SFS is an overabundance of low-frequency mutations relative to the Kingman expectation, which is also the signature of population growth.
-\cite{EldonEtAl2015} were able to reject exponential growth in favor of multiple mergers with sufficient data, but a more flexible model of growth may be able to fit the multiple mergers SFS (see \cite{MyersEtAl2008, BhaskarSong2014}).
-The non-mononotic SFS identified by \cite{RodelspergerEtAl2014} is a more robust signature of multiple mergers, but identifying that the SFS increases at high frequencies requires knowledge of the ancestral allele at each site.
+\cite{EldonEtAl2015} were able to reject exponential growth in favor of multiple mergers, but a more flexible model of growth may be able to fit the multiple mergers SFS (see \cite{MyersEtAl2008, BhaskarSong2014}).
+The non-mononotic SFS identified by \cite{RodelspergerEtAl2014} is a more robust signature of multiple mergers, but identifying that the SFS increases at high frequencies requires knowing the ancestral allele at each site.
 High-frequency mutations are typically much rarer than low-frequency mutations, so misidentifying even a small fraction of ancestral alleles can generate a non-monotonic SFS.
 
 Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtAl2018})---are useful for distinguishing between the Kingman coalescent with population growth and multiple merger coalescents.
@@ -141,7 +141,7 @@ Together, these properties make the 2-SFS useful for demographic model-checking 
 Following the notation of \cite{Fu1995}, the site frequency spectrum of a sample of $n$ haploid genomes is $\left\{ \xi_i : 1 \leq i < n \right\}$, where $\xi_i$ is the fraction of sites containing a mutation with derived allele count $i$ in the sample.
 In many cases, the ancestral allele is unknown and so the allele in $i$ samples and the complementary allele in $n-i$ samples are indistinguishable.
 Therefore, we will mostly consider the \textit{folded} site frequency spectrum $\left\{ \eta_i = \xi_i + (1-\delta_{i,n-i}) \xi_{n-i}: 1 \leq i \leq \floor{n/2} \right\}$, where $\delta_{k,k'}$ is the Kronecker delta. %, where $\eta_i = \xi_i + \delta_{n-2i} \xi_{n-i}$.
-The SFS and folded SFS can be calculated from a set of single nucleotide polymorphisms (SNPs) without knowledge of the physical locations of the SNPs.
+The SFS and folded SFS can be calculated from a set of single nucleotide polymorphisms (SNPs) without knowing the physical locations of the SNPs.
 
 In contrast, the 2-SFS is a statistic of \textit{pairs} of sites.
 We define the 2-SFS,
@@ -210,7 +210,7 @@ where $p(x) = \sum_y p(x,y)$ and similarly for $p(y)$ \autocite{ChurchHanks1990}
 PMI measures the change in the probability that $X=x$ given knowledge that $Y=y$.
 When $X$ and $Y$ are independent, $\pmi(x,y) = 0$ for all $x,y$.
 When $X$ and $Y$ are not independent, $\pmi(x,y) > 0$ implies that $p(x|y) > p(x)$, and $\pmi(x,y) < 0$ implies the converse.
-(The expectation of PMI over the joint distribution of $X$ and $Y$ is known as the mutual information of $X$ and $Y$ \autocite{CoverThomas1991}.)
+The expectation of PMI over the joint distribution of $X$ and $Y$ is known as the mutual information of $X$ and $Y$ \autocite{CoverThomas1991}.
 
 We can interpret the 2-SFS as a joint probability mass function over minor allele counts.
 Given a coalescent model, the minor allele count at an arbitrary site is a random variable over $\{0,\ldots,\floor{n/2}\}$ with probability mass function $p(i) = \E{\eta_i}$, where we define $\eta_0$ to be the fraction of monomorphic sites.
@@ -222,7 +222,7 @@ First, because $\fpmi$ is based on the minor allele frequencies, we may compute 
 Second, the results of \cite{Fu1995} for the folded SFS imply that $\fpmi(i,j) < 0$ for $i\neq j$ for non-recombining sites under the time-homogeneous Kingman coalescent.
 Finally, $\fpmi$ normalizes for distortions in the coalescence time distribution reflected in the single site SFS.
 In the Kingman coalescent, population-size variation alters the coalescence time distribution but preserves the distribution of tree topologies.
-We will show that, because $\fpmi$ normalizes the 2-SFS by the product of single site spectra, it is relatively insensitive to the distribution of coalescence times.
+We will show that, because $\fpmi$ normalizes the 2-SFS by the product of single site spectra, it is largely insensitive to the distribution of coalescence times.
 Thus, $\fpmi$ primarily reflects the distribution of topologies, which distinguishes multiple mergers from the Kingman coalescent.
 
 Furthermore, the same normalization renders $\fpmi$ insensitive to ascertainment bias.
@@ -263,7 +263,7 @@ Thus, to detect multiple mergers, we use a binned form of the SFS and 2-SFS:
     \eta_{\text{hi,lo}}(d; i_c) &= \sum_{i=1}^{i_c-1} \sum_{j=i_c}^{\floor{n/2}} \eta_{ij}(d),
 \end{align}
 where $i_c$ is an arbitrary cutoff between high and low minor allele frequency.
-Binning provides a stable estimate of the 2-SFS for large sample sizes, because we may adjust $i_c$ to ensure a large number of sites in both the high--minor allele count and low--minor allele count bins.
+Binning provides a stable estimate of the 2-SFS for large sample sizes because we may adjust $i_c$ to ensure a large number of sites in both the high--minor allele count and low--minor allele count bins.
 We note that a less coarse-grained binning scheme may strike a balance between sampling noise and preserving more detailed information about allele frequencies.
 
 We compute the pointwise mutual information of the binned distribution as
@@ -407,7 +407,7 @@ Thus, the 2-SFS, and $\hilopmi$ in particular, are capable of capturing the effe
 
 \subsection*{Pointwise mutual information between recombining sites}
 
-We have shown in the previous sections that $\fpmi$ between pairs of non-recombining sites can discriminate between the Kingman coalescent with population growth and the beta coalescent.
+We have shown in the previous section that $\fpmi$ between pairs of non-recombining sites can discriminate between the Kingman coalescent with population growth and the beta coalescent.
 However, most demographic inference is performed on regions of the genome with non-zero recombination rates.
 Therefore, it is important to assess the robustness of our approach to recombination between sites.
 
@@ -501,7 +501,7 @@ This procedure checks whether the demographic model is consistent with a feature
 Inconsistency suggests that the inferred $N(t)$ may be an artifact of natural selection, skewed offspring distributions, etc., rather than reflecting the true historical population size.
 
 In this section, we illustrate the procedure outlined above by using genomic diversity data from the \textit{Drosophila melanogaster} DGPG3 panel \cite{LackEtAl2015}.
-The DPGP3 data consists of haploid consensus sequences from $\sim$ 200 wild-caught flies from a Zambian population known to be relatively free of cosmopolitan admixture.
+The DPGP3 data consists of haploid consensus sequences from $\sim$ 200 wild-caught flies from a Zambian population known to be mostly free of cosmopolitan admixture.
 Recently, several groups have used the DPGP3 data to estimate the population-size history of \textit{D. melanogaster} \autocite{TerhorstEtAl2017,RagsdaleGutenkunst2017}.
 On the other hand, it is widely believed that the genetic diversity of \textit{Drosophila} is strongly shaped by natural selection (e.g., \cite{ElyashivEtAl2016, GarudPetrov2016}).
 Thus, this data is a good candidate for demonstrating the utility of $\fpmi$ for assessing coalescent model fit.
@@ -531,7 +531,7 @@ However, we caution against concluding that sweeps are necessarily responsible f
 
 \section*{Discussion}
 
-We have shown that $\fpmi$ and its binned analog $\hilopmi$ are sensitive to multiple mergers, but relatively invariant to population growth in the Kingman coalescent.
+We have shown that $\fpmi$ and its binned analog $\hilopmi$ are sensitive to multiple mergers, but largely invariant to population growth in the Kingman coalescent.
 These properties make them well-suited for coalescent model checking.
 We demonstrated a model-checking procedure on data from \textit{D. melanogaster}, which is believed to be strongly shaped by natural selection, and found evidence that population growth alone can not explain the positive associations between high and low frequency mutations.
 
@@ -582,7 +582,7 @@ One could extend our work to implement a formal hypothesis-testing framework for
 Numerical calculations would require higher moments of the branch-length distribution, which may be computationally intractable for large samples.
 On the other hand, it would be straightforward to develop a bootstrap-style procedure, using coalescent simulations to estimate the variance in test statistics under the fit model.
 In any case, we believe that it would be useful for simulation packages such as \texttt{msprime} and population genetics analysis libraries to include standard functions for computing the 2-SFS, $\fpmi$, and $\hilopmi$.
-We provide such functions in the [GITHUB] repository associated with this paper.
+We provide such functions in the GitHub repository associated with this paper.
 
 Our coalescent simulations implement a particular version of the multiple mergers coalescent with recombination.
 However, the precise correspondence between this model and any particular forward-time process is unclear.
@@ -597,7 +597,19 @@ Alternatively, one could survey multiple species using a data set such as the di
 Either would reveal new information about the suitability of population genetic models, and the forces that determine genetic diversity.
 
 \subsection*{Acknowledgements}
-TODO
+DPR was supported by the Chicago Fellows Program of the University of Chicago.
+[OTHER FUNDING].
+We thank
+Arjun Biddanda,
+Maryn Carlson,
+Ivana Cvijovi\'c,
+Ben Good,
+Dick Hudson,
+Evan Koch,
+Joe Marcus,
+Richard Neher,
+Matthias Steinr\"ucken,
+and Aleksandra Walczak for helpful discussions and comments on the manuscript.
 
 \printbibliography
 
