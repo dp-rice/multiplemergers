@@ -3,7 +3,6 @@
 	{
 		"time" : "10:00:00",
         "mem": "1G",
-		"partition": "jnovembre",
 		"ncores": "1",
         "name": "{rule}.{wildcards}",
 		"out": "log/{rule}.{wildcards}-%j.out",
@@ -35,41 +34,9 @@
         "time" : "0:05:00"
     },
 
-    "bgsel":
-    {
-        "time" : "1:00:00"
-    },
-
-    "sweepslong":
-    {
-        "time" : "0:30:00"
-    },
-
     "sweeps":
     {
         "time" : "0:30:00"
-    },
-
-    "sweepsbigN":
-    {
-        "time" : "0:20:00"
-    },
-
-    "unlinked":
-    {
-        "time" : "1:00:00"
-    },
-
-    "steppingstone":
-    {
-        "time" : "10:00:00",
-        "mem" : "2G"
-    },
-
-    "two_deme":
-    {
-        "time" : "10:00:00",
-        "mem" : "2G"
     },
 
     "constant_rate":
@@ -99,15 +66,5 @@
     "align_dpgp3":
     {
         "time" : "2:00:00"
-    },
-
-    "get_maf":
-    {
-        "time" : "0:15:00"
-    },
-
-    "filter_missing_data":
-    {
-        "time" : "0:15:00"
     }
 }
