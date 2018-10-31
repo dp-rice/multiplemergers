@@ -1,8 +1,0 @@
-# /Users/dpr/fastNeutrino_v1.0/build/fastNeutrino --maxB 20 --modelFile model1ExponentialEpoch1Bottleneck.txt --inferredModelOutputFile model1ExponentialEpoch1BottleneckInferredParams.txt --maxRandomRestarts 10
-25000
-e	3658000.184	281.138	0.0146951
-c	60545.54108	281.138
-c	19872.40837	420.005
-c	15400	3499
-c	11.25	3500
-c	48000	17000
