@@ -1,7 +1,5 @@
 import numpy as np
 
-ruleorder: msprime_like_slim > slim
-
 ### SLiM ###
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
 sim_sample_size = 100
@@ -54,7 +52,7 @@ rule slim:
         "slim -d fsel={wildcards.fsel} src/slim/{wildcards.typ}.slim > {output}"
 
 ### MSPRIME ###
-SAMPLE_SIZES = [100]
+SAMPLE_SIZES = [100, 4]
 RS = np.insert(np.logspace(-1, 3, 13), 0, 0.0)
 ALPHAS = [1.25, 1.5, 1.75, 2.0]
 GS = [0.01, 0.1, 1.0, 2.0, 4.0, 8.0]

@@ -55,11 +55,6 @@
         "time" : "0:20:00"
     },
 
-    "msprime_like_slim":
-    {
-        "time" : "0:10:00"
-    },
-
     "unlinked":
     {
         "time" : "1:00:00"
@@ -94,7 +89,7 @@
         "time" : "8:00:00",
         "mem" : "1G"
     },
-     
+
 	"untar_dpgp3":
 	{
 		"time" : "1:00:00",
