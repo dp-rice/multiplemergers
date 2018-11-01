@@ -7,7 +7,7 @@ Investigating whether the Kingman coalescent can be rejected in favor of multipl
 dependencies:
 - conda
 - conda environment
-- msprime-lambda
+- msprime-lambda: git clone [REPO]; cd [DIRECTORY]; pip install .
 - SLiM
 - fastNeutrino
 

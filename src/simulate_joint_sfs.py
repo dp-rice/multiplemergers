@@ -1,15 +1,6 @@
 import sys
 import numpy as np
 import argparse
-
-#FIXME: this is a hack to use my local version of msprime
-# sys.path.insert(1, '/users/danielrice/msprime-lambda/')
-# sys.path.insert(1, '/home/dpr/mmc_genomics/src/msprime-lambda/')
-import os
-module_path = os.path.abspath(os.path.join('src/msprime-lambda/'))
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
 import msprime
 import jsfs
 

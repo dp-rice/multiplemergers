@@ -1,7 +1,5 @@
 import sys
 import numpy as np
-#FIXME: this is a hack to use my local version of msprime
-sys.path.insert(1, '/users/danielrice/msprime-lambda/')
 import msprime
 from collections import deque
 
@@ -146,7 +144,7 @@ if __name__ == "__main__":
 
     population_configurations = [msprime.PopulationConfiguration(sample_size=nSamples, multiple_merger_para=alpha)]
 
-    simulations = msprime.simulate(num_replicates=nLoci, recombination_rate=r, 
+    simulations = msprime.simulate(num_replicates=nLoci, recombination_rate=r,
                                     population_configurations=population_configurations)
     t_test = 0
     t_naive = 0
