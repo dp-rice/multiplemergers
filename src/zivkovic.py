@@ -4,6 +4,9 @@ from numpy.polynomial.laguerre import laggauss
 from math import factorial
 from functools import partial
 
+'''
+Impliments the formulas in Zivkovic et al. for calculating second moments of coalescent times
+'''
 LAGDEGREE = 40
 
 def zivkovic_alpha(n):
