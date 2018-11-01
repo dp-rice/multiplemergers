@@ -4,6 +4,11 @@ import argparse
 import msprime
 import jsfs
 
+'''
+Run msprime simulations from the command line.
+Output the average SFS and the 2-SFS at the extreme ends of the locus.
+'''
+
 # Constant for the length of time for a bottleneck to last
 BOTTLENECK_DURATION = 1e-6
 
