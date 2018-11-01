@@ -1,8 +1,12 @@
 import sys
 import tarfile
 
+'''
+    Combine the consensus sequences into a single file for one chromosome
+'''
+
 # We will read the files in chunks of size CHUNKSIZE bytes
-CHUNKSIZE=4096 
+CHUNKSIZE=4096
 
 #TODO: argparse
 tar_fn = sys.argv[1]

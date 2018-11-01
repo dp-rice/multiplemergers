@@ -1,5 +1,9 @@
 import sys
 
+'''
+Take SLiM output with n_old individuals and randomly sample n_new individuals.
+'''
+
 script, n_old, n_new = sys.argv
 n_old = int(n_old)
 n_new = int(n_new)
@@ -14,7 +18,7 @@ if n_old == n_new:
     exit()
 
 
-line = infile.readline() 
+line = infile.readline()
 # Re-print header
 while not line.startswith('#OUT'):
     outfile.write(line)
