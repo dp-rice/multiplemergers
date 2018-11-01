@@ -96,7 +96,7 @@ rule copy_mac_all:
 rule mac2fastNeutrino:
     input:
         "data/DPGP3/minor_allele_counts/{chrom}.mac.txt.gz",
-        "data/dmel-4Dsites.txt"
+        "data/dmel-4Dsites.txt.gz"
     output:
         "data/DPGP3/windowed_sfs/{chrom}.sfs.txt"
     params:

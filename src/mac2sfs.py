@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import gzip
 import helpers as h
 from scipy.stats import hypergeom
 
@@ -45,7 +46,7 @@ n_ds = args.n_downsample
 # Strip off the "chr" from chromosme names.
 chrom = args.chromosome[3:]
 # Import 4-fold degenerate sites
-with open(args.fourfold_file) as infile:
+with gzip.open(args.fourfold_file) as infile:
     # Convert 4d sites from one-indexed to zero-indexed.
     fourDsites = [int(line.split()[1]) - 1 for line in infile
                     if line.startswith(chrom)]
