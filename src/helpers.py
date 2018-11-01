@@ -1,6 +1,10 @@
 import numpy as np
 import gzip
 
+def tajimasD(n, eta):
+    theta_pi = sfs2pi(eta, n)
+    theta_w  = np.sum(eta) / np.sum(1/np.arange(1,n))
+    return (theta_pi - theta_w) / theta_pi
 
 def pairwise_diversity(allele_counts, sample_size):
     f = allele_counts / sample_size
