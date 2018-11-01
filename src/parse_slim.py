@@ -2,6 +2,11 @@ import sys
 import numpy as np
 import helpers as h
 
+'''
+Parse SLiM output by calculating the SFS in windows.
+Windowing greatly reduces the time to compute correlations because mutations are sparse.
+'''
+
 infn = sys.argv[1]
 L_str = sys.argv[2]
 w_str = sys.argv[3]

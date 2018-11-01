@@ -2,6 +2,10 @@ import sys
 import gzip
 import numpy as np
 
+'''
+Merge correlations calculated from different SLiM runs into one file.
+'''
+
 n_samples = int(sys.argv[1])
 # The total length of the simulated chromosome
 L_str = sys.argv[2]
@@ -58,7 +62,7 @@ for fn in filenames:
             hihi_corr[i,:] += y
 
 sfs /= n_files
-pi_corr /= n_files 
+pi_corr /= n_files
 lolo_corr /= n_files
 lohi_corr /= n_files
 hihi_corr /= n_files

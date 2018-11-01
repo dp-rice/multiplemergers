@@ -2,6 +2,12 @@ import sys
 import numpy as np
 import helpers as h
 
+'''
+Process SLiM output:
+Take windowed site frequency spectra and
+calculate the correlations between high- and low-frequency alleles
+'''
+
 filename = sys.argv[1]
 n_samples = int(sys.argv[2])
 # The total length of the simulated chromosome

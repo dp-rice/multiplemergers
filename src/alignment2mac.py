@@ -2,6 +2,10 @@ import sys
 import argparse
 from collections import Counter
 
+'''
+Calculate the minor allele count from DPGP3 sequence alignments.
+'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument("nSamples", type=int, help="number of samples to subsample to. Must be less than or equal to the number of samples in the file")
 args = parser.parse_args()
