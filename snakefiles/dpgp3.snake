@@ -1,10 +1,6 @@
 #!python3
 
-import gzip as gz
-import os
-
-
-# ----- Definitions for the project ----- #
+# ----- Definitions ----- #
 
 CHROMS = ['Chr' + c for c in ['2L', '2R', '3L', '3R']]
 CHROM_LENGTHS = {'Chr2L':23011544,
@@ -12,7 +8,8 @@ CHROM_LENGTHS = {'Chr2L':23011544,
                 'Chr3L':24543557,
                 'Chr3R':27905053}
 
-### The Starting and Ending locus positions (in 100KB) for fastNeutrino
+# The Starting and Ending locus positions (in 100KB) for fastNeutrino
+# This focuses on the central region of each chromosome arm.
 LOCUS_START = {'Chr2L':10,
                 'Chr2R':60,
                 'Chr3L':10,
@@ -22,7 +19,8 @@ LOCUS_END = {'Chr2L':170,
                 'Chr3L':170,
                 'Chr3R':260}
 
-DATA_PATH = "/project/jnovembre/data/external_public/DPGP3/"
+# Path to where the data is stored.
+DATA_PATH = "data/DPGP3/"
 
 # ------  Rules ----- #
 
@@ -64,30 +62,14 @@ rule get_mac:
     input:
         DATA_PATH + "{chrom}.alignment.txt.gz"
     output:
-        DATA_PATH + "{chrom}.mac.txt.gz"
+        DATA_PATH + "minor_allele_counts/{chrom}.mac.txt.gz"
     shell:
         "gunzip -c < {input} | python src/alignment2mac.py 100 "
         "| gzip -c > {output}"
 
 rule get_mac_all:
     input:
-        expand(DATA_PATH + "{CHROM}.mac.txt.gz", CHROM=CHROMS)
-
-'''
-    Make a copy of the minor allele count files in the data directory
-'''
-rule copy_mac:
-    input:
-        DATA_PATH + "{chrom}.mac.txt.gz"
-    output:
-        "data/DPGP3/minor_allele_counts/{chrom}.mac.txt.gz"
-    shell:
-        "mkdir -p data/DPGP3/minor_allele_counts/; "
-        "cp {input} {output}"
-
-rule copy_mac_all:
-    input:
-        expand("data/DPGP3/minor_allele_counts/{CHROM}.mac.txt.gz", CHROM=CHROMS)
+        expand(DATA_PATH + "minor_allele_counts/{CHROM}.mac.txt.gz", CHROM=CHROMS)
 
 '''
     Convert minor allele counts to downsampled SFS for fastNeutrino.
@@ -133,6 +115,7 @@ rule fastNeutrino:
         "< {input.datafile} "
         "> fastNeutrino/log/{wildcards.chrom}.{wildcards.model}.log"
 
+# Note: only 2EpochConst used in the paper.
 MODELS=['2EpochConst',
         '2EpochExp',
         '3EpochConstConst',

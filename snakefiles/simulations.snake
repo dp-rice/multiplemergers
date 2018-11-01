@@ -1,12 +1,19 @@
 import numpy as np
 
 ### SLiM ###
+# Fraction of sites under selection
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
 sim_sample_size = 100
 SUBSAMPLE_SIZES = [100, 4]
+# Length of genome
 L = int(1e8)
+# Window size for coarse-graining
 w = 1000
 
+
+'''
+Calculate the 2-site SFS from SLiM output.
+'''
 rule merge_correlations_all:
     input:
         expand("simulations/slim/sweeps_n-{n}_fsel-{fsel}_corrmerged.txt.gz", fsel=FSEL, n=SUBSAMPLE_SIZES),
@@ -35,6 +42,9 @@ rule parse_slim:
     shell:
         "python src/parse_slim.py {input} {L} {w} {output}"
 
+'''
+Subsample SLiM output to a smaller sample size.
+'''
 rule subsample_slim:
     input:
         "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
@@ -43,6 +53,9 @@ rule subsample_slim:
     shell:
         "python src/subsample_slim_output.py {sim_sample_size} {wildcards.n} < {input} > {output}"
 
+'''
+Run SLiM simulations.
+'''
 rule slim:
     output:
         "simulations/slim/raw/{typ}_fsel-{fsel}_rep-{rep}.txt"
@@ -53,24 +66,39 @@ rule slim:
 
 ### MSPRIME ###
 SAMPLE_SIZES = [100, 4]
+# Recombination rates
 RS = np.insert(np.logspace(-1, 3, 13), 0, 0.0)
+# Beta-coalescent parameters
 ALPHAS = [1.25, 1.5, 1.75, 2.0]
+# Exponential rowth rates
 GS = [0.01, 0.1, 1.0, 2.0, 4.0, 8.0]
+# Two-epoch growth times
 TS = [0.01, 0.1, 1.0]
+# Two-epoch inverse growth factors
 SS = [0.2, 0.1, 0.05, 0.01]
 
-rule growth_all:
+
+'''
+    Run msprime simulations of coalescent models, saving the two-site SFS.
+'''
+rule msprime_all:
     input:
         expand("simulations/msprime/jsfs_n-{n}_a-{alpha}_r-{r}.txt", n=SAMPLE_SIZES, alpha=ALPHAS, r=RS[:-3]),
         expand("simulations/msprime/jsfs_n-{n}_g-{g}_r-{r}.txt", n=SAMPLE_SIZES, g=GS, r=RS),
         expand("simulations/msprime/jsfs_n-{n}_T-{T}_S-{S}_r-{r}.txt", n=SAMPLE_SIZES, T=TS, S=SS, r=RS)
 
+'''
+    Run msprime simulations of fastNeutrino-fitted models, saving the two-site SFS.
+'''
 rule fastNeutrino2msprime_all:
     input:
         expand("simulations/msprime/jsfs_fastNeutrino_n-{n}_{CHROM}_3EpochConstConst_r-{r}.txt",
                 n=SAMPLE_SIZES, r=RS, CHROM=CHROMS)
 
-rule constant_rate:
+'''
+    Run beta coalescent simulations.
+'''
+rule beta_coalescent:
     output:
         "simulations/msprime/jsfs_n-{n}_a-{alpha}_r-{r}.txt"
     wildcard_constraints:
@@ -79,13 +107,18 @@ rule constant_rate:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "--alpha {wildcards.alpha} -r {wildcards.r} > {output}"
 
+'''
+    Run exponential growth simulations.
+'''
 rule exponential_growth:
     output:
         "simulations/msprime/jsfs_n-{n}_g-{g}_r-{r}.txt"
     shell:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "-G {wildcards.g} -r {wildcards.r} > {output}"
-
+'''
+    Run two-epoch growth simulations.
+'''
 rule step_growth:
     output:
         "simulations/msprime/jsfs_n-{n}_T-{T}_S-{S}_r-{r}.txt"
@@ -93,6 +126,9 @@ rule step_growth:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "-T {wildcards.T} -S {wildcards.S} -r {wildcards.r} > {output}"
 
+'''
+    Run msprime with fastNeutrino-fitted parameters.
+'''
 rule fastNeutrino2msprime:
     output:
         "simulations/msprime/jsfs_fastNeutrino_n-{n}_{chrom}_{model}_r-{r}.txt"
