@@ -4,14 +4,16 @@ mmc_genomics
 Investigating whether the Kingman coalescent can be rejected in favor of multiple mergers
     using genomic diversity data.
 
-##TODO:
-    - Set up conda environment(s)
-    - Convert old bash scripts to Snakemake
-    - Redo data processing for:
-        - DPGP3
-        - EVE sequences
-    - Determine rules for including/excluding windows from analysis
-    - Calculate SFS covariance matrices
-    - Find good plots/summary statistics of the cov matrices
-    - Re-run simulations with more thorough exploration of parameters
-    - Revisit quality control at the SNP level
+dependencies:
+- conda
+- conda environment
+- msprime-lambda
+- SLiM
+- fastNeutrino
+
+run_snakemake.sh is for submitting to a SLURM cluster. (cluster.json)
+2 snakefiles: one for running simulations, one for data analysis
+3 jupyter notebooks for making figures
+Tarball with simulation output
+Intructions on downloading raw dpgp3 data.
+files with processed DPGP3 data.
