@@ -1,7 +1,6 @@
 #!python3
 
-# ---- Including other snakefiles ---- #
-include: 'snakefiles/dpgp3.snake'
+# Snakefile that runs msprime and SLiM simulations
 include: 'snakefiles/simulations.snake'
-
-# ---- Base Rule ----------- #
+# Snakefile that processes DPGP3 data
+include: 'snakefiles/dpgp3.snake'
