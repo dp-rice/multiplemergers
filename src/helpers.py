@@ -6,6 +6,7 @@ def tajimasD(n, eta):
     theta_w  = np.sum(eta) / np.sum(1/np.arange(1,n))
     return (theta_pi - theta_w) / theta_pi
 
+
 def pairwise_diversity(allele_counts, sample_size):
     f = allele_counts / sample_size
     return 2*f*(1-f) / (1 - (1/sample_size))
@@ -23,7 +24,6 @@ def sfs2pi(sfs, sample_size):
 
 
 def cross_correlation(X, Y, lim):
-    # return np.correlate(X, Y[:-lim], 'valid') / (X.shape[0] - lim)
     n_comps = X.shape[0] - lim
     xy = np.correlate(X, Y[:-lim], 'valid') / n_comps
     x = np.convolve(X, np.ones(n_comps), 'valid') / n_comps
