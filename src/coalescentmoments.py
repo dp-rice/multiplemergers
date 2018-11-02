@@ -2,6 +2,72 @@ import sys
 import numpy as np
 from scipy.special import beta, binom
 
+'''
+Calculate the site frequncy spectrum first and second moments
+according to Fu 1995 and Eldon et al 2015.
+'''
+
+def sfs_moments(N, alpha, m2=True):
+    '''
+    Calculate first and second moments of the site frequency spectrum.
+
+    Parameters
+    ----------
+    N : int
+        Sample size
+    alpha : float
+        Beta coalescent parameter alpha
+    m2 : Bool
+        If True, return first and second moments.
+        If False, return first moments only
+
+    '''
+    # If Kingman coalescent, use explicit Fu formulas to save time
+    if alpha == 2.0:
+        moments = fu_moments(N)
+        if m2:
+            return moments
+        else:
+            return moments[0]
+    else:
+        Pij = pij(N, alpha)
+        G = g(N, Pij, alpha)
+        Pnkb = pnkb(N, Pij, G)
+        if m2:
+            Peq = peq(N, Pij, G)
+            Pun = pun(N, Pij, G, Pnkb)
+            Pne = pne(N, Pij, G, Pnkb)
+            return sfs_m1(N, G, Pnkb), sfs_m2(N, G, Peq, Pun, Pne)
+        else:
+            return sfs_m1(N, G, Pnkb)
+
+def fold_sfs_moments(N, M1, M2):
+    '''
+    Calculate first and second moments of the folded site frequency spectrum.
+
+    Parameters
+    ----------
+    N : int
+        Sample size
+    M1 : np.array(dtype=float)
+        First moments of the unfolded site frequency spectrum
+    M2 : np.array(dtype=float)
+        Second moments of the unfolded site frequency spectrum
+
+    '''
+
+    M1_folded = np.zeros(N//2)
+    for i in range(N//2):
+         M1_folded[i] = (M1[i] + M1[N-i-2]) / (1.0 + (i==N-i-2))
+
+    M2_folded = np.zeros((N//2, N//2))
+    for i in range(N//2):
+        for j in range(i):
+            M2_folded[i,j] = (M2[i,j] + M2[N-i-2,j] + M2[i,N-j-2] + M2[N-i-2,N-j-2]) / ((1.0+(i==N-i-2))*(1.0+(j==N-j-2)))
+            M2_folded[j,i] = M2_folded[i,j]
+    return (M1_folded, M2_folded)
+
+
 # Schweinsberg 2003 Eq. 12
 def lamb(n, k, alpha):
     if alpha == 2:
@@ -243,37 +309,6 @@ def fu_moments(n):
     m2[np.diag_indices(n-1)] = 0.0
     return m1, m2
 
-def sfs_moments(N, alpha, m2=True):
-    # If Kingman coalescent, use explicit Fu formulas to save time
-    if alpha == 2.0:
-        moments = fu_moments(N)
-        if m2:
-            return moments
-        else:
-            return moments[0]
-    else:
-        Pij = pij(N, alpha)
-        G = g(N, Pij, alpha)
-        Pnkb = pnkb(N, Pij, G)
-        if m2:
-            Peq = peq(N, Pij, G)
-            Pun = pun(N, Pij, G, Pnkb)
-            Pne = pne(N, Pij, G, Pnkb)
-            return sfs_m1(N, G, Pnkb), sfs_m2(N, G, Peq, Pun, Pne)
-        else:
-            return sfs_m1(N, G, Pnkb)
-
-def fold_sfs_moments(N, M1, M2):
-    M1_folded = np.zeros(N//2)
-    for i in range(N//2):
-         M1_folded[i] = (M1[i] + M1[N-i-2]) / (1.0 + (i==N-i-2))
-
-    M2_folded = np.zeros((N//2, N//2))
-    for i in range(N//2):
-        for j in range(i):
-            M2_folded[i,j] = (M2[i,j] + M2[N-i-2,j] + M2[i,N-j-2] + M2[N-i-2,N-j-2]) / ((1.0+(i==N-i-2))*(1.0+(j==N-j-2)))
-            M2_folded[j,i] = M2_folded[i,j]
-    return (M1_folded, M2_folded)
 
 if __name__ == "__main__":
     # Bug testing: compare calculation to fu formula for kingman coalescent
@@ -290,21 +325,3 @@ if __name__ == "__main__":
         print('\tsecond moments equal Fu expectation.')
     else:
         print('\tsecond moments DO NOT equal Fu expectation!')
-
-# M1_sq = M1[None,:] * M1[:,None]
-
-# M1_folded = np.zeros(N/2 + 1)
-# for i in range(1, N/2 + 1):
-    # M1_folded[i] = M1[i] + M1[N-i]
-# M1_folded_sq = M1_folded[None,:] * M1_folded[:,None]
-
-# M2_folded = np.zeros((N/2 + 1, N/2 + 1))
-# for i in range(1, N/2 + 1):
-    # for j in range(1, i):
-        # M2_folded[i,j] = M2[i,j] + M2[N-i,j] + M2[i,N-j] + M2[N-i,N-j]
-        # M2_folded[j,i] = M2_folded[i,j]
-
-# COV = M2 - M1_sq
-# RATIO = M2 / M1_sq
-# COV_folded = M2_folded - M1_folded_sq
-# RATIO_folded = M2_folded / M1_folded_sq
