@@ -74,11 +74,13 @@ The commands for reproducing our figures are in three `jupyter` notebooks:
 # Reproducing simulations and data processing
 If you would like to reproduce the analysis from scratch or do something similar, we have provided two `snakemake` pipelines:
 
-1. `snakefiles\simulations.snake` contains the pipeline for running all of the simulations.
+1. `snakefiles/simulations.snake` contains the pipeline for running all of the simulations.
 
-2. `snakefiles\dpgp3.snake` contains the pipeline for processing the *Drosophila* data. You will need to download the raw data from the [Drosophila Genome Nexus](http://www.johnpool.net/genomes.html). You can also find a description of the data there. To download the data, use:
+2. `snakefiles/dpgp3.snake` contains the pipeline for processing the *Drosophila* data. You will need to download the raw data from the [Drosophila Genome Nexus](http://www.johnpool.net/genomes.html). You can also find a description of the data there. To download the data, use:
 
 `wget http://pooldata.genetics.wisc.edu/dpgp3_sequences.tar.bz2`
+
+To run snakemake locally, use commands like `snakemake msprime_all`, which will run all the `msprime` simulations. See the snakefiles for all rules. There is also a bash script `run_snakemake.sh`, which will submit jobs to a parallel computing cluster. It is currently configured for `SLURM` job scheduling.
 
 # Calculating the 2-SFS and frequency PMI
 The `src` directory contains `python` code for computing the various statistics described in the manuscript.
