@@ -92,6 +92,8 @@ rule msprime_all:
 '''
     Run msprime simulations of fastNeutrino-fitted models, saving the two-site SFS.
 '''
+CHROMS = ['Chr' + c for c in ['2L', '2R', '3L', '3R']]
+
 rule fastNeutrino2msprime_all:
     input:
         expand("simulations/msprime/jsfs_fastNeutrino_n-{n}_{CHROM}_3EpochConstConst_r-{r}.txt",
