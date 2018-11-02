@@ -4,10 +4,78 @@ from numpy.polynomial.laguerre import laggauss
 from math import factorial
 from functools import partial
 
+# Degree of laguerre polynomials for numerical integration
+LAGDEGREE = 40
+
 '''
 Impliments the formulas in Zivkovic et al. for calculating second moments of coalescent times
 '''
-LAGDEGREE = 40
+
+def sigma_i(n, mode, **params):
+    '''
+    Calculate the expected site frequency spectrum.
+
+    Parameters
+    ----------
+    n : int
+        Sample size
+    mode : string
+        Type of model. For now may be "constant", "exponential", or "two-epoch".
+    params : {str : float}
+        Dictionary of parameters, which depend on mode.
+        "constant" takes no parameters.
+        "exponential" takes a growth rate parameter 'g'.
+        "two-epoch" takes two parameters: growth time "tau" and inverse growth factor "f".
+    '''
+    alpha = zivkovic_alpha(n)
+    p_nki = marginal_leaf_prob(n)
+    K = np.arange(n+1)
+    B = binom(K,2)
+    if mode == 'constant':
+        I1_j = 1 / B
+    else:
+        I1_j = laguerre_integral(lambda_inv(mode, **params), B)
+
+    I1_j[np.isinf(I1_j)] = 0
+    I1_j[np.isnan(I1_j)] = 0
+    sign_jk = diagonal_signs(n)
+    alpha_jk = alpha[n]
+    T_k = I1_j @ (sign_jk*alpha_jk)
+    T_k[:2] = 0
+    p_ki = p_nki[n]
+    return (K*T_k) @ p_ki
+
+def sigma_ij(n, mode, **params):
+    '''
+    Calculate the covariance matrix site frequency spectrum.
+
+    Parameters
+    ----------
+    n : int
+        Sample size
+    mode : string
+        Type of model. For now may be "constant", "exponential", or "two-epoch".
+    params : {str : float}
+        Dictionary of parameters, which depend on mode.
+        "constant" takes no parameters.
+        "exponential" takes a growth rate parameter 'g'.
+        "two-epoch" takes two parameters: growth time "tau" and inverse growth factor "f".
+    '''
+
+    if n > 4 and mode=="two-epoch":
+        raise ValueError('Two-epoch growth has not been tested for n>4!')
+    Sigma_i = sigma_i(n, mode, **params)
+    Ett_kpk = time_second_moments(n, mode, **params)
+    Sigma_ij1 = sigma_ij1(n, Ett_kpk)
+    Sigma_ij2 = sigma_ij2(n, Ett_kpk)
+    Sigma_ij3 = sigma_ij3(n, Ett_kpk)
+
+    Sigma_ij = Sigma_ij1 + Sigma_ij2 + Sigma_ij3
+    Sigma_ij += Sigma_ij.T
+    Sigma_ij -= np.outer(Sigma_i, Sigma_i)
+    Sigma_ij[np.diag_indices(n+1)] = 0
+    return Sigma_ij
+
 
 def zivkovic_alpha(n):
     r = np.arange(n+1)
@@ -100,25 +168,6 @@ def pstar(n):
 def diagonal_signs(n):
     r = np.arange(n+1)
     return (-1)**(r[:,None]+r[None,:])
-
-def sigma_i(n, mode, **params):
-    alpha = zivkovic_alpha(n)
-    p_nki = marginal_leaf_prob(n)
-    K = np.arange(n+1)
-    B = binom(K,2)
-    if mode == 'constant':
-        I1_j = 1 / B
-    else:
-        I1_j = laguerre_integral(lambda_inv(mode, **params), B)
-
-    I1_j[np.isinf(I1_j)] = 0
-    I1_j[np.isnan(I1_j)] = 0
-    sign_jk = diagonal_signs(n)
-    alpha_jk = alpha[n]
-    T_k = I1_j @ (sign_jk*alpha_jk)
-    T_k[:2] = 0
-    p_ki = p_nki[n]
-    return (K*T_k) @ p_ki
 
 ### <T_k' T_k> ###
 def time_second_moments(n, mode, **params):
@@ -249,20 +298,7 @@ def sigma_ij3(n, Ett_kpk):
     ret = np.diag(val_i)
     return np.fliplr(ret)
 
-def sigma_ij(n, mode, **params):
-    if n > 4 and mode=="two-epoch":
-        raise ValueError('Two-epoch growth has not been tested for n>4!')
-    Sigma_i = sigma_i(n, mode, **params)
-    Ett_kpk = time_second_moments(n, mode, **params)
-    Sigma_ij1 = sigma_ij1(n, Ett_kpk)
-    Sigma_ij2 = sigma_ij2(n, Ett_kpk)
-    Sigma_ij3 = sigma_ij3(n, Ett_kpk)
 
-    Sigma_ij = Sigma_ij1 + Sigma_ij2 + Sigma_ij3
-    Sigma_ij += Sigma_ij.T
-    Sigma_ij -= np.outer(Sigma_i, Sigma_i)
-    Sigma_ij[np.diag_indices(n+1)] = 0
-    return Sigma_ij
 
 def main():
     n = 5
