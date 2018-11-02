@@ -250,6 +250,8 @@ def sigma_ij3(n, Ett_kpk):
     return np.fliplr(ret)
 
 def sigma_ij(n, mode, **params):
+    if n > 4 and mode=="two-epoch":
+        raise ValueError('Two-epoch growth has not been tested for n>4!')
     Sigma_i = sigma_i(n, mode, **params)
     Ett_kpk = time_second_moments(n, mode, **params)
     Sigma_ij1 = sigma_ij1(n, Ett_kpk)
