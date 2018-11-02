@@ -52,7 +52,7 @@ You will now be able to use `import msprime` within `python` code to use the msp
 In order to reproduce the selective sweep simulations, you will need to install `SLiM`.
 Follow the instructions at: https://messerlab.org/slim/
 
-## fastNeutrino (optional)
+## Fitting demographic models with `fastNeutrino` (optional)
 In order to reproduce our coalescent model fits to *Drosophila melanogaster* diversity data, you will need to install `fastNeutrino`.
 Follow the instructions at: https://sourceforge.net/projects/fastneutrino/
 
