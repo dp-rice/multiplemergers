@@ -14,7 +14,10 @@
     autocite=inline,
     isbn=false, doi=false, url=false, eprint=false,
     uniquename=false,
-    maxcitenames=2
+    uniquelist=false,
+    maxcitenames=2,
+    mincitenames=1,
+    maxbibnames=9
 ]{biblatex}
 
 \newcommand{\beginsupplement}{%
@@ -642,7 +645,7 @@ The authors have no competing interests.
 
 \begin{table}[ht!]
   \begin{center}
-    \caption{Boundaries of the homogeneous central regions of chromosomes (shown in \ref{fig:dpgp_pi}).}
+    \caption{Boundaries of the homogeneous central regions of chromosomes (shown in \fig{fig:dpgp_pi}).}
     \label{tab:central_regions}
     \begin{tabular}{l|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
       \textbf{Chr.} & \textbf{Start position (MB)} & \textbf{End position (MB)}\\
