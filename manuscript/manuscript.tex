@@ -115,10 +115,10 @@ For example, \textcite{SchriderEtAl2016} recently demonstrated that several popu
 In a similar vein, \textcite{CvijovicEtAl2018}, showed that reduction of genetic diversity by purifying selection is accompanied by distortions in the SFS, leading to a false signal of population growth.
 Moreover, genomic evidence from multiple species suggests that such violations of neutrality may be widespread \autocite{SellaEtAl2009, Corbett-DetigEtAl2015, KernHahn2018}.
 
-An important extension of the Kingman coalescent is a family of models known as \textit{multiple merger coalescents} (\cite{Pitman1999, Sagitov1999, DonnellyKurtz1999,}; reviewed in \cite{Eldon2016}), which arise in a variety of contexts both with and without selection.
-Whereas in the Kingman coalescent lineages may coalesce only pairwise, multiple merger coalescents permit more than two lineages to coalesce in a single event.
-The more general class of simultaneous multiple merger coalescents \autocite{Schweinsberg2000, MohleSagitov2001, Sagitov2003} permits more than one distinct multiple merger event at the same time.
-Multiple merger and simultaneous multiple merger models are relevant for species with
+An important extension of the Kingman coalescent is a family of models known as \textit{multiple-merger coalescents} (\cite{Pitman1999, Sagitov1999, DonnellyKurtz1999,}; reviewed in \cite{Eldon2016}), which arise in a variety of contexts both with and without selection.
+Whereas in the Kingman coalescent lineages may coalesce only pairwise, multiple-merger coalescents permit more than two lineages to coalesce in a single event.
+The more general class of simultaneous-multiple-merger coalescents \autocite{Schweinsberg2000, MohleSagitov2001, Sagitov2003} permits more than one distinct multiple-merger event at the same time.
+multiple-merger and simultaneous-multiple-merger models are relevant for species with
 ``sweepstakes'' reproductive events \autocite{EldonWakeley2006, SargsyanWakeley2008},
 fat-tailed offspring number distributions \autocite{Schweinsberg2003},
 recurring selective sweeps at linked sites \autocite{DurrettSchweinsberg2005, CoopRalph2012},
@@ -127,7 +127,7 @@ and purifying selection at sufficiently many sites \autocite{SegerEtAl2010, Nico
 
 In each of these contexts, the coalescent timescale is not necessarily proportional to the population size.
 For example, with fat-tailed offspring distributions the rate of coalescence is a power law in the population size \autocite{Schweinsberg2003}, while with linked sweeps it is determined by the rate of linked sweeps, as described above \autocite{DurrettSchweinsberg2005}.
-In these settings, interpreting the level of genetic diversity in terms of an ``effective population size'' is misleading and inferences based on the Kingman coalescent may be qualitatively incorrect.
+In these settings, interpreting the level of genetic diversity in terms of an ``effective population size'' is misleading, and inferences based on the Kingman coalescent may be qualitatively incorrect.
 
 It is therefore important to determine whether the Kingman model is appropriate for a given data set before performing demographic inference.
 This task is distinct from ``selection scan'' methods designed to detect particular regions of the genome that are under selection (see~\cite{VittiEtAl2013}).
@@ -136,17 +136,17 @@ Genomic regions that are outliers from this distribution are presumed to be unde
 In contrast, we are interested in detecting when the genome-wide background \emph{is not} well-modeled by the Kingman coalescent.
 
 One approach to identifying multiple mergers in genomic data is to use the SFS as a summary statistic.
-To this end, \textcite{BirknerEtAl2013, BlathEtAl2016} and \textcite{SpenceEtAl2016} derived methods for computing the expected SFS of (simultaneous-)multiple merger coalescents.
-Further, \textcite{EldonEtAl2015} showed that it is possible to distinguish between a multiple merger coalescent of the beta family and the Kingman coalescent with exponential growth using the SFS.
+To this end, \textcite{BirknerEtAl2013, BlathEtAl2016} and \textcite{SpenceEtAl2016} derived methods for computing the expected SFS of (simultaneous) multiple-merger coalescents.
+Further, \textcite{EldonEtAl2015} showed that it is possible to distinguish between a multiple-merger coalescent of the beta family and the Kingman coalescent with exponential growth using the SFS.
 In a related approach, \textcite{RodelspergerEtAl2014} detected widespread linked selection in the nematode \textit{Pristionchus pacificus} by demonstrating that the SFS is non-monotonic, a signature of multiple mergers \autocite{NeherHallatschek2013, BirknerEtAl2013}.
 
 However, existing methods are limited in their ability to distinguish multiple mergers from general models of population-size change.
 The primary signature of multiple mergers in the SFS is an overabundance of low-frequency mutations relative to the Kingman expectation, which is also the signature of population growth.
-\textcite{EldonEtAl2015} were able to reject exponential growth in favor of multiple mergers, but a more flexible model of growth may be able to fit the multiple mergers SFS (see \cite{MyersEtAl2008, BhaskarSong2014}).
+\textcite{EldonEtAl2015} were able to reject exponential growth in favor of multiple mergers, but a more flexible model of growth may be able to fit the multiple-merger SFS (see \cite{MyersEtAl2008, BhaskarSong2014}).
 The non-mononotic SFS identified by \textcite{RodelspergerEtAl2014} is a more robust signature of multiple mergers, but identifying that the SFS increases at high frequencies requires knowing the ancestral allele at each site.
 High-frequency mutations are typically much rarer than low-frequency mutations, so misidentifying even a small fraction of ancestral alleles can generate a non-monotonic SFS.
 
-Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtAl2018}---are useful for distinguishing between the Kingman coalescent with population growth and multiple merger coalescents.
+Here, we propose that summary statistics based on the two-site frequency spectrum (2-SFS)---the generalization of the SFS to pairs of nearby sites \autocite{Hudson2001, FerrettiEtAl2018}---are useful for distinguishing between the Kingman coalescent with population growth and multiple-merger coalescents.
 These statistics may be calculated efficiently from genomic single-nucleotide-variant data.
 Furthermore, they do not require phasing, recombination maps, or ancestral allele identification and are informative even with small sample sizes.
 Together, these properties make the 2-SFS useful for demographic model-checking in a wide range of species.
@@ -178,10 +178,10 @@ He found that $\E{\tau_i \tau_j} < \E{\tau_i}\E{\tau_j}$ for all $j \not\in \{i,
 This result, combined with \eqs{eq:expected_sfs}{eq:expected_2sfs}, implies a negative correlation between mutations at different frequencies: trees generating a mutation with derived allele count $i$ are less likely than average to generate a second mutation with derived allele count $j \not\in \{i, (n-i)\}$.
 (There are positive correlations between mutations at complementary frequencies induced by genealogies whose root node partitions the tree into subtrees of size $i$ and $n-i$.)
 
-\textcite{BirknerEtAl2013} extended Fu's calculation to a family of multiple merger coalescents called beta coalescents.
+\textcite{BirknerEtAl2013} extended Fu's calculation to a family of multiple-merger coalescents called beta coalescents.
 This one-parameter family interpolates between the Kingman coalescent and the Bolthausen-Sznitman coalescent as the parameter, $\alpha$, ranges from 2 to 1.
 Beta coalescents arise in models with fat-tailed offspring distributions \autocite{Schweinsberg2003, SteinruckenEtAl2013}, and the Bolthausen-Sznitman coalescent is the limiting distribution of genealogies in populations that are rapidly adapting or experiencing extensive purifying selection \autocite{NeherHallatschek2013}.
-The calculations of \textcite{BirknerEtAl2013} show positive correlations between $\xi_i$ and $\xi_j$ for $j \not\in \{i, n-i\}$ (Figures 5 and 6 of \cite{BirknerEtal2013}).
+The calculations of \textcite{BirknerEtAl2013} show positive correlations between $\xi_i$ and $\xi_j$ for $j \not\in \{i, n-i\}$ (Figures 5 and 6 of \cite{BirknerEtAl2013}).
 Thus, unlike the standard Kingman coalescent, the beta coalescent can generate positive associations between mutations with different minor allele counts.
 
 In the following, we demonstrate that the positive associations between mutations at different frequencies distinguish the multiple-merger from the Kingman coalescent and that this distinction
@@ -233,10 +233,10 @@ Comparing, \eq{eq:fpmi} with \eq{eq:pmi} shows that $\fpmi$ is the standard poin
 This transformation of the 2-SFS has several useful properties.
 First, because $\fpmi$ is based on the minor allele frequencies, we may compute it without knowing the ancestral allele.
 Second, the results of \textcite{Fu1995} for the folded SFS imply that $\fpmi(i,j) < 0$ for $i\neq j$ for non-recombining sites under the time-homogeneous Kingman coalescent.
-Finally, $\fpmi$ normalizes for distortions in the coalescence time distribution reflected in the single site SFS.
+Finally, $\fpmi$ normalizes for distortions in the coalescence time distribution reflected in the single-site SFS.
 In the Kingman coalescent, population-size variation alters the coalescence time distribution but preserves the distribution of tree topologies.
-We will show that, because $\fpmi$ normalizes the 2-SFS by the product of single site spectra, it is largely insensitive to the distribution of coalescence times.
-Thus, $\fpmi$ primarily reflects the distribution of topologies, which distinguishes multiple mergers from the Kingman coalescent.
+We will show that, because $\fpmi$ normalizes the 2-SFS by the product of single-site spectra, it is largely insensitive to the distribution of coalescence times.
+Thus, $\fpmi$ primarily reflects the distribution of topologies, which distinguishes the multiple-merger coalescent from the Kingman coalescent.
 
 Furthermore, the same normalization renders $\fpmi$ insensitive to ascertainment bias.
 Variant detection methods typically compare sampled sequences to a reference sequence and ``call'' a variant site when there is sufficient evidence that at least one sample differs from the reference at that site.
@@ -329,7 +329,7 @@ In all of these simulations, we simulated a population of 500 diploids for $10^4
 Each haploid genome consisted of a single genomic element $L=10^8$ basepairs long with recombination rate per-basepair $r = 10^{-8}$ and per-basepair mutation rate $\mu = 10^{-7}$.
 We simulated two types of mutations: neutral mutations and beneficial mutations with additive effects and selection coefficient $s=0.1$.
 With these parameters, $2Ns = 100$, so beneficial mutations are strongly selected and will sweep in $T_{\text{sweep}}\sim s^{-1} \log Ns \approx 50$ generations.
-Such sweeps will effect a region of the chromosome $d_{\text{sweep}} \sim (r T_{\text{sweep}})^{-1} \approx 2 \times 10^6$ basepairs long.
+Such sweeps will affect a region of the chromosome $d_{\text{sweep}} \sim (r T_{\text{sweep}})^{-1} \approx 2 \times 10^6$ basepairs long.
 Thus $d_{\text{sweep}} \ll L$, which will minimize edge effects of simulating a finite chromosome.
 
 In order to vary the effects of sweeps on neutral diversity, we varied the fraction of mutations that are beneficial, $f_{\text{sel}}$, over several orders of magnitude: $f_{\text{sel}} \in \{10^{-6}, 10^{-5}, 10^{-4}, 10^{-3}\}$.
@@ -339,7 +339,7 @@ For each $f_{\text{sel}}$, we ran 100 independent replicate simulations and comp
 
 \subsection*{Analysis of \textit{D. melanogaster} data}
 
-We analyzed sequence data from the DPGP3 data set, which consists of haploid consensus sequences from $\sim 200$ flies, obtained via the haploid embryo method of \textcite{LangleyEtAl2011}.
+We analyzed sequence data from the DPGP3 data set, which consists of haploid consensus sequences from ${\sim}200$ flies, obtained via the haploid embryo method of \textcite{LangleyEtAl2011}.
 The SNP calls that characterize these sequences were subjected to a variety of quality filters described in \textcite{LackEtAl2015}.
 We obtained the DPGP3 consensus sequence files version 1.1 from \url{www.johnpool.net/genomes.html}.
 These files contain the sequence alignments of all flies in the sample on all chromosome arms.
@@ -350,7 +350,7 @@ As a result, the data for each chromosome arm is from a slightly different subse
 We calculated the average pairwise diversity, $\Pi$, as a function of position for each autosomal chromosome arm (\fig{fig:dpgp_pi}).
 Pairwise diversity is high in the middle of each chromosome arm and lower near the centromeres and telomeres, in agreement with calculations by \textcite{Corbett-DetigEtAl2015}.
 Our modeling---and coalescent-based demographic inference in general---assumes that the distribution of gene genealogies is homogeneous along the chromosome.
-Therefore, we selected a 13-16~MB ``central'' region of each arm with relatively homogeneous values of $\Pi$ for further analysis.
+Therefore, we selected a 13-16~Mb ``central'' region of each arm with relatively homogeneous values of $\Pi$ for further analysis.
 The boundary positions of these central regions are given in Table~\ref{tab:central_regions}.
 
 In order to ensure that the segregating mutations reflect true genetic diversity and not variation in calling errors, we excluded sites with fewer than 90 of the 100 genotypes called.
@@ -478,13 +478,13 @@ The figure also shows that this result is robust to the choice of cutoff minor a
 
 There is one other salient feature of \fig{fig:hilo_vs_d}: $\hilopmi$ does not decay to zero at long distances in the beta coalescent.
 This behavior relates to the results of \textcite{EldonWakeley2006}, who showed that a model with ``jackpot'' reproductive events can generate infinite-range linkage disequilibrium.
-Further, \textcite{EldonWakeley2006} showed that different scalings of rates of mutation, pairwise coalescence, multiple merger coalescence, and recombination lead to different behaviors of diversity and linkage disequilibrium.
-Our implementation of the beta coalescent model with recombination corresponds to a particular scaling limit where recombination does not have time to decorrelate trees during multiple mergers events, even at infinite genetic distances.
-We do not expect this behavior to be universal in multiple mergers coalescents with recombination.
+Further, \textcite{EldonWakeley2006} showed that different scalings of rates of mutation, pairwise coalescence, multiple-merger coalescence, and recombination lead to different behaviors of diversity and linkage disequilibrium.
+Our implementation of the beta coalescent model with recombination corresponds to a particular scaling limit where recombination does not have time to decorrelate trees during multiple-merger events, even at infinite genetic distances.
+We do not expect this behavior to be universal in multiple-merger coalescents with recombination.
 
 \subsection*{Linked selective sweeps}
 
-Various authors have shown that natural selection can generate multiple merger coalescents at linked neutral sites (e.g., \cite{DurrettSchweinsberg2005, CoopRalph2012, NeherHallatschek2013, DesaiEtAl2013, SegerEtAl2010}).
+Various authors have shown that natural selection can generate multiple-merger coalescents at linked neutral sites (e.g., \cite{DurrettSchweinsberg2005, CoopRalph2012, NeherHallatschek2013, DesaiEtAl2013, SegerEtAl2010}).
 However, our simulations of the beta coalescent with recombination are of an explicitly neutral model.
 Thus, they are at best an approximation to the selective models cited above.
 It is therefore important to verify that selection at linked sites can, in fact, generate the sorts of signals in $\fpmi$ that we have detected in the beta coalescent.
@@ -565,7 +565,7 @@ In terms of the 2-SFS, we have $\E{\eta_{12}} < \E{\eta_{1}} \E{\eta_{2}}$.
 On the other hand, multiple mergers induce correlations between the tree topology and the total branch length.
 For example, topology (C) has less opportunity for singletons \emph{and} less opportunity for doubletons than (A) or (B), even though the expected proportion of singletons is higher.
 Thus, observing \emph{any mutation at all} makes topology (C) less likely and the expected number of other mutations at all frequencies higher.
-If multiple-mergers events are frequent enough, this effect may dominate the tradeoff between (A) and (B) so that $\E{\eta_{12}} > \E{\eta_{1}} \E{\eta_{2}}$.
+If multiple-merger events are frequent enough, this effect may dominate the tradeoff between (A) and (B) so that $\E{\eta_{12}} > \E{\eta_{1}} \E{\eta_{2}}$.
 
 \begin{figure}
 \centering
@@ -597,20 +597,20 @@ On the other hand, it would be straightforward to develop a bootstrap-style proc
 In any case, we believe that it would be useful for simulation packages such as \texttt{msprime} and population genetics analysis libraries to include standard functions for computing the 2-SFS, $\fpmi$, and $\hilopmi$.
 We provide such functions in the GitHub repository associated with this paper.
 
-Our coalescent simulations implement a particular version of the multiple mergers coalescent with recombination.
+Our coalescent simulations implement a particular version of the multiple-merger coalescent with recombination.
 However, the precise correspondence between this model and any particular forward-time process is unclear.
 In order to compare with our numerical calculations based on \textcite{BirknerEtAl2013}, we use the beta coalescent for the distribution of marginal genealogies, but the explicit forward-time models that have been studied by others generate simultaneous multiple mergers.
 (See e.g., the \cite{DurrettSchweinsberg2005} model of selective sweeps, but note that our forward-time simulations suggest that this distinction is not important to our main results.)
-Moreover, the long-range correlations observed in \fig{fig:hilo_vs_d} likely depend on an implicit choice regarding the scaling of recombination, coalescent, and multiple merger rates \autocite{EldonWakeley2006}.
+Moreover, the long-range correlations observed in \fig{fig:hilo_vs_d} likely depend on an implicit choice regarding the scaling of recombination, coalescent, and multiple-merger rates \autocite{EldonWakeley2006}.
 These issues are poorly understood, and more theoretical work is required to understand the interactions between multiple mergers and recombination.
 
-An interesteing potential future empircal application of our work would be to use $\fpmi$ to assess the evidence for variation in multiple mergers coalescence within genomes and between species.
+An interesteing potential future empircal application of our work would be to use $\fpmi$ to assess the evidence for variation in multiple-merger coalescence within genomes and between species.
 For example, one could compute the $\fpmi$ in different regions of a large genome and look for a relationship between the strength of non-Kingman coalescence and genomic properties such as the recombination rate and functional density.
 Alternatively, one could survey multiple species using a data set such as the diversity data compiled by \textcite{Corbett-DetigEtAl2015}.
 Either would reveal new information about the suitability of population genetic models, and the forces that determine genetic diversity.
 
 \subsection*{Acknowledgements}
-DPR was supported by the Chicago Fellows Program of the University of Chicago.
+D.P.R. was supported by the Chicago Fellows Program of the University of Chicago.
 J.N. acknowledges support for this work from NIH grants GM108805 and HG007089.
 M.M.D. acknowledges support from the Simons Foundation (Grant 376196), grant DEB-1655960 from the NSF, and grant GM104239 from the NIH.
 This work was completed in part with resources provided by the University of Chicago Research Computing Center and Harvard Faculty of Arts and Sciences Research Computing Center.
@@ -639,7 +639,7 @@ The authors have no competing interests.
 \begin{figure}[ht!]
 \centering
 \includegraphics[scale=1]{figures/pi_vs_position.pdf}
-\caption{Average pairwise diversity, $\Pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~KB window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
+\caption{Average pairwise diversity, $\Pi$, of 100 haploid samples from DPGP3 panel. Each point represents the average over a 10~Kb window. Vertical lines show the boundaries of the central regions defined in Table~\ref{tab:central_regions}.
 \label{fig:dpgp_pi}}
 \end{figure}
 
@@ -648,7 +648,7 @@ The authors have no competing interests.
     \caption{Boundaries of the homogeneous central regions of chromosomes (shown in \fig{fig:dpgp_pi}).}
     \label{tab:central_regions}
     \begin{tabular}{l|r|r} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
-      \textbf{Chr.} & \textbf{Start position (MB)} & \textbf{End position (MB)}\\
+      \textbf{Chr.} & \textbf{Start position (Mb)} & \textbf{End position (Mb)}\\
       \hline
       2L & 1 & 17\\
       2R & 6 & 19\\
