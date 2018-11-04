@@ -2,7 +2,7 @@
 
 ### Daniel P. Rice, John Novembre, and Michael M. Desai
 
-This repository accompanies the manuscript http://www.bioarxiv.org/XXX. It includes:
+This repository accompanies [Rice, Novembre, and Desai (2018)](https://www.biorxiv.org/content/early/2018/11/03/461517). It includes:
 
 1. `jupyter` notebooks, along with processed data and simulation output, for reproducing the figures in the manuscript.
 2. `snakemake` pipelines for reproducing simulations and data analysis from scratch.
