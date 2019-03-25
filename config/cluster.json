@@ -10,6 +10,12 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
+	"simulate_dmel":
+    {
+        "time" : "8:00:00",
+		"mem"  : "4G"
+    },
+
     "get_mac":
     {
         "time" : "0:20:00"

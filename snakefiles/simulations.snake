@@ -8,13 +8,13 @@ remote_dir = '/project/jnovembre/dpr/mmc_genomics/simulations/'
 
 rule simulate_dmel_all:
     input:
-        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(3))
+        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(10))
 
 rule simulate_dmel:
     output:
         remote_dir + "msprime/branch_lengths-{rep}.npz"
     shell:
-        "python src/simulate_dmel_chrom.py {output} 20000 0.067 {wildcards.rep}"
+        "python src/simulate_dmel_chrom.py {output} 1000000 0.067 {wildcards.rep}"
 
 ### SLiM ###
 # Fraction of sites under selection
