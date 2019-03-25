@@ -4,9 +4,10 @@ import numpy as np
 
 ### Simulate Dmel data
 
+remote_dir = '/project/jnovembre/dpr/mmc_genomics/simulations/'
 rule simulate_dmel:
     output:
-        "~/jnov/dpr/mmc_genomics/simulations/msprime/test.txt"
+        remote_dir + "msprime/test.txt"
     shell:
         "echo hello world > {output}"
 
