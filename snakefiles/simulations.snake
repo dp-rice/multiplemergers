@@ -5,11 +5,12 @@ import numpy as np
 ### Simulate Dmel data
 
 remote_dir = '/project/jnovembre/dpr/mmc_genomics/simulations/'
+
 rule simulate_dmel:
     output:
-        remote_dir + "msprime/test.txt"
+        remote_dir + "msprime/branch_lengths-{rep}.npz"
     shell:
-        "echo hello world > {output}"
+        "python src/simulate_dmel_chrom.py {output} 20000 0.067 {wildcards.rep}"
 
 ### SLiM ###
 # Fraction of sites under selection
