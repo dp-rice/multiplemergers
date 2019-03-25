@@ -8,7 +8,7 @@ remote_dir = '/project/jnovembre/dpr/mmc_genomics/simulations/'
 
 rule simulate_dmel_all:
     input:
-        expand(emote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(3))
+        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(3))
 
 rule simulate_dmel:
     output:
