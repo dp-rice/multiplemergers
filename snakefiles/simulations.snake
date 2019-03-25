@@ -2,6 +2,14 @@
 
 import numpy as np
 
+### Simulate Dmel data
+
+rule simulate_dmel:
+    output:
+        "~/jnov/dpr/mmc_genomics/simulations/msprime/test.txt"
+    shell:
+        "echo hello world > {output}"
+
 ### SLiM ###
 # Fraction of sites under selection
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
