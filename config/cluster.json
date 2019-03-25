@@ -1,6 +1,7 @@
 {
 	"__default__":
 	{
+        "partition" : "jnovembre",
 		"time" : "10:00:00",
         "mem": "1G",
 		"ncores": "1",
