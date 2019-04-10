@@ -16,7 +16,7 @@ rule simulate_dmel:
     shell:
         """
         PATH="/home/dpr/miniconda3/envs/multiplemergers/bin:/home/dpr/miniconda3/condabin:"$PATH
-        python src/simulate_dmel_chrom.py {output} 10000000 0.067 {wildcards.rep}
+        python src/simulate_dmel_chrom.py {output} 0.067 {wildcards.rep}
         """
 
 rule simulate_dmel_short:

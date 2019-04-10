@@ -97,18 +97,21 @@ def sites(bl_calc, sample_set, site_positions):
 # Set simulation parameters
 n = 100
 output_fn = argv[1]
-L = int(argv[2])
-r = float(argv[3])
+r = float(argv[2])
 # Optional seed
-if len(argv) == 5:
-    np.random.seed(int(argv[4]))
+if len(argv) == 4:
+    np.random.seed(int(argv[3]))
 
+# Simulate 10 MB in 1 MB segments
+L = int(1e6)
+n_reps = 10
 # Run simulations
 sim = msprime.simulate(model=msprime.StandardCoalescent(),
                        Ne=1/2,
                        recombination_rate=r,
                        length=L,
-                       sample_size=n)
+                       sample_size=n,
+                       num_replicates=n_reps)
 
 # Get positions of 4D sites from Chr2L
 fourD_sites = pd.read_csv('data/dmel-4Dsites.txt.gz', header=None,
@@ -116,12 +119,17 @@ fourD_sites = pd.read_csv('data/dmel-4Dsites.txt.gz', header=None,
 # Starting position of central window
 start = int(1e6) + 1
 positions = np.array(fourD_sites.pos[fourD_sites.chr == '2L'] - start)
-positions = positions[np.logical_and(positions >= 0, positions < L)]
 
-# Compute branch lengths at site positions
-sample_set = list(range(n))
-calculator = tskit.BranchLengthStatCalculator(sim)
-branch_lengths = np.array(sites(calculator, sample_set, positions))
+branch_lengths = []
+for i, rep in enumerate(sim):
+    # Get the sites and normalize them
+    pos = positions[np.logical_and(positions >= i*L, positions < (i+1)*L)]
+    pos -= i*L
+
+    # Compute branch lengths at site positions
+    sample_set = list(range(n))
+    calculator = tskit.BranchLengthStatCalculator(rep)
+    branch_lengths.append(np.array(sites(calculator, sample_set, pos)))
 
 # Save array of branch lengths
-np.savez_compressed(output_fn, branch_lengths=branch_lengths)
+np.savez_compressed(output_fn, *branch_lengths)
