@@ -8,14 +8,25 @@ remote_dir = '/project/jnovembre/dpr/mmc_genomics/simulations/'
 
 rule simulate_dmel_all:
     input:
-        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(10))
+        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(20))
 
 rule simulate_dmel:
     output:
         remote_dir + "msprime/branch_lengths-{rep}.npz"
     shell:
-        "python src/simulate_dmel_chrom.py {output} 1000000 0.067 {wildcards.rep}"
+        """
+        PATH="/home/dpr/miniconda3/envs/multiplemergers/bin:/home/dpr/miniconda3/condabin:"$PATH
+        python src/simulate_dmel_chrom.py {output} 10000000 0.067 {wildcards.rep}
+        """
 
+rule simulate_dmel_short:
+    output:
+        remote_dir + "msprime/branch_lengths-short.npz"
+    shell:
+        """
+        PATH="/home/dpr/miniconda3/envs/multiplemergers/bin:/home/dpr/miniconda3/condabin:"$PATH
+        python src/simulate_dmel_chrom.py {output} 100000 0.067 0
+        """
 ### SLiM ###
 # Fraction of sites under selection
 FSEL = np.insert(np.logspace(-6, -3, 4), 0, 0)
