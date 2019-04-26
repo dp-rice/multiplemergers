@@ -98,20 +98,40 @@ def sites(bl_calc, sample_set, site_positions):
 n = 100
 output_fn = argv[1]
 r = float(argv[2])
+model_str = argv[3]
 # Optional seed
-if len(argv) == 4:
-    np.random.seed(int(argv[3]))
+if len(argv) == 5:
+    np.random.seed(int(argv[4]))
 
 # Simulate 10 MB in 1 MB segments
 L = int(1e6)
 n_reps = 10
+
 # Run simulations
-sim = msprime.simulate(model=msprime.StandardCoalescent(),
-                       Ne=1/2,
-                       recombination_rate=r,
-                       length=L,
-                       sample_size=n,
-                       num_replicates=n_reps)
+if model_str == 'constant':
+    sim = msprime.simulate(model=msprime.StandardCoalescent(),
+                           Ne=1/2,
+                           recombination_rate=r,
+                           length=L,
+                           sample_size=n,
+                           num_replicates=n_reps)
+elif model_str == 'dmel':
+
+    demographic_events = [
+                    msprime.PopulationParametersChange(0,
+                                                       initial_size=1075793),
+                    msprime.PopulationParametersChange(27756,
+                                                       initial_size=462688),
+                    msprime.PopulationParametersChange(398814,
+                                                       initial_size=300000)]
+    t2 = 1407233
+    sim = msprime.simulate(demographic_events=demographic_events,
+                           recombination_rate=r/(2*t2),
+                           length=L,
+                           sample_size=n,
+                           num_replicates=n_reps)
+else:
+    exit(1)
 
 # Get positions of 4D sites from Chr2L
 fourD_sites = pd.read_csv('data/dmel-4Dsites.txt.gz', header=None,

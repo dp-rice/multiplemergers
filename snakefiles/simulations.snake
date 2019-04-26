@@ -8,15 +8,25 @@ remote_dir = '/project/jnovembre/dpr/mmc_genomics/simulations/'
 
 rule simulate_dmel_all:
     input:
-        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(20))
+        expand(remote_dir + "msprime/branch_lengths-{rep}.npz", rep=range(20)),
+        expand(remote_dir + "msprime/branch_lengths_dmel-{rep}.npz", rep=range(20))
 
-rule simulate_dmel:
+rule simulate_dmel_constant:
     output:
         remote_dir + "msprime/branch_lengths-{rep}.npz"
     shell:
         """
         PATH="/home/dpr/miniconda3/envs/multiplemergers/bin:/home/dpr/miniconda3/condabin:"$PATH
-        python src/simulate_dmel_chrom.py {output} 0.067 {wildcards.rep}
+        python src/simulate_dmel_chrom.py {output} 0.067 constant {wildcards.rep}
+        """
+
+rule simulate_dmel_demo:
+    output:
+        remote_dir + "msprime/branch_lengths_dmel-{rep}.npz"
+    shell:
+        """
+        PATH="/home/dpr/miniconda3/envs/multiplemergers/bin:/home/dpr/miniconda3/condabin:"$PATH
+        python src/simulate_dmel_chrom.py {output} 0.067 dmel {wildcards.rep}
         """
 
 rule simulate_dmel_short:
