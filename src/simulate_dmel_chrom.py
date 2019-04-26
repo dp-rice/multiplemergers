@@ -124,9 +124,9 @@ elif model_str == 'dmel':
                                                        initial_size=462688),
                     msprime.PopulationParametersChange(398814,
                                                        initial_size=300000)]
-    t2 = 1407233
+    t2 = 1407233/2
     sim = msprime.simulate(demographic_events=demographic_events,
-                           recombination_rate=r/(2*t2),
+                           recombination_rate=r/t2,
                            length=L,
                            sample_size=n,
                            num_replicates=n_reps)
