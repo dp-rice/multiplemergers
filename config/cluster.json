@@ -22,6 +22,12 @@
 		"mem"  : "4G"
     },
 
+	"simulate_dmel_xibeta":
+    {
+        "time" : "24:00:00",
+		"mem"  : "4G"
+    },
+
     "get_mac":
     {
         "time" : "0:20:00"

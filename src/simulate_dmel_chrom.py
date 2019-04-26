@@ -130,6 +130,13 @@ elif model_str == 'dmel':
                            length=L,
                            sample_size=n,
                            num_replicates=n_reps)
+elif model_str == 'xi-beta':
+    model = msprime.BetaCoalescent(population_size=1/2, alpha=1.5)
+    sim = msprime.simulate(model=model,
+                           recombination_rate=r,
+                           length=L,
+                           sample_size=n,
+                           num_replicates=n_reps)
 else:
     exit(1)
 
