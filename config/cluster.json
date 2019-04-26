@@ -10,7 +10,13 @@
 		"err": "log/{rule}.{wildcards}-%j.err"
 	},
 
-	"simulate_dmel":
+	"simulate_dmel_constant":
+    {
+        "time" : "24:00:00",
+		"mem"  : "4G"
+    },
+
+	"simulate_dmel_demo":
     {
         "time" : "24:00:00",
 		"mem"  : "4G"
