@@ -31,6 +31,10 @@ parser.add_argument("-r", "--recombination_rate", type=float, default=0.0, help=
 parser.add_argument("-G", "--growth_rate", type=float, default=0.0, help="population growth rate DEFAULT=0.0")
 parser.add_argument("-a", "--alpha", type=float, default=2.0, help="Beta-coalescent parameter alpha. DEFAULT=2.0 (Kingman)")
 
+# Xi-Beta coalescent
+parser.add_argument("-b", "--xibeta", type=float, default=None, help="Xi-Beta-coalescent parameter alpha.")
+
+
 # Population size changes
 parser.add_argument("-T", "--time", type=float, nargs='+', help='Time of population-size change', default=[])
 parser.add_argument("-S", "--size", type=float, nargs='+', help='(used with -T) size of population after size change', default=[])
@@ -136,9 +140,10 @@ if args.demes:
     sys.stdout.write('#MIGRATION_TYPE={}\n'.format(args.migration_type))
 
 else:
+    # FIXME: Re-enable lambda coalescent
     population_configurations = [msprime.PopulationConfiguration(sample_size=args.nSamples,
-                                    growth_rate=args.growth_rate,
-                                    multiple_merger_para=args.alpha)]
+                                    growth_rate=args.growth_rate)]#,
+    #                                multiple_merger_para=args.alpha)]
     # Population size changes only
     # FIXME: make sure this is compatable with multiple-mergers
     if args.time:
@@ -186,14 +191,26 @@ for nLoci, Tc in zip(args.nLoci, args.coalescent_time):
             jTAU += tau1[None,:] * tau2[:,None]
 
     else:
-        simulations = msprime.simulate(
-                recombination_rate=args.recombination_rate,
-                demographic_events=demographic_events,
-                population_configurations=population_configurations,
-                migration_matrix=migration_matrix,
-                num_replicates=nLoci,
-                Ne=Tc/2.0,
-                mutation_rate=args.mutation_rate)
+        if args.xibeta is not None:
+            simulations = msprime.simulate(
+                    model=msprime.BetaCoalescent(alpha=args.xibeta),
+                    recombination_rate=args.recombination_rate,
+                    demographic_events=demographic_events,
+                    population_configurations=population_configurations,
+                    migration_matrix=migration_matrix,
+                    num_replicates=nLoci,
+                    Ne=Tc/2.0,
+                    mutation_rate=args.mutation_rate)
+
+        else:
+            simulations = msprime.simulate(
+                    recombination_rate=args.recombination_rate,
+                    demographic_events=demographic_events,
+                    population_configurations=population_configurations,
+                    migration_matrix=migration_matrix,
+                    num_replicates=nLoci,
+                    Ne=Tc/2.0,
+                    mutation_rate=args.mutation_rate)
 
         # CALCULATE AND OUTPUT SFS
         sys.stderr.write('Calculating times...\n')

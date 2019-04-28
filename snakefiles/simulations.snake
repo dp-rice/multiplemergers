@@ -134,6 +134,7 @@ SS = [0.2, 0.1, 0.05, 0.01]
 rule msprime_all:
     input:
         expand("simulations/msprime/jsfs_n-{n}_a-{alpha}_r-{r}.txt", n=SAMPLE_SIZES, alpha=ALPHAS, r=RS[:-3]),
+        expand("simulations/msprime/jsfs_n-{n}_xibeta-{alpha}_r-{r}.txt", n=SAMPLE_SIZES, alpha=ALPHAS, r=RS[:-3]),
         expand("simulations/msprime/jsfs_n-{n}_g-{g}_r-{r}.txt", n=SAMPLE_SIZES, g=GS, r=RS),
         expand("simulations/msprime/jsfs_n-{n}_T-{T}_S-{S}_r-{r}.txt", n=SAMPLE_SIZES, T=TS, S=SS, r=RS)
 
@@ -158,6 +159,19 @@ rule beta_coalescent:
     shell:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "--alpha {wildcards.alpha} -r {wildcards.r} > {output}"
+
+'''
+    Run xi-beta coalescent simulations.
+'''
+rule xibeta_coalescent:
+    output:
+        "simulations/msprime/jsfs_n-{n}_xibeta-{alpha}_r-{r}.txt"
+    wildcard_constraints:
+        r="\d+\.\d*"
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
+        "--xibeta {wildcards.alpha} -r {wildcards.r} > {output}"
+
 
 '''
     Run exponential growth simulations.
