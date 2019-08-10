@@ -172,7 +172,6 @@ rule xibeta_coalescent:
         "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
         "--xibeta {wildcards.alpha} -r {wildcards.r} > {output}"
 
-
 '''
     Run exponential growth simulations.
 '''
@@ -206,3 +205,180 @@ rule fastNeutrino2msprime:
         "--nSamples {wildcards.n} --nLoci 100000 "
         "-r {wildcards.r} "
         "> {output}"
+
+'''
+    Fit demographic model to xibeta coalescent.
+'''
+rule jsfs2fastNeutrino:
+    input:
+        "simulations/msprime/jsfs_n-100_xibeta-{alpha}_r-0.0.txt",
+    output:
+        "fastNeutrino/input/fn_n-100_xibeta-{alpha}_r-0.0.txt"
+    shell:
+        "python src/jsfs2fastNeutrino.py < {input} > {output}"
+
+
+fastNeutrino = "/Users/danielrice/repos/fastNeutrino_v1.0/build/fastNeutrino"
+
+# ruleorder : fit_to_xibeta_fixedtimes > fit_to_xibeta
+
+rule fit_to_xibeta:
+    input:
+        datafile = "fastNeutrino/input/fn_n-100_xibeta-{alpha}_r-0.0.txt",
+        modelfile = "fastNeutrino/models/{model}.txt"
+    output:
+        "fastNeutrino/fitted_params/n-100_xibeta-{alpha}.{model}FixedTimes.txt"
+    shell:
+        "{fastNeutrino} --maxB 10 --maxRandomRestarts 1 "
+        "--modelFile {input.modelfile} "
+        "--inferredModelOutputFile {output} "
+        "< {input.datafile} "
+        "> fastNeutrino/log/xibeta-{wildcards.alpha}.{wildcards.model}.log"
+
+# rule fit_to_xibeta:
+#     input:
+#         datafile = "fastNeutrino/input/fn_n-100_xibeta-{alpha}_r-0.0.txt",
+#         modelfile = "fastNeutrino/models/{model}.txt"
+#     output:
+#         "fastNeutrino/fitted_params/n-100_xibeta-{alpha}.{model}.txt"
+#     shell:
+#         "{fastNeutrino} --maxB 10 --maxRandomRestarts 1000 "
+#         "--modelFile {input.modelfile} "
+#         "--inferredModelOutputFile {output} "
+#         "< {input.datafile} "
+#         "> fastNeutrino/log/xibeta-{wildcards.alpha}.{wildcards.model}.log"
+
+# rule fit_to_xibeta_long:
+#     input:
+#         datafile = "fastNeutrino/input/fn_n-100_xibeta-{alpha}_r-0.0.txt",
+#         modelfile = "fastNeutrino/models/{model}.txt"
+#     output:
+#         "fastNeutrino/fitted_params/n-100_xibeta-{alpha}.{model}.long.txt"
+#     shell:
+#         "{fastNeutrino} --maxB 10 --maxRandomRestarts 10000 "
+#         "--modelFile {input.modelfile} "
+#         "--inferredModelOutputFile {output} "
+#         "< {input.datafile} "
+#         "> fastNeutrino/log/xibeta-{wildcards.alpha}.{wildcards.model}.log"
+
+rule fastNeutrino2msprime_xibeta:
+    output:
+        "simulations/msprime/jsfs_fastNeutrino-xibeta_n-{n}_alpha-{alpha}_{model}_r-{r}.txt"
+    input:
+        "fastNeutrino/fitted_params/n-100_xibeta-{alpha}.{model}.txt"
+    wildcard_constraints:
+        r="\d+\.\d*"
+    shell:
+        "python src/simulate_joint_sfs.py "
+        "$(python src/fastNeutrino2params.py {input}) "
+        "--nSamples {wildcards.n} --nLoci 100000 "
+        "-r {wildcards.r} "
+        "> {output}"
+
+
+
+# MODELS = ['2EpochConst',
+#             '2EpochExp',
+#             '3EpochConstConst',
+#             '3EpochConstExp',
+#             '3EpochExpConst',
+#             '3EpochExpExp',
+#             '4EpochConst',
+#             '5EpochConst']
+
+# rule fastNeutrino2msprime_xibeta_all:
+#     input:
+#         expand("simulations/msprime/jsfs_fastNeutrino-xibeta_n-{n}_alpha-{alpha}_{model}_r-{r}.txt",
+#                n=100, alpha=ALPHAS[:-1],
+#                model=MODELS,
+#                r=0.0)
+#
+
+ALPHA_NEW = [1.975, 1.95, 1.9, 1.85, 1.8, 1.75, 1.625, 1.5]
+R_NEW = [0.0, 0.5, 1.0, 2.5, 5.0]# , 10.0]
+
+rule xibeta_new:
+    input:
+        expand("simulations/msprime/jsfs_n-{n}_xibeta-{alpha}_r-{r}.txt",
+               n=100,
+               alpha=ALPHA_NEW,
+               r=R_NEW)
+
+rule fastNeutrino_new:
+    input:
+        expand("fastNeutrino/fitted_params/n-100_xibeta-{alpha}.{model}.txt",
+               alpha=ALPHA_NEW,
+               model="ConstFixedTimes")
+
+rule fastNeutrino2msprime_xibeta_r:
+    input:
+        expand("simulations/msprime/jsfs_fastNeutrino-xibeta_n-{n}_alpha-{alpha}_{model}_r-{r}.txt",
+               n=100, alpha=ALPHA_NEW,
+               model="ConstFixedTimes",
+               r=R_NEW)
+
+
+
+
+
+
+
+
+
+
+t2_dict = {'1.975':1.9147040163086877,
+            ('1.975','ConstFixedTimes'):0.9857570954110398,
+            '1.95':1.8580860017797316,
+            ('1.95','ConstFixedTimes'):0.8060548337628121,
+            '1.9':1.7936099273119825,
+            ('1.9','ConstFixedTimes'):0.7484995401521894,
+            '1.85':1.7596684029993237,
+            ('1.85','ConstFixedTimes'):0.5916311947466382,
+            '1.8':1.7228157901104733,
+            ('1.8','ConstFixedTimes'):0.7326115473889974,
+            '1.75':1.700555522433559,
+            ('1.75','ConstFixedTimes'):0.7036971458515244,
+            '1.625':1.6624201582014804,
+            ('1.625','ConstFixedTimes'):0.6410797980679432,
+            '1.5':1.6373134579807764,
+            ('1.5','ConstFixedTimes'):6.279944311189792e-05
+}
+
+
+rule xibeta_coalescent_scaled:
+    output:
+        "simulations/msprime/jsfs_n-{n}_xibeta-{alpha}_r-{r}.scaled.txt"
+    wildcard_constraints:
+        r="\d+\.\d*"
+    params:
+        r_scaled=lambda wildcards: str(float(wildcards.r) / t2_dict[wildcards.alpha])
+    shell:
+        "python src/simulate_joint_sfs.py --nSamples {wildcards.n} --nLoci 100000 "
+        "--xibeta {wildcards.alpha} -r {params.r_scaled} "
+        "> {output}"
+
+
+rule fastNeutrino2msprime_scaled:
+    output:
+        "simulations/msprime/jsfs_fastNeutrino-xibeta_n-{n}_alpha-{alpha}_{model}_r-{r}.scaled.txt"
+    input:
+        "fastNeutrino/fitted_params/n-100_xibeta-{alpha}.{model}.txt"
+    params:
+        r_scaled=lambda wildcards: str(float(wildcards.r) / t2_dict[(wildcards.alpha, wildcards.model)])
+    shell:
+        "python src/simulate_joint_sfs.py "
+        "$(python src/fastNeutrino2params.py {input}) "
+        "--nSamples {wildcards.n} --nLoci 100000 "
+        "-r {params.r_scaled} "
+        "> {output}"
+
+rule everything_scaled:
+    input:
+        expand("simulations/msprime/jsfs_fastNeutrino-xibeta_n-{n}_alpha-{alpha}_{model}_r-{r}.scaled.txt",
+               n=100, alpha=ALPHA_NEW,
+               model="ConstFixedTimes",
+               r=R_NEW),
+        expand("simulations/msprime/jsfs_n-{n}_xibeta-{alpha}_r-{r}.scaled.txt",
+               n=100,
+               alpha=ALPHA_NEW,
+               r=R_NEW)

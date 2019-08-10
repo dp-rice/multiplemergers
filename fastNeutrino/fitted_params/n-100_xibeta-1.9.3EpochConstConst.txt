@@ -1,0 +1,4 @@
+# /Users/danielrice/repos/fastNeutrino_v1.0/build/fastNeutrino --maxB 10 --maxRandomRestarts 1000 --modelFile fastNeutrino/models/3EpochConstConst.txt --inferredModelOutputFile fastNeutrino/fitted_params/n-100_xibeta-1.9.3EpochConstConst.txt
+300000
+c	18824.23031	71898
+c	370368.5475	386516

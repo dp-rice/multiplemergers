@@ -1,0 +1,6 @@
+# /Users/danielrice/repos/fastNeutrino_v1.0/build/fastNeutrino --maxB 10 --maxRandomRestarts 1 --modelFile fastNeutrino/models/ConstFixedTimes.txt --inferredModelOutputFile fastNeutrino/fitted_params/n-100_xibeta-1.95.ConstFixedTimes.txt
+1
+c	3.557307056	0.01
+c	3.047486894	0.1
+c	1.568758757	1
+c	4.164622652	10

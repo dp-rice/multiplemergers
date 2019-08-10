@@ -1,0 +1,3 @@
+# /Users/danielrice/repos/fastNeutrino_v1.0/build/fastNeutrino --maxB 10 --maxRandomRestarts 100 --modelFile fastNeutrino/models/2EpochExp.txt --inferredModelOutputFile fastNeutrino/fitted_params/n-100_xibeta-1.25.2EpochExp.txt
+300000
+e	0.1279622084	28.7134	-0.4
